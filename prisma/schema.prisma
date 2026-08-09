@@ -1,0 +1,323 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Transaction {
+  id                  Int                   @id @default(autoincrement())
+  date                DateTime              @default(now())
+  grant_total         Float
+  transaction_type    TransactionType       @default(RETAIL)
+  customerId          Int
+  staffId             Int
+  customer            Customer              @relation(fields: [customerId], references: [id])
+  staff               StaffUser             @relation(fields: [staffId], references: [id])
+
+  transactionItems    TransactionItem[]
+  shipments           Shipment[]
+  returns             Return[]
+  exchanges           Exchange[]
+
+  @@map("transaction")
+
+}
+
+model TransactionItem {
+
+  id                  Int                   @id @default(autoincrement())
+  transactionId       Int
+  productId           Int
+  quantity_sold       Int
+  applied_price       Float
+
+  transaction         Transaction           @relation(fields: [transactionId], references: [id])
+  product             Product               @relation(fields: [productId], references: [id])
+
+  @@map("transaction_item")
+
+}
+
+model Exchange {
+  id                  Int                   @id @default(autoincrement())
+  transactionId       Int
+  date                DateTime              @default(now())
+  price_difference    Float
+  is_within_7_days    Boolean
+
+  transaction         Transaction           @relation(fields: [transactionId], references: [id])
+
+  @@map("exchange")
+}
+
+model Return {
+  id                  Int                   @id @default(autoincrement())
+  transactionId       Int
+  date                DateTime
+  defect_reason       String
+  refund_amount       Float
+  staffId             Int
+
+  transaction         Transaction           @relation(fields: [transactionId], references: [id])
+
+  @@map("return")
+}
+
+model Payment {
+  id                  Int                   @id @default(autoincrement())
+  transactionId       Int
+  date                DateTime              @default(now())
+  amount_paid         Float
+  cashPayment         CashPayment?
+  gCashPayment        GCashPayment?
+  creditPayment       CreditPayment?
+
+  @@map("payment")
+
+}
+
+model CashPayment {
+  paymendId           Int                   @id
+  cash_tendered       Float
+  change_given        Float
+  payment             Payment               @relation(fields: [paymendId], references: [id], onDelete: Cascade)
+
+  @@map("cash_payment")
+}
+
+model GCashPayment {
+  paymentId           Int                   @id
+  reference_number    String
+  gcash_mobile_number String
+  payment             Payment               @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("gcash_payment")
+}
+
+model CreditPayment {
+  paymentId           Int                   @id
+  due_date            DateTime
+  remaining_credit_balance  Int
+  payment             Payment               @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("credit_payment")
+}
+
+model Shipment {
+  id                  Int                   @id @default(autoincrement())
+  transactionId       Int
+  forwarderId         Int
+  dispatch_date       DateTime
+  tracking_status     TrackingStatus        @default(PENDING)
+  transaction         Transaction           @relation(fields: [transactionId], references: [id])
+  forwarder           Forwarder             @relation(fields: [forwarderId], references: [id])
+
+  @@map("shipment")
+}
+
+model Forwarder {
+  id                  Int                   @id @default(autoincrement())
+  company_name        String
+  tracking_contact_info String
+
+  shipments           Shipment[]
+
+  @@map("forwarder")
+  
+}
+
+model StaffUser {
+  id                  Int                   @id @default(autoincrement())
+  first_name          String
+  last_name           String
+  assigned_role       AssignedRole
+  is_active           Boolean               @default(true)
+
+  transactions        Transaction[]
+  stockMovements      StockMovement[]
+  purchaseOrders      PurchaseOrder[]
+  deliveries          Delivery[]
+
+  @@map("staff_user")
+}
+
+model Customer {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  contact_number      String
+  type                CustomerType          @default(RETAIL)
+  wholesale           WholeSaleCustomer?
+  transactions        Transaction[]
+
+  createdAt           DateTime              @default(now())
+
+  @@map("customer")
+
+}
+
+model WholeSaleCustomer {
+  customerId          Int                   @id
+  credit_limit        Float
+  outstanding_balance Float
+  company_name        String
+  customer            Customer              @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("wholesale_profile")
+}
+
+model Product {
+  id                  Int                   @id @default(autoincrement())
+  category            ProductCategory       
+  size_dimensions     String
+  thread_type         String
+  material_grade      String
+  current_quantity    Int
+  reorder_point_ROP   Int
+  unit_price          Float
+  binId               Int
+  bin_location        BinLocation           @relation(fields: [binId], references: [id])
+
+  transactionItems    TransactionItem[]
+  stockMovements      StockMovement[]
+  poItems             POItem[]
+
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  @@map("product")
+
+}
+
+model BinLocation {
+  id                  Int                 @id @default(autoincrement())
+  aisle_number        String
+  shelf_location      String
+  products            Product[]
+
+  @@map("bin_location")
+}
+
+model StockMovement {
+  id                  Int                 @id @default(autoincrement())
+  productId           Int
+  date                DateTime
+  type                MovementType
+  quantity_changed    Int
+  reason              String
+  staffId             Int
+
+  product             Product             @relation(fields: [productId], references: [id])
+  staff               StaffUser           @relation(fields: [staffId], references: [id])
+
+  @@map("stock_movement")
+
+}
+
+model PurchaseOrder {
+  id                Int                 @id @default(autoincrement())
+  supplierId        Int
+  order_date        DateTime            @default(now())
+  po_status         POStatus            @default(PENDING)
+  staffId           Int
+
+  deliveries        Delivery[]
+  poItems           POItem[]
+  staff             StaffUser           @relation(fields: [staffId], references: [id])
+  supplier          Supplier            @relation(fields: [supplierId], references: [id])
+
+  @@map("purchase_order")
+
+}
+
+model POItem {
+  id              Int                 @id @default(autoincrement())
+  poId            Int
+  productId       Int
+  requested_quantity  Int
+
+  purchaseOrder   PurchaseOrder       @relation(fields: [poId], references: [id])
+  product         Product             @relation(fields: [productId], references: [id])
+
+  @@map("po_item")
+}
+
+model Supplier {
+  id              Int                 @id @default(autoincrement())
+  name            String
+  contact_info    String
+  location        String
+  lead_time_days  Int
+
+  purchaseOrders  PurchaseOrder[]
+
+  @@map("supplier")
+  
+}
+
+model Delivery {
+  id              Int                 @id @default(autoincrement())
+  poId            Int
+  delivery_date   DateTime
+  staffid         Int
+
+  purchaseOrder   PurchaseOrder       @relation(fields: [poId], references: [id])
+  staff           StaffUser           @relation(fields: [staffid], references: [id])
+
+  @@map("delivery")
+}
+
+enum ProductCategory {
+  BOLTS
+  NUTS
+  WASHERS
+  // And More
+}
+
+enum TransactionType {
+  RETAIL
+  WHOLESALE
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+}
+
+enum AssignedRole {
+  SECRETARY
+  CASHIER
+  SALES
+  CLERK
+  STOCK_MANAGEMENT
+}
+
+enum PaymentMethod {
+  CASH
+  GCASH
+  CREDIT
+}
+
+enum TrackingStatus {
+  PENDING
+  DISPATCHED
+  DELIVERED
+}
+
+enum MovementType {
+  STOCK_IN
+  STOCK_OUT
+}
+
+enum POStatus {
+  PENDING
+  FULFILLED
+}

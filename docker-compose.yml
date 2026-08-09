@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # --- DATABASE SERVICE ---
+  pos-db:
+    image: postgres:16-alpine
+    container_name: pos-inventory-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pos_secure_pass_dev}
+      POSTGRES_DB: ${DB_NAME:-pos_inventory_dev}
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    volumes:
+      - postgres_pos_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-pos_inventory_dev}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pos-network
+
+  # --- NESTJS BACKEND API ---
+  pos-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pos-inventory-api
+    restart: unless-stopped
+    ports:
+      - '${API_PORT:-3000}:3000'
+    environment:
+      DATABASE_URL: 'postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-pos_secure_pass_dev}@pos-db:5432/${DB_NAME:-pos_inventory_dev}?schema=public'
+      PORT: 3000
+      NODE_ENV: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      pos-db:
+        condition: service_healthy
+    networks:
+      - pos-network
+
+  # --- PRISMA STUDIO (Visual DB Explorer) ---
+  prisma-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pos-prisma-studio
+    restart: unless-stopped
+    command: npx prisma studio --browser none
+    ports:
+      - '${STUDIO_PORT:-5555}:5555'
+    environment:
+      DATABASE_URL: 'postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-pos_secure_pass_dev}@pos-db:5432/${DB_NAME:-pos_inventory_dev}?schema=public'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      pos-db:
+        condition: service_healthy
+    networks:
+      - pos-network
+
+volumes:
+  postgres_pos_data:
+    driver: local
+
+networks:
+  pos-network:
+    driver: bridge
