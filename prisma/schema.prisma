@@ -19,10 +19,18 @@ datasource db {
 
 model Transaction {
   id               Int             @id @default(autoincrement())
+  invoice_number   String?         @unique // Optional generated code (e.g., "INV-2026-0001")
   date             DateTime        @default(now())
-  grand_total      Decimal         @db.Decimal(10, 2)
+  status           TransactionStatus @default(COMPLETED)
   transaction_type TransactionType @default(RETAIL)
 
+  // Financial Breakdown
+  subtotal         Decimal         @db.Decimal(10, 2)
+  tax_total        Decimal         @default(0.00) @db.Decimal(10, 2)
+  discount_total   Decimal         @default(0.00) @db.Decimal(10, 2)
+  grand_total      Decimal         @db.Decimal(10, 2)
+  
+  // Foreign Keys
   customerId       Int?            // Optional for walk-in retail customers
   staffId          Int
 
@@ -35,6 +43,9 @@ model Transaction {
   returns          Return[]
   exchanges        Exchange[]
 
+  @@index([date])
+  @@index([staffId])
+  @@index([customerId])
   @@map("transaction")
 }
 
@@ -42,12 +53,21 @@ model TransactionItem {
   id             Int         @id @default(autoincrement())
   transactionId  Int
   productId      Int
-  quantity_sold  Int
-  applied_price  Decimal     @db.Decimal(10, 2)
 
+  // Use Decimal if selling loose items by weight (e.g., 2.5kg of nails). Keep Int if strictly by piece.
+  quantity_sold  Decimal     @db.Decimal(10, 3)
+  unit_of_measure String     @default("pcs")    // e.g., "pcs", "kg", "box"
+
+  unit_price     Decimal     @db.Decimal(10, 2) // Base price per unit at moment of sale
+  discount       Decimal     @default(0.00) @db.Decimal(10, 2) // Line-item discount amount
+  subtotal       Decimal     @db.Decimal(10, 2) // (quantity_sold * unit_price) - discount
+
+  // Relations
   transaction    Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   product        Product     @relation(fields: [productId], references: [id])
 
+  @@index([transactionId])
+  @@index([productId])
   @@map("transaction_item")
 }
 
@@ -174,7 +194,8 @@ model StaffUser {
   is_active     Boolean      @default(true)
 
   transactions   Transaction[]
-  stockMovements StockMovement[]
+  initiatedMovements StockMovement[] @relation("InitiatedMovements")
+  approvedMovements  StockMovement[] @relation("ApprovedMovements")
   purchaseOrders PurchaseOrder[]
   deliveries     Delivery[]
   returns        Return[]
@@ -221,18 +242,28 @@ model Category {
 
 model Product {
   id               Int       @id @default(autoincrement())
-  name             String    // Descriptive name e.g. "Hex Bolt 1/2 x 2"
+  sku              String?   @unique // Shorthand code e.g. "BLT-m8-30-SS" or bin barcode
+  name             String       // Descriptive Name. e.g. "Hex Bolt M8-1.25 x 30mm"
   categoryId       Int
-  size_dimensions  String
-  thread_type      String
-  material_grade   String
+
+  // Fastener-specific attributes (Nullable for non-threaded items like drill bits/tools)
+  size_dimensions  String?      // e.g. "1/2 x 2" or "M8 x 30mm" 
+  thread_type      String?      // e.g. "Coarse (UNC)", "Fine (UNF)", "M8x1.25"
+  material_grade   String?      // e.g. "Stainless 304", "Grade 8", "Zinc Plated"
+
+  // Inventory & Auditing
   current_quantity Int       @default(0)
   reorder_point_ROP Int      @default(10)
+  needsRecount     Boolean   @default(false) // Set to TRUE during forced stock-out overrides
+
+  // Pricing
   retail_price     Decimal   @db.Decimal(10, 2)
   wholesale_price  Decimal?  @db.Decimal(10, 2)
   
-  binId            Int?      // Optional until assigned to a bin
+  // Storage Location
+  binId            Int?      // Link to BinLocation
   
+  // Relations
   category         Category     @relation(fields: [categoryId], references: [id])
   bin_location     BinLocation? @relation(fields: [binId], references: [id])
 
@@ -245,6 +276,9 @@ model Product {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
+  @@index([categoryId])
+  @@index([name])
+  @@index([binId])
   @@map("product")
 }
 
@@ -261,15 +295,28 @@ model BinLocation {
 model StockMovement {
   id               Int          @id @default(autoincrement())
   productId        Int
+  staffId          Int          // Staff member who initiated/entered the movement
+  approvedById     Int?         // Admin/Manager who authorized an override (if applicable)
+
   date             DateTime     @default(now())
   type             MovementType
-  quantity_changed Int
-  reason           String
-  staffId          Int
+  quantity_changed Int          // Positive for stock in, negative for stock out
 
+  // Stock snapshot at the time of movement
+  previous_quantity Int?        // e.g., 0 (DB level before change)
+  new_quantity     Int?         // e.g., -2 (DB level after change)
+
+  isOverride       Boolean      @default(false) // Flags if this bypassed normal stock limits
+  reason           String       // e.g., "OVERRIDE_OUT_OF_STOCK: Customer bought physical item"
+
+
+  // Relations
   product          Product      @relation(fields: [productId], references: [id])
-  staff            StaffUser    @relation(fields: [staffId], references: [id])
+  staff            StaffUser    @relation("InitiatedMovements", fields: [staffId], references: [id])
+  approvedBy       StaffUser?   @relation("ApprovedMovements", fields: [approvedById], references: [id])
 
+  @@index([productId])
+  @@index([date])
   @@map("stock_movement")
 }
 
@@ -338,6 +385,14 @@ enum TransactionType {
   WHOLESALE
 }
 
+enum TransactionStatus {
+  COMPLETED
+  PENDING
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
 enum CustomerType {
   RETAIL
   WHOLESALE
@@ -364,8 +419,11 @@ enum TrackingStatus {
 }
 
 enum MovementType {
-  STOCK_IN
-  STOCK_OUT
+  IN
+  OUT
+  SALE
+  RETURN
+  ADJUSTMENT
 }
 
 enum POStatus {
