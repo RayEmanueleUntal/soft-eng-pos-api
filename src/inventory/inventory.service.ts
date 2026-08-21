@@ -31,40 +31,50 @@ export class InventoryService {
 
   // Adjust Inventory
   async adjustInventory(userId: number, adjustDto: AdjustInventoryDto) {
-    const product = await this.prisma.product.findUnique({
-      where: { id: adjustDto.productId },
-    });
+    return await this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: adjustDto.productId },
+      });
 
-    // Check if product exists
-    if (!product) {
-      throw new NotFoundException(`Product not found`);
-    }
+      if (!product) {
+        throw new NotFoundException(`Product not found`);
+      }
 
-    // Check if product base uom matches the adjusted inventory uom
-    if (product.base_uom !== adjustDto.current_uom) {
-      throw new UOMMismatchException(product.name, product.base_uom);
-    }
+      // Validate UOM
+      if (product.base_uom !== adjustDto.current_uom) {
+        throw new UOMMismatchException(product.name, product.base_uom);
+      }
 
-    await this.prisma.$transaction([
-      this.prisma.stockMovement.create({
+      const previousQty = new Decimal(product.current_quantity);
+      const newQty = new Decimal(adjustDto.new_count);
+      const qtyChanged = newQty.minus(previousQty);
+
+      // Create audit record
+      const movement = await tx.stockMovement.create({
         data: {
-          productId: adjustDto.productId,
+          productId: product.id,
           staffId: userId,
-          date: adjustDto.date,
+          date: adjustDto.date ?? new Date(),
           type: MovementType.ADJUSTMENT,
           current_uom: product.base_uom,
-          quantity_changed: new Decimal(adjustDto.new_count).minus(
-            product.current_quantity,
-          ),
-          previous_quantity: product.current_quantity,
-          new_quantity: adjustDto.new_count,
+          quantity_changed: qtyChanged,
+          previous_quantity: previousQty,
+          new_quantity: newQty,
           reason: adjustDto.reason,
         },
-      }),
-      this.prisma.product.update({
-        where: { id: product.id },
-        data: { current_quantity: adjustDto.new_count },
-      }),
-    ]);
+      });
+
+      await tx.product.update({
+        where: {
+          id: product.id,
+        },
+        data: {
+          current_quantity: newQty,
+          needsRecount: false,
+        },
+      });
+
+      return movement;
+    });
   }
 }

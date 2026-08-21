@@ -419,6 +419,7 @@ enum CustomerType {
 }
 
 enum AssignedRole {
+  ADMIN
   MANAGER
   SECRETARY
   CASHIER

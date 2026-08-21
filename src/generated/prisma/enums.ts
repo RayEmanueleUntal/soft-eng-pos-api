@@ -37,6 +37,7 @@ export type CustomerType = (typeof CustomerType)[keyof typeof CustomerType]
 
 
 export const AssignedRole = {
+  ADMIN: 'ADMIN',
   MANAGER: 'MANAGER',
   SECRETARY: 'SECRETARY',
   CASHIER: 'CASHIER',
