@@ -7,6 +7,7 @@ import { Decimal } from '@prisma/client/runtime/client';
 import { StockInDto } from './dto/stock-in.dto';
 import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace';
 import { Product } from 'src/generated/prisma/client';
+import { OutOfStockException } from 'src/common/exceptions/out-of-stock.exception';
 
 @Injectable()
 export class InventoryService {
@@ -52,6 +53,7 @@ export class InventoryService {
         userId,
         productId,
       });
+
       throw new NotFoundException('Product not found');
     }
 
@@ -129,11 +131,10 @@ export class InventoryService {
 
   // Stock-In
   async stockin(userId: number, stockInDto: StockInDto) {
-    (this.logger.log('Initiating inventory stock-in transaction'),
-      {
-        userId,
-        productId: stockInDto.productId,
-      });
+    this.logger.log('Initiating inventory stock-in transaction', {
+      userId,
+      productId: stockInDto.productId,
+    });
 
     return await this.prisma.$transaction(async (tx) => {
       const product = await this.validateAndGetProduct(
@@ -181,11 +182,10 @@ export class InventoryService {
 
   // Stock-Out
   async stockOut(userId: number, stockOutDto: StockOutDto) {
-    (this.logger.log('Initiating inventory stock-out transaction'),
-      {
-        userId,
-        productId: stockOutDto.productId,
-      });
+    this.logger.log('Initiating inventory stock-out transaction', {
+      userId,
+      productId: stockOutDto.productId,
+    });
 
     return await this.prisma.$transaction(async (tx) => {
       const product = await this.validateAndGetProduct(
@@ -200,7 +200,24 @@ export class InventoryService {
       const takenQty = new Decimal(stockOutDto.added_qty);
       const newQty = prevQty.minus(takenQty);
 
-      // ADD LOGIC TO HANDLE NEGATIVE STOCK
+      // Check if stock is invalid (negative)
+      if (newQty.isNegative()) {
+        this.logger.warn(`Stock-Out failed: Insufficient Stock`, {
+          userId,
+          productId: product.id,
+          prevQty: prevQty.toString(),
+          takenQty: takenQty.toString(),
+          newQty: newQty.toString(),
+        });
+
+        // Set product need recount status to true
+        await tx.product.update({
+          where: { id: product.id },
+          data: { needsRecount: true },
+        });
+
+        throw new OutOfStockException(product.id, product.name);
+      }
 
       const movement = await tx.stockMovement.create({
         data: {
