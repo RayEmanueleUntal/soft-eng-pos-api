@@ -75,7 +75,7 @@ model Exchange {
   id               Int         @id @default(autoincrement())
   transactionId    Int
   productId        Int         // Product being exchanged
-  quantity         Int         @default(1)
+  quantity         Decimal     @default(1.000) @db.Decimal(10, 3)
   date             DateTime    @default(now())
   price_difference Decimal     @db.Decimal(10, 2)
   is_within_7_days Boolean     @default(true)
@@ -90,7 +90,7 @@ model Return {
   id             Int         @id @default(autoincrement())
   transactionId  Int
   productId      Int         // Product being returned
-  quantity       Int         @default(1)
+  quantity       Decimal     @default(1.000) @db.Decimal(10, 3)
   date           DateTime    @default(now())
   defect_reason  String
   refund_amount  Decimal     @db.Decimal(10, 2)
@@ -251,12 +251,16 @@ model Product {
   thread_type      String?      // e.g. "Coarse (UNC)", "Fine (UNF)", "M8x1.25"
   material_grade   String?      // e.g. "Stainless 304", "Grade 8", "Zinc Plated"
 
-  // Inventory & Auditing
-  current_quantity Int       @default(0)
-  reorder_point_ROP Int      @default(10)
+  // Inventory Tracking (Always in Base Units)
+  base_uom         String    @default("pcs")  // "pcs", "kg", "meter"
+  current_quantity Decimal   @default(0.00) @db.Decimal(10,3)
+  reorder_point_ROP Decimal  @default(0.00) @db.Decimal(10,3)
   needsRecount     Boolean   @default(false) // Set to TRUE during forced stock-out overrides
 
-  // Pricing
+  // Multi-UoM Pricing & Unit Conversion
+  pricing_uom      String    @default("pcs")  // "pcs", "kg", "hundred", "gross", "sack"
+  pricing_unit_qty Decimal   @default(1.000)  @db.Decimal(10, 3)  // e.g., 100 for "Per Hundred", 144 for "Gross"
+  cost_price       Decimal   @default(0.00)   @db.Decimal(10, 2)  // Purchasing cost
   retail_price     Decimal   @db.Decimal(10, 2)
   wholesale_price  Decimal?  @db.Decimal(10, 2)
   
@@ -270,6 +274,7 @@ model Product {
   transactionItems TransactionItem[]
   stockMovements   StockMovement[]
   poItems          POItem[]
+  deliveryItems    DeliveryItem[]
   returns          Return[]
   exchanges        Exchange[]
 
@@ -289,6 +294,7 @@ model BinLocation {
 
   products       Product[]
 
+  @@unique([aisle_number, shelf_location])
   @@map("bin_location")
 }
 
@@ -300,11 +306,11 @@ model StockMovement {
 
   date             DateTime     @default(now())
   type             MovementType
-  quantity_changed Int          // Positive for stock in, negative for stock out
 
-  // Stock snapshot at the time of movement
-  previous_quantity Int?        // e.g., 0 (DB level before change)
-  new_quantity     Int?         // e.g., -2 (DB level after change)
+  current_uom      String       @default("pcs")
+  quantity_changed Decimal      @db.Decimal(10, 3)  // Positive for stock in, negative for stock out
+  previous_quantity Decimal     @db.Decimal(10, 3)  // e.g., 0 (DB level before change)
+  new_quantity     Decimal      @db.Decimal(10, 3)  // e.g., -2 (DB level after change)
 
   isOverride       Boolean      @default(false) // Flags if this bypassed normal stock limits
   reason           String       // e.g., "OVERRIDE_OUT_OF_STOCK: Customer bought physical item"
@@ -344,7 +350,8 @@ model POItem {
   id                 Int           @id @default(autoincrement())
   poId               Int
   productId          Int
-  requested_quantity Int
+  requested_quantity Decimal       @db.Decimal(10, 3)
+  unit_cost          Decimal       @db.Decimal(10, 2)  // Price quoted by supplier
 
   purchaseOrder      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
   product            Product       @relation(fields: [productId], references: [id])
@@ -372,8 +379,21 @@ model Delivery {
 
   purchaseOrder PurchaseOrder @relation(fields: [poId], references: [id])
   staff         StaffUser     @relation(fields: [staffId], references: [id])
+  deliveryItems DeliveryItem[]
 
   @@map("delivery")
+}
+
+model DeliveryItem {
+  id            Int           @id @default(autoincrement())
+  deliveryId    Int
+  productId     Int
+  received_quantity Decimal   @db.Decimal(10, 3)
+
+  delivery      Delivery      @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id])
+  
+  @@map("delivery_item")
 }
 
 // ==========================================

@@ -212,13 +212,14 @@ export type BinLocationOrderByWithRelationInput = {
 
 export type BinLocationWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  aisle_number_shelf_location?: Prisma.BinLocationAisle_numberShelf_locationCompoundUniqueInput
   AND?: Prisma.BinLocationWhereInput | Prisma.BinLocationWhereInput[]
   OR?: Prisma.BinLocationWhereInput[]
   NOT?: Prisma.BinLocationWhereInput | Prisma.BinLocationWhereInput[]
   aisle_number?: Prisma.StringFilter<"BinLocation"> | string
   shelf_location?: Prisma.StringFilter<"BinLocation"> | string
   products?: Prisma.ProductListRelationFilter
-}, "id">
+}, "id" | "aisle_number_shelf_location">
 
 export type BinLocationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -286,6 +287,11 @@ export type BinLocationUncheckedUpdateManyInput = {
 export type BinLocationNullableScalarRelationFilter = {
   is?: Prisma.BinLocationWhereInput | null
   isNot?: Prisma.BinLocationWhereInput | null
+}
+
+export type BinLocationAisle_numberShelf_locationCompoundUniqueInput = {
+  aisle_number: string
+  shelf_location: string
 }
 
 export type BinLocationCountOrderByAggregateInput = {

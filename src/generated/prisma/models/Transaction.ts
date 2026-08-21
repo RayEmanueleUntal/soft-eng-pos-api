@@ -28,6 +28,9 @@ export type AggregateTransaction = {
 
 export type TransactionAvgAggregateOutputType = {
   id: number | null
+  subtotal: runtime.Decimal | null
+  tax_total: runtime.Decimal | null
+  discount_total: runtime.Decimal | null
   grand_total: runtime.Decimal | null
   customerId: number | null
   staffId: number | null
@@ -35,6 +38,9 @@ export type TransactionAvgAggregateOutputType = {
 
 export type TransactionSumAggregateOutputType = {
   id: number | null
+  subtotal: runtime.Decimal | null
+  tax_total: runtime.Decimal | null
+  discount_total: runtime.Decimal | null
   grand_total: runtime.Decimal | null
   customerId: number | null
   staffId: number | null
@@ -42,27 +48,42 @@ export type TransactionSumAggregateOutputType = {
 
 export type TransactionMinAggregateOutputType = {
   id: number | null
+  invoice_number: string | null
   date: Date | null
-  grand_total: runtime.Decimal | null
+  status: $Enums.TransactionStatus | null
   transaction_type: $Enums.TransactionType | null
+  subtotal: runtime.Decimal | null
+  tax_total: runtime.Decimal | null
+  discount_total: runtime.Decimal | null
+  grand_total: runtime.Decimal | null
   customerId: number | null
   staffId: number | null
 }
 
 export type TransactionMaxAggregateOutputType = {
   id: number | null
+  invoice_number: string | null
   date: Date | null
-  grand_total: runtime.Decimal | null
+  status: $Enums.TransactionStatus | null
   transaction_type: $Enums.TransactionType | null
+  subtotal: runtime.Decimal | null
+  tax_total: runtime.Decimal | null
+  discount_total: runtime.Decimal | null
+  grand_total: runtime.Decimal | null
   customerId: number | null
   staffId: number | null
 }
 
 export type TransactionCountAggregateOutputType = {
   id: number
+  invoice_number: number
   date: number
-  grand_total: number
+  status: number
   transaction_type: number
+  subtotal: number
+  tax_total: number
+  discount_total: number
+  grand_total: number
   customerId: number
   staffId: number
   _all: number
@@ -71,6 +92,9 @@ export type TransactionCountAggregateOutputType = {
 
 export type TransactionAvgAggregateInputType = {
   id?: true
+  subtotal?: true
+  tax_total?: true
+  discount_total?: true
   grand_total?: true
   customerId?: true
   staffId?: true
@@ -78,6 +102,9 @@ export type TransactionAvgAggregateInputType = {
 
 export type TransactionSumAggregateInputType = {
   id?: true
+  subtotal?: true
+  tax_total?: true
+  discount_total?: true
   grand_total?: true
   customerId?: true
   staffId?: true
@@ -85,27 +112,42 @@ export type TransactionSumAggregateInputType = {
 
 export type TransactionMinAggregateInputType = {
   id?: true
+  invoice_number?: true
   date?: true
-  grand_total?: true
+  status?: true
   transaction_type?: true
+  subtotal?: true
+  tax_total?: true
+  discount_total?: true
+  grand_total?: true
   customerId?: true
   staffId?: true
 }
 
 export type TransactionMaxAggregateInputType = {
   id?: true
+  invoice_number?: true
   date?: true
-  grand_total?: true
+  status?: true
   transaction_type?: true
+  subtotal?: true
+  tax_total?: true
+  discount_total?: true
+  grand_total?: true
   customerId?: true
   staffId?: true
 }
 
 export type TransactionCountAggregateInputType = {
   id?: true
+  invoice_number?: true
   date?: true
-  grand_total?: true
+  status?: true
   transaction_type?: true
+  subtotal?: true
+  tax_total?: true
+  discount_total?: true
+  grand_total?: true
   customerId?: true
   staffId?: true
   _all?: true
@@ -199,9 +241,14 @@ export type TransactionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type TransactionGroupByOutputType = {
   id: number
+  invoice_number: string | null
   date: Date
-  grand_total: runtime.Decimal
+  status: $Enums.TransactionStatus
   transaction_type: $Enums.TransactionType
+  subtotal: runtime.Decimal
+  tax_total: runtime.Decimal
+  discount_total: runtime.Decimal
+  grand_total: runtime.Decimal
   customerId: number | null
   staffId: number
   _count: TransactionCountAggregateOutputType | null
@@ -231,9 +278,14 @@ export type TransactionWhereInput = {
   OR?: Prisma.TransactionWhereInput[]
   NOT?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
   id?: Prisma.IntFilter<"Transaction"> | number
+  invoice_number?: Prisma.StringNullableFilter<"Transaction"> | string | null
   date?: Prisma.DateTimeFilter<"Transaction"> | Date | string
-  grand_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFilter<"Transaction"> | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.IntNullableFilter<"Transaction"> | number | null
   staffId?: Prisma.IntFilter<"Transaction"> | number
   customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
@@ -247,9 +299,14 @@ export type TransactionWhereInput = {
 
 export type TransactionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  invoice_number?: Prisma.SortOrderInput | Prisma.SortOrder
   date?: Prisma.SortOrder
-  grand_total?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   transaction_type?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
+  grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrderInput | Prisma.SortOrder
   staffId?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
@@ -263,12 +320,17 @@ export type TransactionOrderByWithRelationInput = {
 
 export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  invoice_number?: string
   AND?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
   OR?: Prisma.TransactionWhereInput[]
   NOT?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
   date?: Prisma.DateTimeFilter<"Transaction"> | Date | string
-  grand_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFilter<"Transaction"> | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.IntNullableFilter<"Transaction"> | number | null
   staffId?: Prisma.IntFilter<"Transaction"> | number
   customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
@@ -278,13 +340,18 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   shipments?: Prisma.ShipmentListRelationFilter
   returns?: Prisma.ReturnListRelationFilter
   exchanges?: Prisma.ExchangeListRelationFilter
-}, "id">
+}, "id" | "invoice_number">
 
 export type TransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  invoice_number?: Prisma.SortOrderInput | Prisma.SortOrder
   date?: Prisma.SortOrder
-  grand_total?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   transaction_type?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
+  grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrderInput | Prisma.SortOrder
   staffId?: Prisma.SortOrder
   _count?: Prisma.TransactionCountOrderByAggregateInput
@@ -299,17 +366,27 @@ export type TransactionScalarWhereWithAggregatesInput = {
   OR?: Prisma.TransactionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TransactionScalarWhereWithAggregatesInput | Prisma.TransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Transaction"> | number
+  invoice_number?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   date?: Prisma.DateTimeWithAggregatesFilter<"Transaction"> | Date | string
-  grand_total?: Prisma.DecimalWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusWithAggregatesFilter<"Transaction"> | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeWithAggregatesFilter<"Transaction"> | $Enums.TransactionType
+  subtotal?: Prisma.DecimalWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.IntNullableWithAggregatesFilter<"Transaction"> | number | null
   staffId?: Prisma.IntWithAggregatesFilter<"Transaction"> | number
 }
 
 export type TransactionCreateInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
@@ -321,9 +398,14 @@ export type TransactionCreateInput = {
 
 export type TransactionUncheckedCreateInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -334,9 +416,14 @@ export type TransactionUncheckedCreateInput = {
 }
 
 export type TransactionUpdateInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
@@ -348,9 +435,14 @@ export type TransactionUpdateInput = {
 
 export type TransactionUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -362,39 +454,62 @@ export type TransactionUncheckedUpdateInput = {
 
 export type TransactionCreateManyInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
 }
 
 export type TransactionUpdateManyMutationInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TransactionUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type TransactionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  invoice_number?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  grand_total?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   transaction_type?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
+  grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
 }
 
 export type TransactionAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
   grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -402,24 +517,37 @@ export type TransactionAvgOrderByAggregateInput = {
 
 export type TransactionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  invoice_number?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  grand_total?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   transaction_type?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
+  grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
 }
 
 export type TransactionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  invoice_number?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  grand_total?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   transaction_type?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
+  grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
 }
 
 export type TransactionSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  tax_total?: Prisma.SortOrder
+  discount_total?: Prisma.SortOrder
   grand_total?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -440,8 +568,20 @@ export type TransactionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type EnumTransactionStatusFieldUpdateOperationsInput = {
+  set?: $Enums.TransactionStatus
+}
+
+export type EnumTransactionTypeFieldUpdateOperationsInput = {
+  set?: $Enums.TransactionType
 }
 
 export type DecimalFieldUpdateOperationsInput = {
@@ -450,10 +590,6 @@ export type DecimalFieldUpdateOperationsInput = {
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type EnumTransactionTypeFieldUpdateOperationsInput = {
-  set?: $Enums.TransactionType
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -627,9 +763,14 @@ export type TransactionUncheckedUpdateManyWithoutCustomerNestedInput = {
 }
 
 export type TransactionCreateWithoutTransactionItemsInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   payments?: Prisma.PaymentCreateNestedManyWithoutTransactionInput
@@ -640,9 +781,14 @@ export type TransactionCreateWithoutTransactionItemsInput = {
 
 export type TransactionUncheckedCreateWithoutTransactionItemsInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTransactionInput
@@ -668,9 +814,14 @@ export type TransactionUpdateToOneWithWhereWithoutTransactionItemsInput = {
 }
 
 export type TransactionUpdateWithoutTransactionItemsInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutTransactionNestedInput
@@ -681,9 +832,14 @@ export type TransactionUpdateWithoutTransactionItemsInput = {
 
 export type TransactionUncheckedUpdateWithoutTransactionItemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTransactionNestedInput
@@ -693,9 +849,14 @@ export type TransactionUncheckedUpdateWithoutTransactionItemsInput = {
 }
 
 export type TransactionCreateWithoutExchangesInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
@@ -706,9 +867,14 @@ export type TransactionCreateWithoutExchangesInput = {
 
 export type TransactionUncheckedCreateWithoutExchangesInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -734,9 +900,14 @@ export type TransactionUpdateToOneWithWhereWithoutExchangesInput = {
 }
 
 export type TransactionUpdateWithoutExchangesInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
@@ -747,9 +918,14 @@ export type TransactionUpdateWithoutExchangesInput = {
 
 export type TransactionUncheckedUpdateWithoutExchangesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -759,9 +935,14 @@ export type TransactionUncheckedUpdateWithoutExchangesInput = {
 }
 
 export type TransactionCreateWithoutReturnsInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
@@ -772,9 +953,14 @@ export type TransactionCreateWithoutReturnsInput = {
 
 export type TransactionUncheckedCreateWithoutReturnsInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -800,9 +986,14 @@ export type TransactionUpdateToOneWithWhereWithoutReturnsInput = {
 }
 
 export type TransactionUpdateWithoutReturnsInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
@@ -813,9 +1004,14 @@ export type TransactionUpdateWithoutReturnsInput = {
 
 export type TransactionUncheckedUpdateWithoutReturnsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -825,9 +1021,14 @@ export type TransactionUncheckedUpdateWithoutReturnsInput = {
 }
 
 export type TransactionCreateWithoutPaymentsInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
@@ -838,9 +1039,14 @@ export type TransactionCreateWithoutPaymentsInput = {
 
 export type TransactionUncheckedCreateWithoutPaymentsInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -866,9 +1072,14 @@ export type TransactionUpdateToOneWithWhereWithoutPaymentsInput = {
 }
 
 export type TransactionUpdateWithoutPaymentsInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
@@ -879,9 +1090,14 @@ export type TransactionUpdateWithoutPaymentsInput = {
 
 export type TransactionUncheckedUpdateWithoutPaymentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -891,9 +1107,14 @@ export type TransactionUncheckedUpdateWithoutPaymentsInput = {
 }
 
 export type TransactionCreateWithoutShipmentsInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
@@ -904,9 +1125,14 @@ export type TransactionCreateWithoutShipmentsInput = {
 
 export type TransactionUncheckedCreateWithoutShipmentsInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   staffId: number
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -932,9 +1158,14 @@ export type TransactionUpdateToOneWithWhereWithoutShipmentsInput = {
 }
 
 export type TransactionUpdateWithoutShipmentsInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
@@ -945,9 +1176,14 @@ export type TransactionUpdateWithoutShipmentsInput = {
 
 export type TransactionUncheckedUpdateWithoutShipmentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -957,9 +1193,14 @@ export type TransactionUncheckedUpdateWithoutShipmentsInput = {
 }
 
 export type TransactionCreateWithoutStaffInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
   payments?: Prisma.PaymentCreateNestedManyWithoutTransactionInput
@@ -970,9 +1211,14 @@ export type TransactionCreateWithoutStaffInput = {
 
 export type TransactionUncheckedCreateWithoutStaffInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTransactionInput
@@ -1012,17 +1258,27 @@ export type TransactionScalarWhereInput = {
   OR?: Prisma.TransactionScalarWhereInput[]
   NOT?: Prisma.TransactionScalarWhereInput | Prisma.TransactionScalarWhereInput[]
   id?: Prisma.IntFilter<"Transaction"> | number
+  invoice_number?: Prisma.StringNullableFilter<"Transaction"> | string | null
   date?: Prisma.DateTimeFilter<"Transaction"> | Date | string
-  grand_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFilter<"Transaction"> | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.IntNullableFilter<"Transaction"> | number | null
   staffId?: Prisma.IntFilter<"Transaction"> | number
 }
 
 export type TransactionCreateWithoutCustomerInput = {
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   staff: Prisma.StaffUserCreateNestedOneWithoutTransactionsInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutTransactionInput
   payments?: Prisma.PaymentCreateNestedManyWithoutTransactionInput
@@ -1033,9 +1289,14 @@ export type TransactionCreateWithoutCustomerInput = {
 
 export type TransactionUncheckedCreateWithoutCustomerInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutTransactionInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTransactionInput
@@ -1072,16 +1333,26 @@ export type TransactionUpdateManyWithWhereWithoutCustomerInput = {
 
 export type TransactionCreateManyStaffInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: number | null
 }
 
 export type TransactionUpdateWithoutStaffInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customer?: Prisma.CustomerUpdateOneWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutTransactionNestedInput
@@ -1092,9 +1363,14 @@ export type TransactionUpdateWithoutStaffInput = {
 
 export type TransactionUncheckedUpdateWithoutStaffInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1105,24 +1381,39 @@ export type TransactionUncheckedUpdateWithoutStaffInput = {
 
 export type TransactionUncheckedUpdateManyWithoutStaffInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TransactionCreateManyCustomerInput = {
   id?: number
+  invoice_number?: string | null
   date?: Date | string
-  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.TransactionStatus
   transaction_type?: $Enums.TransactionType
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
 }
 
 export type TransactionUpdateWithoutCustomerInput = {
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutTransactionsNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutTransactionNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutTransactionNestedInput
@@ -1133,9 +1424,14 @@ export type TransactionUpdateWithoutCustomerInput = {
 
 export type TransactionUncheckedUpdateWithoutCustomerInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1146,9 +1442,14 @@ export type TransactionUncheckedUpdateWithoutCustomerInput = {
 
 export type TransactionUncheckedUpdateManyWithoutCustomerInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   transaction_type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tax_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -1221,9 +1522,14 @@ export type TransactionCountOutputTypeCountExchangesArgs<ExtArgs extends runtime
 
 export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  invoice_number?: boolean
   date?: boolean
-  grand_total?: boolean
+  status?: boolean
   transaction_type?: boolean
+  subtotal?: boolean
+  tax_total?: boolean
+  discount_total?: boolean
+  grand_total?: boolean
   customerId?: boolean
   staffId?: boolean
   customer?: boolean | Prisma.Transaction$customerArgs<ExtArgs>
@@ -1238,9 +1544,14 @@ export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  invoice_number?: boolean
   date?: boolean
-  grand_total?: boolean
+  status?: boolean
   transaction_type?: boolean
+  subtotal?: boolean
+  tax_total?: boolean
+  discount_total?: boolean
+  grand_total?: boolean
   customerId?: boolean
   staffId?: boolean
   customer?: boolean | Prisma.Transaction$customerArgs<ExtArgs>
@@ -1249,9 +1560,14 @@ export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 
 export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  invoice_number?: boolean
   date?: boolean
-  grand_total?: boolean
+  status?: boolean
   transaction_type?: boolean
+  subtotal?: boolean
+  tax_total?: boolean
+  discount_total?: boolean
+  grand_total?: boolean
   customerId?: boolean
   staffId?: boolean
   customer?: boolean | Prisma.Transaction$customerArgs<ExtArgs>
@@ -1260,14 +1576,19 @@ export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 
 export type TransactionSelectScalar = {
   id?: boolean
+  invoice_number?: boolean
   date?: boolean
-  grand_total?: boolean
+  status?: boolean
   transaction_type?: boolean
+  subtotal?: boolean
+  tax_total?: boolean
+  discount_total?: boolean
+  grand_total?: boolean
   customerId?: boolean
   staffId?: boolean
 }
 
-export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "grand_total" | "transaction_type" | "customerId" | "staffId", ExtArgs["result"]["transaction"]>
+export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoice_number" | "date" | "status" | "transaction_type" | "subtotal" | "tax_total" | "discount_total" | "grand_total" | "customerId" | "staffId", ExtArgs["result"]["transaction"]>
 export type TransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.Transaction$customerArgs<ExtArgs>
   staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
@@ -1300,9 +1621,14 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    invoice_number: string | null
     date: Date
-    grand_total: runtime.Decimal
+    status: $Enums.TransactionStatus
     transaction_type: $Enums.TransactionType
+    subtotal: runtime.Decimal
+    tax_total: runtime.Decimal
+    discount_total: runtime.Decimal
+    grand_total: runtime.Decimal
     customerId: number | null
     staffId: number
   }, ExtArgs["result"]["transaction"]>
@@ -1736,9 +2062,14 @@ export interface Prisma__TransactionClient<T, Null = never, ExtArgs extends runt
  */
 export interface TransactionFieldRefs {
   readonly id: Prisma.FieldRef<"Transaction", 'Int'>
+  readonly invoice_number: Prisma.FieldRef<"Transaction", 'String'>
   readonly date: Prisma.FieldRef<"Transaction", 'DateTime'>
-  readonly grand_total: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly status: Prisma.FieldRef<"Transaction", 'TransactionStatus'>
   readonly transaction_type: Prisma.FieldRef<"Transaction", 'TransactionType'>
+  readonly subtotal: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly tax_total: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly discount_total: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly grand_total: Prisma.FieldRef<"Transaction", 'Decimal'>
   readonly customerId: Prisma.FieldRef<"Transaction", 'Int'>
   readonly staffId: Prisma.FieldRef<"Transaction", 'Int'>
 }

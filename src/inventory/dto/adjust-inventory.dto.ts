@@ -17,8 +17,12 @@ export class AdjustInventoryDto {
   date?: string;
 
   @IsNotEmpty()
+  @IsString()
+  current_uom!: string;
+
+  @IsNotEmpty()
   @IsPositive()
-  quantity_changed!: number;
+  new_count!: number;
 
   @IsNotEmpty()
   @IsString()

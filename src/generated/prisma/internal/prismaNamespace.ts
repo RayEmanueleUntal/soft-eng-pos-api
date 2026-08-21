@@ -417,7 +417,8 @@ export const ModelName = {
   PurchaseOrder: 'PurchaseOrder',
   POItem: 'POItem',
   Supplier: 'Supplier',
-  Delivery: 'Delivery'
+  Delivery: 'Delivery',
+  DeliveryItem: 'DeliveryItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -433,7 +434,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "transaction" | "transactionItem" | "exchange" | "return" | "payment" | "cashPayment" | "gCashPayment" | "creditPayment" | "shipment" | "forwarder" | "staffUser" | "customer" | "wholeSaleCustomer" | "category" | "product" | "binLocation" | "stockMovement" | "purchaseOrder" | "pOItem" | "supplier" | "delivery"
+    modelProps: "transaction" | "transactionItem" | "exchange" | "return" | "payment" | "cashPayment" | "gCashPayment" | "creditPayment" | "shipment" | "forwarder" | "staffUser" | "customer" | "wholeSaleCustomer" | "category" | "product" | "binLocation" | "stockMovement" | "purchaseOrder" | "pOItem" | "supplier" | "delivery" | "deliveryItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1991,6 +1992,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DeliveryItem: {
+      payload: Prisma.$DeliveryItemPayload<ExtArgs>
+      fields: Prisma.DeliveryItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>
+        }
+        update: {
+          args: Prisma.DeliveryItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryItemPayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryItem>
+        }
+        groupBy: {
+          args: Prisma.DeliveryItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2032,9 +2107,14 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const TransactionScalarFieldEnum = {
   id: 'id',
+  invoice_number: 'invoice_number',
   date: 'date',
-  grand_total: 'grand_total',
+  status: 'status',
   transaction_type: 'transaction_type',
+  subtotal: 'subtotal',
+  tax_total: 'tax_total',
+  discount_total: 'discount_total',
+  grand_total: 'grand_total',
   customerId: 'customerId',
   staffId: 'staffId'
 } as const
@@ -2047,7 +2127,10 @@ export const TransactionItemScalarFieldEnum = {
   transactionId: 'transactionId',
   productId: 'productId',
   quantity_sold: 'quantity_sold',
-  applied_price: 'applied_price'
+  unit_of_measure: 'unit_of_measure',
+  unit_price: 'unit_price',
+  discount: 'discount',
+  subtotal: 'subtotal'
 } as const
 
 export type TransactionItemScalarFieldEnum = (typeof TransactionItemScalarFieldEnum)[keyof typeof TransactionItemScalarFieldEnum]
@@ -2182,13 +2265,19 @@ export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typ
 
 export const ProductScalarFieldEnum = {
   id: 'id',
+  sku: 'sku',
   name: 'name',
   categoryId: 'categoryId',
   size_dimensions: 'size_dimensions',
   thread_type: 'thread_type',
   material_grade: 'material_grade',
+  base_uom: 'base_uom',
   current_quantity: 'current_quantity',
   reorder_point_ROP: 'reorder_point_ROP',
+  needsRecount: 'needsRecount',
+  pricing_uom: 'pricing_uom',
+  pricing_unit_qty: 'pricing_unit_qty',
+  cost_price: 'cost_price',
   retail_price: 'retail_price',
   wholesale_price: 'wholesale_price',
   binId: 'binId',
@@ -2211,11 +2300,16 @@ export type BinLocationScalarFieldEnum = (typeof BinLocationScalarFieldEnum)[key
 export const StockMovementScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
+  staffId: 'staffId',
+  approvedById: 'approvedById',
   date: 'date',
   type: 'type',
+  current_uom: 'current_uom',
   quantity_changed: 'quantity_changed',
-  reason: 'reason',
-  staffId: 'staffId'
+  previous_quantity: 'previous_quantity',
+  new_quantity: 'new_quantity',
+  isOverride: 'isOverride',
+  reason: 'reason'
 } as const
 
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
@@ -2236,7 +2330,8 @@ export const POItemScalarFieldEnum = {
   id: 'id',
   poId: 'poId',
   productId: 'productId',
-  requested_quantity: 'requested_quantity'
+  requested_quantity: 'requested_quantity',
+  unit_cost: 'unit_cost'
 } as const
 
 export type POItemScalarFieldEnum = (typeof POItemScalarFieldEnum)[keyof typeof POItemScalarFieldEnum]
@@ -2263,6 +2358,16 @@ export const DeliveryScalarFieldEnum = {
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum]
 
 
+export const DeliveryItemScalarFieldEnum = {
+  id: 'id',
+  deliveryId: 'deliveryId',
+  productId: 'productId',
+  received_quantity: 'received_quantity'
+} as const
+
+export type DeliveryItemScalarFieldEnum = (typeof DeliveryItemScalarFieldEnum)[keyof typeof DeliveryItemScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2271,20 +2376,20 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -2308,6 +2413,20 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'String'
+ */
+export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+/**
+ * Reference to a field of type 'String[]'
+ */
+export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -2322,16 +2441,16 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'Decimal'
+ * Reference to a field of type 'TransactionStatus'
  */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+export type EnumTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionStatus'>
     
 
 
 /**
- * Reference to a field of type 'Decimal[]'
+ * Reference to a field of type 'TransactionStatus[]'
  */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+export type ListEnumTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionStatus[]'>
     
 
 
@@ -2350,23 +2469,23 @@ export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
- * Reference to a field of type 'String'
- */
-export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
-    
-
-
-/**
- * Reference to a field of type 'String[]'
- */
-export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
     
 
 
@@ -2639,6 +2758,7 @@ export type GlobalOmitConfig = {
   pOItem?: Prisma.POItemOmit
   supplier?: Prisma.SupplierOmit
   delivery?: Prisma.DeliveryOmit
+  deliveryItem?: Prisma.DeliveryItemOmit
 }
 
 /* Types for Logging */

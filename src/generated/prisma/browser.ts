@@ -122,3 +122,8 @@ export type Supplier = Prisma.SupplierModel
  * 
  */
 export type Delivery = Prisma.DeliveryModel
+/**
+ * Model DeliveryItem
+ * 
+ */
+export type DeliveryItem = Prisma.DeliveryItemModel

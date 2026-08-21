@@ -218,6 +218,7 @@ export type DeliveryWhereInput = {
   staffId?: Prisma.IntFilter<"Delivery"> | number
   purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderScalarRelationFilter, Prisma.PurchaseOrderWhereInput>
   staff?: Prisma.XOR<Prisma.StaffUserScalarRelationFilter, Prisma.StaffUserWhereInput>
+  deliveryItems?: Prisma.DeliveryItemListRelationFilter
 }
 
 export type DeliveryOrderByWithRelationInput = {
@@ -227,6 +228,7 @@ export type DeliveryOrderByWithRelationInput = {
   staffId?: Prisma.SortOrder
   purchaseOrder?: Prisma.PurchaseOrderOrderByWithRelationInput
   staff?: Prisma.StaffUserOrderByWithRelationInput
+  deliveryItems?: Prisma.DeliveryItemOrderByRelationAggregateInput
 }
 
 export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
@@ -239,6 +241,7 @@ export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
   staffId?: Prisma.IntFilter<"Delivery"> | number
   purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderScalarRelationFilter, Prisma.PurchaseOrderWhereInput>
   staff?: Prisma.XOR<Prisma.StaffUserScalarRelationFilter, Prisma.StaffUserWhereInput>
+  deliveryItems?: Prisma.DeliveryItemListRelationFilter
 }, "id">
 
 export type DeliveryOrderByWithAggregationInput = {
@@ -267,6 +270,7 @@ export type DeliveryCreateInput = {
   delivery_date?: Date | string
   purchaseOrder: Prisma.PurchaseOrderCreateNestedOneWithoutDeliveriesInput
   staff: Prisma.StaffUserCreateNestedOneWithoutDeliveriesInput
+  deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutDeliveryInput
 }
 
 export type DeliveryUncheckedCreateInput = {
@@ -274,12 +278,14 @@ export type DeliveryUncheckedCreateInput = {
   poId: number
   delivery_date?: Date | string
   staffId: number
+  deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutDeliveryInput
 }
 
 export type DeliveryUpdateInput = {
   delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   purchaseOrder?: Prisma.PurchaseOrderUpdateOneRequiredWithoutDeliveriesNestedInput
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutDeliveriesNestedInput
+  deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutDeliveryNestedInput
 }
 
 export type DeliveryUncheckedUpdateInput = {
@@ -287,6 +293,7 @@ export type DeliveryUncheckedUpdateInput = {
   poId?: Prisma.IntFieldUpdateOperationsInput | number
   delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
+  deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutDeliveryNestedInput
 }
 
 export type DeliveryCreateManyInput = {
@@ -348,6 +355,11 @@ export type DeliverySumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   poId?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
+}
+
+export type DeliveryScalarRelationFilter = {
+  is?: Prisma.DeliveryWhereInput
+  isNot?: Prisma.DeliveryWhereInput
 }
 
 export type DeliveryCreateNestedManyWithoutStaffInput = {
@@ -434,15 +446,31 @@ export type DeliveryUncheckedUpdateManyWithoutPurchaseOrderNestedInput = {
   deleteMany?: Prisma.DeliveryScalarWhereInput | Prisma.DeliveryScalarWhereInput[]
 }
 
+export type DeliveryCreateNestedOneWithoutDeliveryItemsInput = {
+  create?: Prisma.XOR<Prisma.DeliveryCreateWithoutDeliveryItemsInput, Prisma.DeliveryUncheckedCreateWithoutDeliveryItemsInput>
+  connectOrCreate?: Prisma.DeliveryCreateOrConnectWithoutDeliveryItemsInput
+  connect?: Prisma.DeliveryWhereUniqueInput
+}
+
+export type DeliveryUpdateOneRequiredWithoutDeliveryItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.DeliveryCreateWithoutDeliveryItemsInput, Prisma.DeliveryUncheckedCreateWithoutDeliveryItemsInput>
+  connectOrCreate?: Prisma.DeliveryCreateOrConnectWithoutDeliveryItemsInput
+  upsert?: Prisma.DeliveryUpsertWithoutDeliveryItemsInput
+  connect?: Prisma.DeliveryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DeliveryUpdateToOneWithWhereWithoutDeliveryItemsInput, Prisma.DeliveryUpdateWithoutDeliveryItemsInput>, Prisma.DeliveryUncheckedUpdateWithoutDeliveryItemsInput>
+}
+
 export type DeliveryCreateWithoutStaffInput = {
   delivery_date?: Date | string
   purchaseOrder: Prisma.PurchaseOrderCreateNestedOneWithoutDeliveriesInput
+  deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutDeliveryInput
 }
 
 export type DeliveryUncheckedCreateWithoutStaffInput = {
   id?: number
   poId: number
   delivery_date?: Date | string
+  deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutDeliveryInput
 }
 
 export type DeliveryCreateOrConnectWithoutStaffInput = {
@@ -484,12 +512,14 @@ export type DeliveryScalarWhereInput = {
 export type DeliveryCreateWithoutPurchaseOrderInput = {
   delivery_date?: Date | string
   staff: Prisma.StaffUserCreateNestedOneWithoutDeliveriesInput
+  deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutDeliveryInput
 }
 
 export type DeliveryUncheckedCreateWithoutPurchaseOrderInput = {
   id?: number
   delivery_date?: Date | string
   staffId: number
+  deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutDeliveryInput
 }
 
 export type DeliveryCreateOrConnectWithoutPurchaseOrderInput = {
@@ -518,6 +548,48 @@ export type DeliveryUpdateManyWithWhereWithoutPurchaseOrderInput = {
   data: Prisma.XOR<Prisma.DeliveryUpdateManyMutationInput, Prisma.DeliveryUncheckedUpdateManyWithoutPurchaseOrderInput>
 }
 
+export type DeliveryCreateWithoutDeliveryItemsInput = {
+  delivery_date?: Date | string
+  purchaseOrder: Prisma.PurchaseOrderCreateNestedOneWithoutDeliveriesInput
+  staff: Prisma.StaffUserCreateNestedOneWithoutDeliveriesInput
+}
+
+export type DeliveryUncheckedCreateWithoutDeliveryItemsInput = {
+  id?: number
+  poId: number
+  delivery_date?: Date | string
+  staffId: number
+}
+
+export type DeliveryCreateOrConnectWithoutDeliveryItemsInput = {
+  where: Prisma.DeliveryWhereUniqueInput
+  create: Prisma.XOR<Prisma.DeliveryCreateWithoutDeliveryItemsInput, Prisma.DeliveryUncheckedCreateWithoutDeliveryItemsInput>
+}
+
+export type DeliveryUpsertWithoutDeliveryItemsInput = {
+  update: Prisma.XOR<Prisma.DeliveryUpdateWithoutDeliveryItemsInput, Prisma.DeliveryUncheckedUpdateWithoutDeliveryItemsInput>
+  create: Prisma.XOR<Prisma.DeliveryCreateWithoutDeliveryItemsInput, Prisma.DeliveryUncheckedCreateWithoutDeliveryItemsInput>
+  where?: Prisma.DeliveryWhereInput
+}
+
+export type DeliveryUpdateToOneWithWhereWithoutDeliveryItemsInput = {
+  where?: Prisma.DeliveryWhereInput
+  data: Prisma.XOR<Prisma.DeliveryUpdateWithoutDeliveryItemsInput, Prisma.DeliveryUncheckedUpdateWithoutDeliveryItemsInput>
+}
+
+export type DeliveryUpdateWithoutDeliveryItemsInput = {
+  delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseOrder?: Prisma.PurchaseOrderUpdateOneRequiredWithoutDeliveriesNestedInput
+  staff?: Prisma.StaffUserUpdateOneRequiredWithoutDeliveriesNestedInput
+}
+
+export type DeliveryUncheckedUpdateWithoutDeliveryItemsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  poId?: Prisma.IntFieldUpdateOperationsInput | number
+  delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
 export type DeliveryCreateManyStaffInput = {
   id?: number
   poId: number
@@ -527,12 +599,14 @@ export type DeliveryCreateManyStaffInput = {
 export type DeliveryUpdateWithoutStaffInput = {
   delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   purchaseOrder?: Prisma.PurchaseOrderUpdateOneRequiredWithoutDeliveriesNestedInput
+  deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutDeliveryNestedInput
 }
 
 export type DeliveryUncheckedUpdateWithoutStaffInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   poId?: Prisma.IntFieldUpdateOperationsInput | number
   delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutDeliveryNestedInput
 }
 
 export type DeliveryUncheckedUpdateManyWithoutStaffInput = {
@@ -550,12 +624,14 @@ export type DeliveryCreateManyPurchaseOrderInput = {
 export type DeliveryUpdateWithoutPurchaseOrderInput = {
   delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.StaffUserUpdateOneRequiredWithoutDeliveriesNestedInput
+  deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutDeliveryNestedInput
 }
 
 export type DeliveryUncheckedUpdateWithoutPurchaseOrderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   delivery_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
+  deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutDeliveryNestedInput
 }
 
 export type DeliveryUncheckedUpdateManyWithoutPurchaseOrderInput = {
@@ -565,6 +641,35 @@ export type DeliveryUncheckedUpdateManyWithoutPurchaseOrderInput = {
 }
 
 
+/**
+ * Count Type DeliveryCountOutputType
+ */
+
+export type DeliveryCountOutputType = {
+  deliveryItems: number
+}
+
+export type DeliveryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  deliveryItems?: boolean | DeliveryCountOutputTypeCountDeliveryItemsArgs
+}
+
+/**
+ * DeliveryCountOutputType without action
+ */
+export type DeliveryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryCountOutputType
+   */
+  select?: Prisma.DeliveryCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * DeliveryCountOutputType without action
+ */
+export type DeliveryCountOutputTypeCountDeliveryItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryItemWhereInput
+}
+
 
 export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -573,6 +678,8 @@ export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   staffId?: boolean
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
   staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
+  deliveryItems?: boolean | Prisma.Delivery$deliveryItemsArgs<ExtArgs>
+  _count?: boolean | Prisma.DeliveryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["delivery"]>
 
 export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -604,6 +711,8 @@ export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type DeliveryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
   staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
+  deliveryItems?: boolean | Prisma.Delivery$deliveryItemsArgs<ExtArgs>
+  _count?: boolean | Prisma.DeliveryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DeliveryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
@@ -619,6 +728,7 @@ export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     purchaseOrder: Prisma.$PurchaseOrderPayload<ExtArgs>
     staff: Prisma.$StaffUserPayload<ExtArgs>
+    deliveryItems: Prisma.$DeliveryItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1021,6 +1131,7 @@ export interface Prisma__DeliveryClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   purchaseOrder<T extends Prisma.PurchaseOrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PurchaseOrderDefaultArgs<ExtArgs>>): Prisma.Prisma__PurchaseOrderClient<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   staff<T extends Prisma.StaffUserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUserDefaultArgs<ExtArgs>>): Prisma.Prisma__StaffUserClient<runtime.Types.Result.GetResult<Prisma.$StaffUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  deliveryItems<T extends Prisma.Delivery$deliveryItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Delivery$deliveryItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1452,6 +1563,30 @@ export type DeliveryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Deliveries to delete.
    */
   limit?: number
+}
+
+/**
+ * Delivery.deliveryItems
+ */
+export type Delivery$deliveryItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryItem
+   */
+  select?: Prisma.DeliveryItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryItem
+   */
+  omit?: Prisma.DeliveryItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryItemInclude<ExtArgs> | null
+  where?: Prisma.DeliveryItemWhereInput
+  orderBy?: Prisma.DeliveryItemOrderByWithRelationInput | Prisma.DeliveryItemOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryItemScalarFieldEnum | Prisma.DeliveryItemScalarFieldEnum[]
 }
 
 /**
