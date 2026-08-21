@@ -6,7 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class StockInDto {
+export class StockOutDto {
   @IsNotEmpty()
   @IsPositive()
   productId!: number;
