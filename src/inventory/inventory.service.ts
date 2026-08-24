@@ -225,7 +225,7 @@ export class InventoryService {
       );
 
       const prevQty = new Decimal(product.current_quantity);
-      const takenQty = new Decimal(stockOutDto.added_qty);
+      const takenQty = new Decimal(stockOutDto.taken_qty);
       const newQty = prevQty.minus(takenQty);
 
       // Check if stock is invalid (negative)

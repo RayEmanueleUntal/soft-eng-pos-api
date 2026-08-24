@@ -1,4 +1,7 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
+  IsDate,
   IsDateString,
   IsNotEmpty,
   IsOptional,
@@ -9,22 +12,26 @@ import {
 export class StockOutDto {
   @IsNotEmpty()
   @IsPositive()
+  @Type(() => Number)
   productId!: number;
 
   @IsOptional()
-  @IsString()
-  @IsDateString()
-  date?: string;
+  @Type(() => Date)
+  @IsDate()
+  date?: Date;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({ example: 'pcs' })
   current_uom!: string;
 
   @IsNotEmpty()
   @IsPositive()
-  added_qty!: number;
+  @Type(() => Number)
+  taken_qty!: number;
 
   @IsOptional()
   @IsString()
+  @ApiProperty({ example: 'removed bad items' })
   reason?: string;
 }

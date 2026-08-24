@@ -9,6 +9,7 @@ import {
   StockInDto,
   StockOutDto,
 } from './dto';
+import { Idempotent } from 'src/common/decorators';
 
 @Controller('inventory')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -17,6 +18,7 @@ export class InventoryController {
 
   // Adjust Inventory
   @Post('adjust')
+  @Idempotent()
   @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
   adjustInventory(
     @CurrentUser() user: { id: number },
@@ -27,6 +29,7 @@ export class InventoryController {
 
   // Stock-In
   @Post('stock-in')
+  @Idempotent()
   @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
   stockIn(@CurrentUser() user: { id: number }, @Body() stockInDto: StockInDto) {
     return this.inventoryService.stockIn(user.id, stockInDto);
@@ -34,6 +37,7 @@ export class InventoryController {
 
   // Stock-Out
   @Post('stock-out')
+  @Idempotent()
   @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
   stockOut(
     @CurrentUser() user: { id: number },
