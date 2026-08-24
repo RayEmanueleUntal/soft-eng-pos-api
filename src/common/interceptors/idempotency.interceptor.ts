@@ -28,7 +28,7 @@ export class IdempotencyInterceptor implements NestInterceptor {
     // 1. Extract Idempotency Key
     const idempotencyKey = request.headers['idempotency-key'];
     if (!idempotencyKey) {
-      throw new BadRequestException('Header "Idempotency-Key" is required.');
+      throw new BadRequestException('Header Idempotency-Key is required.');
     }
 
     const cacheKey = `idempotency:${idempotencyKey}`;

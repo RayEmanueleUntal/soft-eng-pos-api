@@ -1,6 +1,6 @@
 import { AssignedRole } from '../../src/generated/prisma/client';
 import * as argon from 'argon2';
-import { prisma } from './client';
+import { prisma } from '../client';
 
 export async function seedAdmin() {
   const adminPass = 'adminpassword123';
