@@ -13,28 +13,56 @@ import { OutOfStockException } from 'src/common/exceptions/out-of-stock.exceptio
 export class InventoryService {
   private readonly logger = new Logger(InventoryService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // Get inventory with query filters
-  getInventory(invDto: InventoryDto) {
-    const { search, categoryId, size, thread, material } = invDto;
+  async getInventory(invDto: InventoryDto) {
+    const {
+      search,
+      categoryId,
+      size,
+      thread,
+      material,
+      page = 1,
+      limit = 20,
+    } = invDto;
 
     this.logger.debug('Fetching inventory list', { filters: invDto });
 
-    return this.prisma.product.findMany({
-      where: {
-        ...(search && {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        }),
-        ...(categoryId && { categoryId }),
-        ...(size && { size_dimensions: size }),
-        ...(thread && { thread_type: thread }),
-        ...(material && { material_grade: material }),
+    const where = {
+      ...(search && {
+        name: {
+          contains: search,
+          mode: 'insensitive' as const,
+        },
+      }),
+      ...(categoryId && { categoryId }),
+      ...(size && { size_dimensions: size }),
+      ...(thread && { thread_type: thread }),
+      ...(material && { material_grade: material }),
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+    };
   }
 
   // Helper method: Validates existence and UOM inside a transaction context
@@ -130,7 +158,7 @@ export class InventoryService {
   }
 
   // Stock-In
-  async stockin(userId: number, stockInDto: StockInDto) {
+  async stockIn(userId: number, stockInDto: StockInDto) {
     this.logger.log('Initiating inventory stock-in transaction', {
       userId,
       productId: stockInDto.productId,
