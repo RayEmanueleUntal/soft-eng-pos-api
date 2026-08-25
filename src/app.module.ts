@@ -9,6 +9,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { InventoryModule } from './inventory/inventory.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ProductsModule } from './products/products.module';
+import { BinLocationModule } from './bin-location/bin-location.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -40,6 +42,8 @@ import KeyvRedis from '@keyv/redis';
     AuthModule,
     StaffUserModule,
     InventoryModule,
+    ProductsModule,
+    BinLocationModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

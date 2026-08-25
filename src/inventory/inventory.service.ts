@@ -1,13 +1,23 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AdjustInventoryDto, InventoryDto, StockOutDto } from './dto';
+import {
+  AdjustInventoryDto,
+  AssignBinDto,
+  AssignBinResponseDto,
+  InventoryDto,
+  LowStockAlertsResponseDto,
+  PaginatedInventoryResponseDto,
+  StockOutDto,
+} from './dto';
+import { Prisma } from 'src/generated/prisma/client';
 import { MovementType } from 'src/generated/prisma/enums';
 import { UOMMismatchException } from 'src/common/exceptions/uom-mismatch.exception';
 import { Decimal } from '@prisma/client/runtime/client';
-import { StockInDto } from './dto/stock-in.dto';
+import { StockInDto } from './dto/requests/stock-in.dto';
 import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace';
 import { Product } from 'src/generated/prisma/client';
 import { OutOfStockException } from 'src/common/exceptions/out-of-stock.exception';
+import { StockMovementResponseDto } from './dto/responses/stock-movement-response.dto';
 
 @Injectable()
 export class InventoryService {
@@ -15,8 +25,12 @@ export class InventoryService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // Get inventory with query filters
-  async getInventory(invDto: InventoryDto) {
+  /*
+    Get inventory with query filters
+  */
+  async getInventory(
+    invDto: InventoryDto,
+  ): Promise<PaginatedInventoryResponseDto> {
     const {
       search,
       categoryId,
@@ -44,7 +58,7 @@ export class InventoryService {
 
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.prisma.$transaction([
+    const [products, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({
         where,
         skip,
@@ -54,18 +68,17 @@ export class InventoryService {
       this.prisma.product.count({ where }),
     ]);
 
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+    return PaginatedInventoryResponseDto.fromEntities(
+      products,
+      total,
+      page,
+      limit,
+    );
   }
 
-  // Helper method: Validates existence and UOM inside a transaction context
+  /*
+  Helper method: Validates existence and UOM inside a transaction context
+  */
   private async validateAndGetProduct(
     tx: TransactionClient,
     productId: number,
@@ -99,14 +112,19 @@ export class InventoryService {
     return product;
   }
 
-  // Adjust Inventory
-  async adjustInventory(userId: number, adjustDto: AdjustInventoryDto) {
+  /*
+  Adjust Inventory
+  */
+  async adjustInventory(
+    userId: number,
+    adjustDto: AdjustInventoryDto,
+  ): Promise<StockMovementResponseDto> {
     this.logger.log('Initiating inventory adjustment transaction', {
       userId,
       productId: adjustDto.productId,
     });
 
-    return await this.prisma.$transaction(async (tx) => {
+    const movement = await this.prisma.$transaction(async (tx) => {
       const product = await this.validateAndGetProduct(
         tx,
         adjustDto.productId,
@@ -119,8 +137,7 @@ export class InventoryService {
       const newQty = new Decimal(adjustDto.new_count);
       const qtyChanged = newQty.minus(previousQty);
 
-      // Create audit record
-      const movement = await tx.stockMovement.create({
+      const createdMovement = await tx.stockMovement.create({
         data: {
           productId: product.id,
           staffId: userId,
@@ -135,9 +152,7 @@ export class InventoryService {
       });
 
       await tx.product.update({
-        where: {
-          id: product.id,
-        },
+        where: { id: product.id },
         data: {
           current_quantity: newQty,
           needsRecount: false,
@@ -145,7 +160,7 @@ export class InventoryService {
       });
 
       this.logger.log('Inventory adjusted successfully', {
-        movementId: movement.id,
+        movementId: createdMovement.id,
         productId: product.id,
         userId,
         previousQty: previousQty.toString(),
@@ -153,18 +168,25 @@ export class InventoryService {
         qtyChanged: qtyChanged.toString(),
       });
 
-      return movement;
+      return createdMovement;
     });
+
+    return StockMovementResponseDto.fromEntity(movement);
   }
 
-  // Stock-In
-  async stockIn(userId: number, stockInDto: StockInDto) {
+  /*
+  Stock-In
+  */
+  async stockIn(
+    userId: number,
+    stockInDto: StockInDto,
+  ): Promise<StockMovementResponseDto> {
     this.logger.log('Initiating inventory stock-in transaction', {
       userId,
       productId: stockInDto.productId,
     });
 
-    return await this.prisma.$transaction(async (tx) => {
+    const movement = await this.prisma.$transaction(async (tx) => {
       const product = await this.validateAndGetProduct(
         tx,
         stockInDto.productId,
@@ -177,7 +199,7 @@ export class InventoryService {
       const addedQty = new Decimal(stockInDto.added_qty);
       const newQty = prevQty.plus(addedQty);
 
-      const movement = await tx.stockMovement.create({
+      const createdMovement = await tx.stockMovement.create({
         data: {
           productId: product.id,
           staffId: userId,
@@ -197,25 +219,32 @@ export class InventoryService {
       });
 
       this.logger.log('Stock-in completed successfully', {
-        movementId: movement.id,
+        movementId: createdMovement.id,
         productId: product.id,
         userId,
         addedQty: addedQty.toString(),
         newQty: newQty.toString(),
       });
 
-      return movement;
+      return createdMovement;
     });
+
+    return StockMovementResponseDto.fromEntity(movement);
   }
 
-  // Stock-Out
-  async stockOut(userId: number, stockOutDto: StockOutDto) {
+  /*
+  Stock-Out
+  */
+  async stockOut(
+    userId: number,
+    stockOutDto: StockOutDto,
+  ): Promise<StockMovementResponseDto> {
     this.logger.log('Initiating inventory stock-out transaction', {
       userId,
       productId: stockOutDto.productId,
     });
 
-    return await this.prisma.$transaction(async (tx) => {
+    const movement = await this.prisma.$transaction(async (tx) => {
       const product = await this.validateAndGetProduct(
         tx,
         stockOutDto.productId,
@@ -247,7 +276,7 @@ export class InventoryService {
         throw new OutOfStockException(product.id, product.name);
       }
 
-      const movement = await tx.stockMovement.create({
+      const createdMovement = await tx.stockMovement.create({
         data: {
           productId: product.id,
           staffId: userId,
@@ -267,14 +296,98 @@ export class InventoryService {
       });
 
       this.logger.log('Stock-out completed successfully', {
-        movementId: movement.id,
+        movementId: createdMovement.id,
         productId: product.id,
         userId,
         takenQty: takenQty.toString(),
         newQty: newQty.toString(),
       });
 
-      return movement;
+      return createdMovement;
     });
+
+    return StockMovementResponseDto.fromEntity(movement);
+  }
+
+  /*
+  Assign bin location to product
+  */
+  async assignBin(
+    userId: number,
+    productId: number,
+    binDto: AssignBinDto,
+  ): Promise<AssignBinResponseDto> {
+    this.logger.log(`Initiating product bin update`, {
+      userId,
+      productId,
+      binId: binDto.binId,
+    });
+
+    // 1. Check if bin location exists
+    const binLoc = await this.prisma.binLocation.findUnique({
+      where: { id: binDto.binId },
+    });
+
+    if (!binLoc) {
+      this.logger.warn(
+        `Assigning bin location failed: Bin location '${binDto.binId}' not found.`,
+      );
+      throw new NotFoundException(
+        `Bin location with id '${binDto.binId}' not found.`,
+      );
+    }
+
+    // 2. Perform update & include bin_location relation for the response mapper
+    try {
+      const updatedProduct = await this.prisma.product.update({
+        where: { id: productId },
+        data: { binId: binDto.binId },
+        include: {
+          bin_location: true,
+        },
+      });
+
+      this.logger.log(`Product bin updated successfully`, {
+        productId,
+        binId: binDto.binId,
+        userId,
+      });
+
+      return AssignBinResponseDto.fromEntity(updatedProduct);
+    } catch (error) {
+      // Prisma error code for Record to update not found
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        this.logger.warn(
+          `Assigning bin location failed: Product '${productId}' not found.`,
+        );
+        throw new NotFoundException(
+          `Product with id '${productId}' not found.`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /*
+  Retrieve products whose current quanitity falls below ROP
+  */
+  async getProductsBelowROP() {
+    this.logger.debug('Fetching products below reorder point');
+
+    const products = await this.prisma.product.findMany({
+      where: {
+        current_quantity: {
+          lte: this.prisma.product.fields.reorder_point_ROP,
+        },
+      },
+      orderBy: {
+        current_quantity: 'asc',
+      },
+    });
+
+    return LowStockAlertsResponseDto.fromEntities(products);
   }
 }
