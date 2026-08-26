@@ -123,6 +123,9 @@ export class InventoryController {
   Get inventory with query filters
   */
   @Get()
+  @ApiOperation({
+    summary: 'Get all products from inventory based on the query parameters.',
+  })
   @ApiOkResponse({
     description: 'Paginated list of inventory items successfully retrieved.',
     type: PaginatedInventoryResponseDto,
