@@ -30,7 +30,7 @@ export type ReturnAvgAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   refund_amount: runtime.Decimal | null
   staffId: number | null
 }
@@ -39,7 +39,7 @@ export type ReturnSumAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   refund_amount: runtime.Decimal | null
   staffId: number | null
 }
@@ -48,7 +48,7 @@ export type ReturnMinAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   date: Date | null
   defect_reason: string | null
   refund_amount: runtime.Decimal | null
@@ -59,7 +59,7 @@ export type ReturnMaxAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   date: Date | null
   defect_reason: string | null
   refund_amount: runtime.Decimal | null
@@ -221,7 +221,7 @@ export type ReturnGroupByOutputType = {
   id: number
   transactionId: number
   productId: number
-  quantity: number
+  quantity: runtime.Decimal
   date: Date
   defect_reason: string
   refund_amount: runtime.Decimal
@@ -255,7 +255,7 @@ export type ReturnWhereInput = {
   id?: Prisma.IntFilter<"Return"> | number
   transactionId?: Prisma.IntFilter<"Return"> | number
   productId?: Prisma.IntFilter<"Return"> | number
-  quantity?: Prisma.IntFilter<"Return"> | number
+  quantity?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Return"> | Date | string
   defect_reason?: Prisma.StringFilter<"Return"> | string
   refund_amount?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -286,7 +286,7 @@ export type ReturnWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ReturnWhereInput | Prisma.ReturnWhereInput[]
   transactionId?: Prisma.IntFilter<"Return"> | number
   productId?: Prisma.IntFilter<"Return"> | number
-  quantity?: Prisma.IntFilter<"Return"> | number
+  quantity?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Return"> | Date | string
   defect_reason?: Prisma.StringFilter<"Return"> | string
   refund_amount?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -319,7 +319,7 @@ export type ReturnScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Return"> | number
   transactionId?: Prisma.IntWithAggregatesFilter<"Return"> | number
   productId?: Prisma.IntWithAggregatesFilter<"Return"> | number
-  quantity?: Prisma.IntWithAggregatesFilter<"Return"> | number
+  quantity?: Prisma.DecimalWithAggregatesFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeWithAggregatesFilter<"Return"> | Date | string
   defect_reason?: Prisma.StringWithAggregatesFilter<"Return"> | string
   refund_amount?: Prisma.DecimalWithAggregatesFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -327,7 +327,7 @@ export type ReturnScalarWhereWithAggregatesInput = {
 }
 
 export type ReturnCreateInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -340,7 +340,7 @@ export type ReturnUncheckedCreateInput = {
   id?: number
   transactionId: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -348,7 +348,7 @@ export type ReturnUncheckedCreateInput = {
 }
 
 export type ReturnUpdateInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -361,7 +361,7 @@ export type ReturnUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -372,7 +372,7 @@ export type ReturnCreateManyInput = {
   id?: number
   transactionId: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -380,7 +380,7 @@ export type ReturnCreateManyInput = {
 }
 
 export type ReturnUpdateManyMutationInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -390,7 +390,7 @@ export type ReturnUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -500,10 +500,6 @@ export type ReturnUncheckedUpdateManyWithoutTransactionNestedInput = {
   deleteMany?: Prisma.ReturnScalarWhereInput | Prisma.ReturnScalarWhereInput[]
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
 export type ReturnCreateNestedManyWithoutStaffInput = {
   create?: Prisma.XOR<Prisma.ReturnCreateWithoutStaffInput, Prisma.ReturnUncheckedCreateWithoutStaffInput> | Prisma.ReturnCreateWithoutStaffInput[] | Prisma.ReturnUncheckedCreateWithoutStaffInput[]
   connectOrCreate?: Prisma.ReturnCreateOrConnectWithoutStaffInput | Prisma.ReturnCreateOrConnectWithoutStaffInput[]
@@ -589,7 +585,7 @@ export type ReturnUncheckedUpdateManyWithoutProductNestedInput = {
 }
 
 export type ReturnCreateWithoutTransactionInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -600,7 +596,7 @@ export type ReturnCreateWithoutTransactionInput = {
 export type ReturnUncheckedCreateWithoutTransactionInput = {
   id?: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -640,7 +636,7 @@ export type ReturnScalarWhereInput = {
   id?: Prisma.IntFilter<"Return"> | number
   transactionId?: Prisma.IntFilter<"Return"> | number
   productId?: Prisma.IntFilter<"Return"> | number
-  quantity?: Prisma.IntFilter<"Return"> | number
+  quantity?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Return"> | Date | string
   defect_reason?: Prisma.StringFilter<"Return"> | string
   refund_amount?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -648,7 +644,7 @@ export type ReturnScalarWhereInput = {
 }
 
 export type ReturnCreateWithoutStaffInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -660,7 +656,7 @@ export type ReturnUncheckedCreateWithoutStaffInput = {
   id?: number
   transactionId: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -693,7 +689,7 @@ export type ReturnUpdateManyWithWhereWithoutStaffInput = {
 }
 
 export type ReturnCreateWithoutProductInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -704,7 +700,7 @@ export type ReturnCreateWithoutProductInput = {
 export type ReturnUncheckedCreateWithoutProductInput = {
   id?: number
   transactionId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -740,7 +736,7 @@ export type ReturnUpdateManyWithWhereWithoutProductInput = {
 export type ReturnCreateManyTransactionInput = {
   id?: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -748,7 +744,7 @@ export type ReturnCreateManyTransactionInput = {
 }
 
 export type ReturnUpdateWithoutTransactionInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -759,7 +755,7 @@ export type ReturnUpdateWithoutTransactionInput = {
 export type ReturnUncheckedUpdateWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -769,7 +765,7 @@ export type ReturnUncheckedUpdateWithoutTransactionInput = {
 export type ReturnUncheckedUpdateManyWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -780,14 +776,14 @@ export type ReturnCreateManyStaffInput = {
   id?: number
   transactionId: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type ReturnUpdateWithoutStaffInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -799,7 +795,7 @@ export type ReturnUncheckedUpdateWithoutStaffInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -809,7 +805,7 @@ export type ReturnUncheckedUpdateManyWithoutStaffInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -818,7 +814,7 @@ export type ReturnUncheckedUpdateManyWithoutStaffInput = {
 export type ReturnCreateManyProductInput = {
   id?: number
   transactionId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -826,7 +822,7 @@ export type ReturnCreateManyProductInput = {
 }
 
 export type ReturnUpdateWithoutProductInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -837,7 +833,7 @@ export type ReturnUpdateWithoutProductInput = {
 export type ReturnUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -847,7 +843,7 @@ export type ReturnUncheckedUpdateWithoutProductInput = {
 export type ReturnUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -937,7 +933,7 @@ export type $ReturnPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     id: number
     transactionId: number
     productId: number
-    quantity: number
+    quantity: runtime.Decimal
     date: Date
     defect_reason: string
     refund_amount: runtime.Decimal
@@ -1371,7 +1367,7 @@ export interface ReturnFieldRefs {
   readonly id: Prisma.FieldRef<"Return", 'Int'>
   readonly transactionId: Prisma.FieldRef<"Return", 'Int'>
   readonly productId: Prisma.FieldRef<"Return", 'Int'>
-  readonly quantity: Prisma.FieldRef<"Return", 'Int'>
+  readonly quantity: Prisma.FieldRef<"Return", 'Decimal'>
   readonly date: Prisma.FieldRef<"Return", 'DateTime'>
   readonly defect_reason: Prisma.FieldRef<"Return", 'String'>
   readonly refund_amount: Prisma.FieldRef<"Return", 'Decimal'>

@@ -19,10 +19,18 @@ datasource db {
 
 model Transaction {
   id               Int             @id @default(autoincrement())
+  invoice_number   String?         @unique // Optional generated code (e.g., "INV-2026-0001")
   date             DateTime        @default(now())
-  grand_total      Decimal         @db.Decimal(10, 2)
+  status           TransactionStatus @default(COMPLETED)
   transaction_type TransactionType @default(RETAIL)
 
+  // Financial Breakdown
+  subtotal         Decimal         @db.Decimal(10, 2)
+  tax_total        Decimal         @default(0.00) @db.Decimal(10, 2)
+  discount_total   Decimal         @default(0.00) @db.Decimal(10, 2)
+  grand_total      Decimal         @db.Decimal(10, 2)
+  
+  // Foreign Keys
   customerId       Int?            // Optional for walk-in retail customers
   staffId          Int
 
@@ -35,6 +43,9 @@ model Transaction {
   returns          Return[]
   exchanges        Exchange[]
 
+  @@index([date])
+  @@index([staffId])
+  @@index([customerId])
   @@map("transaction")
 }
 
@@ -42,12 +53,21 @@ model TransactionItem {
   id             Int         @id @default(autoincrement())
   transactionId  Int
   productId      Int
-  quantity_sold  Int
-  applied_price  Decimal     @db.Decimal(10, 2)
 
+  // Use Decimal if selling loose items by weight (e.g., 2.5kg of nails). Keep Int if strictly by piece.
+  quantity_sold  Decimal     @db.Decimal(10, 3)
+  unit_of_measure String     @default("pcs")    // e.g., "pcs", "kg", "box"
+
+  unit_price     Decimal     @db.Decimal(10, 2) // Base price per unit at moment of sale
+  discount       Decimal     @default(0.00) @db.Decimal(10, 2) // Line-item discount amount
+  subtotal       Decimal     @db.Decimal(10, 2) // (quantity_sold * unit_price) - discount
+
+  // Relations
   transaction    Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   product        Product     @relation(fields: [productId], references: [id])
 
+  @@index([transactionId])
+  @@index([productId])
   @@map("transaction_item")
 }
 
@@ -55,7 +75,7 @@ model Exchange {
   id               Int         @id @default(autoincrement())
   transactionId    Int
   productId        Int         // Product being exchanged
-  quantity         Int         @default(1)
+  quantity         Decimal     @default(1.000) @db.Decimal(10, 3)
   date             DateTime    @default(now())
   price_difference Decimal     @db.Decimal(10, 2)
   is_within_7_days Boolean     @default(true)
@@ -70,7 +90,7 @@ model Return {
   id             Int         @id @default(autoincrement())
   transactionId  Int
   productId      Int         // Product being returned
-  quantity       Int         @default(1)
+  quantity       Decimal     @default(1.000) @db.Decimal(10, 3)
   date           DateTime    @default(now())
   defect_reason  String
   refund_amount  Decimal     @db.Decimal(10, 2)
@@ -174,7 +194,8 @@ model StaffUser {
   is_active     Boolean      @default(true)
 
   transactions   Transaction[]
-  stockMovements StockMovement[]
+  initiatedMovements StockMovement[] @relation("InitiatedMovements")
+  approvedMovements  StockMovement[] @relation("ApprovedMovements")
   purchaseOrders PurchaseOrder[]
   deliveries     Delivery[]
   returns        Return[]
@@ -221,30 +242,48 @@ model Category {
 
 model Product {
   id               Int       @id @default(autoincrement())
-  name             String    // Descriptive name e.g. "Hex Bolt 1/2 x 2"
+  sku              String?   @unique // Shorthand code e.g. "BLT-m8-30-SS" or bin barcode
+  name             String       // Descriptive Name. e.g. "Hex Bolt M8-1.25 x 30mm"
   categoryId       Int
-  size_dimensions  String
-  thread_type      String
-  material_grade   String
-  current_quantity Int       @default(0)
-  reorder_point_ROP Int      @default(10)
+
+  // Fastener-specific attributes (Nullable for non-threaded items like drill bits/tools)
+  size_dimensions  String?      // e.g. "1/2 x 2" or "M8 x 30mm" 
+  thread_type      String?      // e.g. "Coarse (UNC)", "Fine (UNF)", "M8x1.25"
+  material_grade   String?      // e.g. "Stainless 304", "Grade 8", "Zinc Plated"
+
+  // Inventory Tracking (Always in Base Units)
+  base_uom         String    @default("pcs")  // "pcs", "kg", "meter"
+  current_quantity Decimal   @default(0.00) @db.Decimal(10,3)
+  reorder_point_ROP Decimal  @default(0.00) @db.Decimal(10,3)
+  needsRecount     Boolean   @default(false) // Set to TRUE during forced stock-out overrides
+
+  // Multi-UoM Pricing & Unit Conversion
+  pricing_uom      String    @default("pcs")  // "pcs", "kg", "hundred", "gross", "sack"
+  pricing_unit_qty Decimal   @default(1.000)  @db.Decimal(10, 3)  // e.g., 100 for "Per Hundred", 144 for "Gross"
+  cost_price       Decimal   @default(0.00)   @db.Decimal(10, 2)  // Purchasing cost
   retail_price     Decimal   @db.Decimal(10, 2)
   wholesale_price  Decimal?  @db.Decimal(10, 2)
   
-  binId            Int?      // Optional until assigned to a bin
+  // Storage Location
+  binId            Int?      // Link to BinLocation
   
+  // Relations
   category         Category     @relation(fields: [categoryId], references: [id])
   bin_location     BinLocation? @relation(fields: [binId], references: [id])
 
   transactionItems TransactionItem[]
   stockMovements   StockMovement[]
   poItems          POItem[]
+  deliveryItems    DeliveryItem[]
   returns          Return[]
   exchanges        Exchange[]
 
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
+  @@index([categoryId])
+  @@index([name])
+  @@index([binId])
   @@map("product")
 }
 
@@ -255,21 +294,35 @@ model BinLocation {
 
   products       Product[]
 
+  @@unique([aisle_number, shelf_location])
   @@map("bin_location")
 }
 
 model StockMovement {
   id               Int          @id @default(autoincrement())
   productId        Int
+  staffId          Int          // Staff member who initiated/entered the movement
+  approvedById     Int?         // Admin/Manager who authorized an override (if applicable)
+
   date             DateTime     @default(now())
   type             MovementType
-  quantity_changed Int
-  reason           String
-  staffId          Int
 
+  current_uom      String       @default("pcs")
+  quantity_changed Decimal      @db.Decimal(10, 3)  // Positive for stock in, negative for stock out
+  previous_quantity Decimal     @db.Decimal(10, 3)  // e.g., 0 (DB level before change)
+  new_quantity     Decimal      @db.Decimal(10, 3)  // e.g., -2 (DB level after change)
+
+  isOverride       Boolean      @default(false) // Flags if this bypassed normal stock limits
+  reason           String       // e.g., "OVERRIDE_OUT_OF_STOCK: Customer bought physical item"
+
+
+  // Relations
   product          Product      @relation(fields: [productId], references: [id])
-  staff            StaffUser    @relation(fields: [staffId], references: [id])
+  staff            StaffUser    @relation("InitiatedMovements", fields: [staffId], references: [id])
+  approvedBy       StaffUser?   @relation("ApprovedMovements", fields: [approvedById], references: [id])
 
+  @@index([productId])
+  @@index([date])
   @@map("stock_movement")
 }
 
@@ -297,7 +350,8 @@ model POItem {
   id                 Int           @id @default(autoincrement())
   poId               Int
   productId          Int
-  requested_quantity Int
+  requested_quantity Decimal       @db.Decimal(10, 3)
+  unit_cost          Decimal       @db.Decimal(10, 2)  // Price quoted by supplier
 
   purchaseOrder      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
   product            Product       @relation(fields: [productId], references: [id])
@@ -325,8 +379,21 @@ model Delivery {
 
   purchaseOrder PurchaseOrder @relation(fields: [poId], references: [id])
   staff         StaffUser     @relation(fields: [staffId], references: [id])
+  deliveryItems DeliveryItem[]
 
   @@map("delivery")
+}
+
+model DeliveryItem {
+  id            Int           @id @default(autoincrement())
+  deliveryId    Int
+  productId     Int
+  received_quantity Decimal   @db.Decimal(10, 3)
+
+  delivery      Delivery      @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id])
+  
+  @@map("delivery_item")
 }
 
 // ==========================================
@@ -338,12 +405,21 @@ enum TransactionType {
   WHOLESALE
 }
 
+enum TransactionStatus {
+  COMPLETED
+  PENDING
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
 enum CustomerType {
   RETAIL
   WHOLESALE
 }
 
 enum AssignedRole {
+  ADMIN
   MANAGER
   SECRETARY
   CASHIER
@@ -364,8 +440,11 @@ enum TrackingStatus {
 }
 
 enum MovementType {
-  STOCK_IN
-  STOCK_OUT
+  IN
+  OUT
+  SALE
+  RETURN
+  ADJUSTMENT
 }
 
 enum POStatus {

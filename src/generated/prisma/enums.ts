@@ -17,6 +17,17 @@ export const TransactionType = {
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
 
 
+export const TransactionStatus = {
+  COMPLETED: 'COMPLETED',
+  PENDING: 'PENDING',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
+  PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED'
+} as const
+
+export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus]
+
+
 export const CustomerType = {
   RETAIL: 'RETAIL',
   WHOLESALE: 'WHOLESALE'
@@ -26,6 +37,7 @@ export type CustomerType = (typeof CustomerType)[keyof typeof CustomerType]
 
 
 export const AssignedRole = {
+  ADMIN: 'ADMIN',
   MANAGER: 'MANAGER',
   SECRETARY: 'SECRETARY',
   CASHIER: 'CASHIER',
@@ -55,8 +67,11 @@ export type TrackingStatus = (typeof TrackingStatus)[keyof typeof TrackingStatus
 
 
 export const MovementType = {
-  STOCK_IN: 'STOCK_IN',
-  STOCK_OUT: 'STOCK_OUT'
+  IN: 'IN',
+  OUT: 'OUT',
+  SALE: 'SALE',
+  RETURN: 'RETURN',
+  ADJUSTMENT: 'ADJUSTMENT'
 } as const
 
 export type MovementType = (typeof MovementType)[keyof typeof MovementType]

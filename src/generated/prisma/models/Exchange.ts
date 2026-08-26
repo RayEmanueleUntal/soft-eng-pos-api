@@ -30,7 +30,7 @@ export type ExchangeAvgAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   price_difference: runtime.Decimal | null
 }
 
@@ -38,7 +38,7 @@ export type ExchangeSumAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   price_difference: runtime.Decimal | null
 }
 
@@ -46,7 +46,7 @@ export type ExchangeMinAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   date: Date | null
   price_difference: runtime.Decimal | null
   is_within_7_days: boolean | null
@@ -56,7 +56,7 @@ export type ExchangeMaxAggregateOutputType = {
   id: number | null
   transactionId: number | null
   productId: number | null
-  quantity: number | null
+  quantity: runtime.Decimal | null
   date: Date | null
   price_difference: runtime.Decimal | null
   is_within_7_days: boolean | null
@@ -211,7 +211,7 @@ export type ExchangeGroupByOutputType = {
   id: number
   transactionId: number
   productId: number
-  quantity: number
+  quantity: runtime.Decimal
   date: Date
   price_difference: runtime.Decimal
   is_within_7_days: boolean
@@ -244,7 +244,7 @@ export type ExchangeWhereInput = {
   id?: Prisma.IntFilter<"Exchange"> | number
   transactionId?: Prisma.IntFilter<"Exchange"> | number
   productId?: Prisma.IntFilter<"Exchange"> | number
-  quantity?: Prisma.IntFilter<"Exchange"> | number
+  quantity?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Exchange"> | Date | string
   price_difference?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFilter<"Exchange"> | boolean
@@ -271,7 +271,7 @@ export type ExchangeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ExchangeWhereInput | Prisma.ExchangeWhereInput[]
   transactionId?: Prisma.IntFilter<"Exchange"> | number
   productId?: Prisma.IntFilter<"Exchange"> | number
-  quantity?: Prisma.IntFilter<"Exchange"> | number
+  quantity?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Exchange"> | Date | string
   price_difference?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFilter<"Exchange"> | boolean
@@ -301,14 +301,14 @@ export type ExchangeScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Exchange"> | number
   transactionId?: Prisma.IntWithAggregatesFilter<"Exchange"> | number
   productId?: Prisma.IntWithAggregatesFilter<"Exchange"> | number
-  quantity?: Prisma.IntWithAggregatesFilter<"Exchange"> | number
+  quantity?: Prisma.DecimalWithAggregatesFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeWithAggregatesFilter<"Exchange"> | Date | string
   price_difference?: Prisma.DecimalWithAggregatesFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolWithAggregatesFilter<"Exchange"> | boolean
 }
 
 export type ExchangeCreateInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
@@ -320,14 +320,14 @@ export type ExchangeUncheckedCreateInput = {
   id?: number
   transactionId: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
 }
 
 export type ExchangeUpdateInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -339,7 +339,7 @@ export type ExchangeUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -349,14 +349,14 @@ export type ExchangeCreateManyInput = {
   id?: number
   transactionId: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
 }
 
 export type ExchangeUpdateManyMutationInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -366,7 +366,7 @@ export type ExchangeUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -517,7 +517,7 @@ export type ExchangeUncheckedUpdateManyWithoutProductNestedInput = {
 }
 
 export type ExchangeCreateWithoutTransactionInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
@@ -527,7 +527,7 @@ export type ExchangeCreateWithoutTransactionInput = {
 export type ExchangeUncheckedCreateWithoutTransactionInput = {
   id?: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
@@ -566,14 +566,14 @@ export type ExchangeScalarWhereInput = {
   id?: Prisma.IntFilter<"Exchange"> | number
   transactionId?: Prisma.IntFilter<"Exchange"> | number
   productId?: Prisma.IntFilter<"Exchange"> | number
-  quantity?: Prisma.IntFilter<"Exchange"> | number
+  quantity?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Exchange"> | Date | string
   price_difference?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFilter<"Exchange"> | boolean
 }
 
 export type ExchangeCreateWithoutProductInput = {
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
@@ -583,7 +583,7 @@ export type ExchangeCreateWithoutProductInput = {
 export type ExchangeUncheckedCreateWithoutProductInput = {
   id?: number
   transactionId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
@@ -618,14 +618,14 @@ export type ExchangeUpdateManyWithWhereWithoutProductInput = {
 export type ExchangeCreateManyTransactionInput = {
   id?: number
   productId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
 }
 
 export type ExchangeUpdateWithoutTransactionInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -635,7 +635,7 @@ export type ExchangeUpdateWithoutTransactionInput = {
 export type ExchangeUncheckedUpdateWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -644,7 +644,7 @@ export type ExchangeUncheckedUpdateWithoutTransactionInput = {
 export type ExchangeUncheckedUpdateManyWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -653,14 +653,14 @@ export type ExchangeUncheckedUpdateManyWithoutTransactionInput = {
 export type ExchangeCreateManyProductInput = {
   id?: number
   transactionId: number
-  quantity?: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
   price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: boolean
 }
 
 export type ExchangeUpdateWithoutProductInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -670,7 +670,7 @@ export type ExchangeUpdateWithoutProductInput = {
 export type ExchangeUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -679,7 +679,7 @@ export type ExchangeUncheckedUpdateWithoutProductInput = {
 export type ExchangeUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -757,7 +757,7 @@ export type $ExchangePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: number
     transactionId: number
     productId: number
-    quantity: number
+    quantity: runtime.Decimal
     date: Date
     price_difference: runtime.Decimal
     is_within_7_days: boolean
@@ -1189,7 +1189,7 @@ export interface ExchangeFieldRefs {
   readonly id: Prisma.FieldRef<"Exchange", 'Int'>
   readonly transactionId: Prisma.FieldRef<"Exchange", 'Int'>
   readonly productId: Prisma.FieldRef<"Exchange", 'Int'>
-  readonly quantity: Prisma.FieldRef<"Exchange", 'Int'>
+  readonly quantity: Prisma.FieldRef<"Exchange", 'Decimal'>
   readonly date: Prisma.FieldRef<"Exchange", 'DateTime'>
   readonly price_difference: Prisma.FieldRef<"Exchange", 'Decimal'>
   readonly is_within_7_days: Prisma.FieldRef<"Exchange", 'Boolean'>
