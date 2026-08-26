@@ -43,18 +43,48 @@ export class InventoryService {
 
     this.logger.debug('Fetching inventory list', { filters: invDto });
 
-    const where = {
-      ...(search && {
-        name: {
-          contains: search,
-          mode: 'insensitive' as const,
-        },
-      }),
-      ...(categoryId && { categoryId }),
-      ...(size && { size_dimensions: size }),
-      ...(thread && { thread_type: thread }),
-      ...(material && { material_grade: material }),
-    };
+    // const where = {
+    //   ...(search && {
+    //     name: {
+    //       contains: search,
+    //       mode: 'insensitive' as const,
+    //     },
+    //   }),
+    //   ...(categoryId && { categoryId }),
+    //   ...(size && { size_dimensions: size }),
+    //   ...(thread && { thread_type: thread }),
+    //   ...(material && { material_grade: material }),
+    // };
+
+    // A. If the user types a general search strin glike "Hex Bolt Grade 8"
+    const searchKeywords = search ? search.trim().split(/\s+/) : [];
+
+    const where: any = {};
+
+    if (searchKeywords.length > 0) {
+      // Every keyword typed must match AT LEAST ONE of the searchable fields
+      where.AND = searchKeywords.map((keyword) => ({
+        OR: [
+          { name: { contains: keyword, mode: 'insensitive' } },
+          { sku: { contains: keyword, mode: 'insensitive' } },
+          { size_dimensions: { contains: keyword, mode: 'insensitive' } },
+          { thread_type: { contains: keyword, mode: 'insensitive' } },
+          { material_grade: { contains: keyword, mode: 'insensitive' } },
+        ],
+      }));
+    }
+
+    // B. Keep explicit filters if they are provided via dropdowns
+    if (categoryId) where.categoryId = categoryId;
+    if (size) {
+      where.size_dimensions = { contains: size, mode: 'insensitive' };
+    }
+    if (thread) {
+      where.thread_type = { contains: thread, mode: 'insensitive' };
+    }
+    if (material) {
+      where.material_grade = { contains: material, mode: 'insensitive' };
+    }
 
     const skip = (page - 1) * limit;
 
