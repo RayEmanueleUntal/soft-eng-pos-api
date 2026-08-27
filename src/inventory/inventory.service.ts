@@ -10,14 +10,13 @@ import {
   StockOutDto,
 } from './dto';
 import { Prisma } from 'src/generated/prisma/client';
-import { MovementType } from 'src/generated/prisma/enums';
+import { MovementType, UnitOfMeasure } from 'src/generated/prisma/enums';
 import { UOMMismatchException } from 'src/common/exceptions/uom-mismatch.exception';
-import { Decimal } from '@prisma/client/runtime/client';
 import { StockInDto } from './dto/requests/stock-in.dto';
 import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace';
 import { Product } from 'src/generated/prisma/client';
-import { OutOfStockException } from 'src/common/exceptions/out-of-stock.exception';
 import { StockMovementResponseDto } from './dto/responses/stock-movement-response.dto';
+import { InsufficientStockException } from 'src/common/exceptions/insufficient-stock.exception';
 
 @Injectable()
 export class InventoryService {
@@ -94,6 +93,7 @@ export class InventoryService {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: { bin_location: true },
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -112,7 +112,7 @@ export class InventoryService {
   private async validateAndGetProduct(
     tx: TransactionClient,
     productId: number,
-    providedUom: string,
+    providedUom: UnitOfMeasure,
     userId: number,
     operationName: string,
   ): Promise<Product> {
@@ -163,8 +163,8 @@ export class InventoryService {
         'Inventory adjustment',
       );
 
-      const previousQty = new Decimal(product.current_quantity);
-      const newQty = new Decimal(adjustDto.new_count);
+      const previousQty = new Prisma.Decimal(product.current_quantity);
+      const newQty = new Prisma.Decimal(adjustDto.new_count);
       const qtyChanged = newQty.minus(previousQty);
 
       const createdMovement = await tx.stockMovement.create({
@@ -225,8 +225,8 @@ export class InventoryService {
         'Stock-In',
       );
 
-      const prevQty = new Decimal(product.current_quantity);
-      const addedQty = new Decimal(stockInDto.added_qty);
+      const prevQty = new Prisma.Decimal(product.current_quantity);
+      const addedQty = new Prisma.Decimal(stockInDto.added_qty);
       const newQty = prevQty.plus(addedQty);
 
       const createdMovement = await tx.stockMovement.create({
@@ -263,6 +263,103 @@ export class InventoryService {
   }
 
   /*
+  Helper function that reduces the stock
+  */
+  async reduceProductStock(
+    tx: Prisma.TransactionClient,
+    params: {
+      productId: number;
+      quantityToDeduct: number;
+      provided_uom: UnitOfMeasure;
+      userId: number;
+      reason: string;
+      allowOverride: boolean;
+      operation_name: string;
+    },
+  ) {
+    const {
+      productId,
+      quantityToDeduct,
+      provided_uom,
+      userId,
+      reason,
+      allowOverride,
+      operation_name,
+    } = params;
+
+    const product = await this.validateAndGetProduct(
+      tx,
+      productId,
+      provided_uom,
+      userId,
+      operation_name,
+    );
+
+    const prevQty = new Prisma.Decimal(product.current_quantity);
+    const takenQty = new Prisma.Decimal(quantityToDeduct);
+    const newQty = prevQty.minus(takenQty);
+
+    if (newQty.isNegative()) {
+      if (!allowOverride) {
+        await tx.product.update({
+          where: { id: productId },
+          data: { needsRecount: true },
+        });
+
+        this.logger.warn(`Checkout failed: Insufficient stock`, {
+          productId: product.id,
+          productName: product.name,
+          requested: takenQty.toNumber(),
+          available: prevQty.toNumber(),
+        });
+
+        // Throw exception for insufficient stock
+        throw new InsufficientStockException(
+          product.id,
+          product.name,
+          takenQty.toNumber(),
+          prevQty.toNumber(),
+        );
+      }
+
+      // Override allowed: proceed with negative balance
+      this.logger.warn(
+        `STOCK OVERRIDE APPLIED: Negative inventory balance allowed`,
+        {
+          userId,
+          productId: product.id,
+          newQuantity: newQty.toString(),
+        },
+      );
+    }
+
+    await tx.product.update({
+      where: { id: product.id },
+      data: {
+        current_quantity: newQty,
+        ...(newQty.isNegative() ? { needsRecount: true } : {}),
+      },
+    });
+
+    return await tx.stockMovement.create({
+      data: {
+        productId: product.id,
+        staffId: userId,
+        date: new Date(),
+        type: MovementType.OUT,
+        current_uom: product.pricing_uom ?? UnitOfMeasure.PCS,
+        quantity_changed: takenQty.times(-1),
+        previous_quantity: prevQty,
+        new_quantity: newQty,
+        reason:
+          allowOverride && newQty.isNegative()
+            ? `${reason} (OVERRIDDEN)`
+            : reason,
+      },
+    });
+  }
+
+  /*
   Stock-Out
   */
   async stockOut(
@@ -275,65 +372,15 @@ export class InventoryService {
     });
 
     const movement = await this.prisma.$transaction(async (tx) => {
-      const product = await this.validateAndGetProduct(
-        tx,
-        stockOutDto.productId,
-        stockOutDto.current_uom,
+      return this.reduceProductStock(tx, {
+        productId: stockOutDto.productId,
+        quantityToDeduct: stockOutDto.taken_qty,
+        provided_uom: stockOutDto.current_uom,
         userId,
-        'Stock-Out',
-      );
-
-      const prevQty = new Decimal(product.current_quantity);
-      const takenQty = new Decimal(stockOutDto.taken_qty);
-      const newQty = prevQty.minus(takenQty);
-
-      // Check if stock is invalid (negative)
-      if (newQty.isNegative()) {
-        this.logger.warn(`Stock-Out failed: Insufficient Stock`, {
-          userId,
-          productId: product.id,
-          prevQty: prevQty.toString(),
-          takenQty: takenQty.toString(),
-          newQty: newQty.toString(),
-        });
-
-        // Set product need recount status to true
-        await tx.product.update({
-          where: { id: product.id },
-          data: { needsRecount: true },
-        });
-
-        throw new OutOfStockException(product.id, product.name);
-      }
-
-      const createdMovement = await tx.stockMovement.create({
-        data: {
-          productId: product.id,
-          staffId: userId,
-          date: stockOutDto.date ?? new Date(),
-          type: MovementType.OUT,
-          current_uom: product.base_uom,
-          quantity_changed: takenQty.times(-1),
-          previous_quantity: prevQty,
-          new_quantity: newQty,
-          reason: stockOutDto.reason ?? 'Stock-Out',
-        },
+        reason: stockOutDto.reason ?? 'Manual Stock-Out',
+        allowOverride: stockOutDto.allowOverride ?? false,
+        operation_name: 'Stock-out',
       });
-
-      await tx.product.update({
-        where: { id: product.id },
-        data: { current_quantity: newQty },
-      });
-
-      this.logger.log('Stock-out completed successfully', {
-        movementId: createdMovement.id,
-        productId: product.id,
-        userId,
-        takenQty: takenQty.toString(),
-        newQty: newQty.toString(),
-      });
-
-      return createdMovement;
     });
 
     return StockMovementResponseDto.fromEntity(movement);

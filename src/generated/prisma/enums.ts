@@ -9,6 +9,21 @@
 * 🟢 You can import this file directly.
 */
 
+export const UnitOfMeasure = {
+  PCS: 'PCS',
+  BOX: 'BOX',
+  SET: 'SET',
+  KG: 'KG',
+  G: 'G',
+  METER: 'METER',
+  HUNDRED: 'HUNDRED',
+  GROSS: 'GROSS',
+  SACKs: 'SACKs'
+} as const
+
+export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]
+
+
 export const TransactionType = {
   RETAIL: 'RETAIL',
   WHOLESALE: 'WHOLESALE'

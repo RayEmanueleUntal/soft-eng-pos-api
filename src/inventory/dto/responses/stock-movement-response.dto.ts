@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { StockMovement, MovementType } from 'src/generated/prisma/client';
+import {
+  StockMovement,
+  MovementType,
+  UnitOfMeasure,
+} from 'src/generated/prisma/client';
 
 export class StockMovementResponseDto {
   @ApiProperty({ example: 501, description: 'Unique StockMovement ID' })
@@ -14,8 +18,8 @@ export class StockMovementResponseDto {
   @ApiProperty({ enum: MovementType, example: MovementType.ADJUSTMENT })
   type!: MovementType;
 
-  @ApiProperty({ example: 'pcs' })
-  current_uom!: string;
+  @ApiProperty({ example: UnitOfMeasure.PCS })
+  current_uom!: UnitOfMeasure;
 
   @ApiProperty({
     example: -5.0,

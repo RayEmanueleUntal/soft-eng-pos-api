@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -98,7 +99,7 @@ export class InventoryController {
   @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
   assignBin(
     @CurrentUser() user: { id: number },
-    @Param('id') productId: number,
+    @Param('id', ParseIntPipe) productId: number,
     @Body() binDto: AssignBinDto,
   ): Promise<AssignBinResponseDto> {
     return this.inventoryService.assignBin(user.id, productId, binDto);

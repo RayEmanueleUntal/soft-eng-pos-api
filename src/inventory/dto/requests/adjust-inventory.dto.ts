@@ -3,11 +3,13 @@ import { Type } from 'class-transformer';
 import {
   IsDate,
   IsDateString,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPositive,
   IsString,
 } from 'class-validator';
+import { UnitOfMeasure } from 'src/generated/prisma/enums';
 
 export class AdjustInventoryDto {
   @IsNotEmpty()
@@ -21,9 +23,10 @@ export class AdjustInventoryDto {
   date?: Date;
 
   @IsNotEmpty()
-  @IsString()
-  @ApiProperty({ example: 'pcs' })
-  current_uom!: string;
+  @IsEnum(UnitOfMeasure)
+  @Type()
+  @ApiProperty({ example: 'PCS' })
+  current_uom!: UnitOfMeasure;
 
   @IsNotEmpty()
   @IsPositive()
