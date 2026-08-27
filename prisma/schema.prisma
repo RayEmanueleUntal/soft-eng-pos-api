@@ -56,7 +56,7 @@ model TransactionItem {
 
   // Use Decimal if selling loose items by weight (e.g., 2.5kg of nails). Keep Int if strictly by piece.
   quantity_sold  Decimal     @db.Decimal(10, 3)
-  unit_of_measure String     @default("pcs")    // e.g., "pcs", "kg", "box"
+  unit_of_measure UnitOfMeasure   @default(PCS)    // e.g., "pcs", "kg", "box"
 
   unit_price     Decimal     @db.Decimal(10, 2) // Base price per unit at moment of sale
   discount       Decimal     @default(0.00) @db.Decimal(10, 2) // Line-item discount amount
@@ -252,16 +252,16 @@ model Product {
   material_grade   String?      // e.g. "Stainless 304", "Grade 8", "Zinc Plated"
 
   // Inventory Tracking (Always in Base Units)
-  base_uom         String    @default("pcs")  // "pcs", "kg", "meter"
+  base_uom         UnitOfMeasure    @default(PCS)  // "pcs", "kg", "meter"
   current_quantity Decimal   @default(0.00) @db.Decimal(10,3)
   reorder_point_ROP Decimal  @default(0.00) @db.Decimal(10,3)
   needsRecount     Boolean   @default(false) // Set to TRUE during forced stock-out overrides
 
   // Multi-UoM Pricing & Unit Conversion
-  pricing_uom      String    @default("pcs")  // "pcs", "kg", "hundred", "gross", "sack"
+  pricing_uom      UnitOfMeasure    @default(PCS)  // "pcs", "kg", "hundred", "gross", "sack"
   pricing_unit_qty Decimal   @default(1.000)  @db.Decimal(10, 3)  // e.g., 100 for "Per Hundred", 144 for "Gross"
   cost_price       Decimal   @default(0.00)   @db.Decimal(10, 2)  // Purchasing cost
-  retail_price     Decimal   @db.Decimal(10, 2)
+  retail_price     Decimal   @db.Decimal(10, 2)  // should be VAT-inclusive
   wholesale_price  Decimal?  @db.Decimal(10, 2)
   
   // Storage Location
@@ -307,7 +307,7 @@ model StockMovement {
   date             DateTime     @default(now())
   type             MovementType
 
-  current_uom      String       @default("pcs")
+  current_uom      UnitOfMeasure       @default(PCS)
   quantity_changed Decimal      @db.Decimal(10, 3)  // Positive for stock in, negative for stock out
   previous_quantity Decimal     @db.Decimal(10, 3)  // e.g., 0 (DB level before change)
   new_quantity     Decimal      @db.Decimal(10, 3)  // e.g., -2 (DB level after change)
@@ -399,6 +399,18 @@ model DeliveryItem {
 // ==========================================
 // ENUMS
 // ==========================================
+
+enum UnitOfMeasure {
+  PCS
+  BOX
+  SET
+  KG
+  G
+  METER
+  HUNDRED
+  GROSS 
+  SACKs
+}
 
 enum TransactionType {
   RETAIL

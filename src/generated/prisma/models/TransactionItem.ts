@@ -51,7 +51,7 @@ export type TransactionItemMinAggregateOutputType = {
   transactionId: number | null
   productId: number | null
   quantity_sold: runtime.Decimal | null
-  unit_of_measure: string | null
+  unit_of_measure: $Enums.UnitOfMeasure | null
   unit_price: runtime.Decimal | null
   discount: runtime.Decimal | null
   subtotal: runtime.Decimal | null
@@ -62,7 +62,7 @@ export type TransactionItemMaxAggregateOutputType = {
   transactionId: number | null
   productId: number | null
   quantity_sold: runtime.Decimal | null
-  unit_of_measure: string | null
+  unit_of_measure: $Enums.UnitOfMeasure | null
   unit_price: runtime.Decimal | null
   discount: runtime.Decimal | null
   subtotal: runtime.Decimal | null
@@ -226,7 +226,7 @@ export type TransactionItemGroupByOutputType = {
   transactionId: number
   productId: number
   quantity_sold: runtime.Decimal
-  unit_of_measure: string
+  unit_of_measure: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal
   discount: runtime.Decimal
   subtotal: runtime.Decimal
@@ -260,7 +260,7 @@ export type TransactionItemWhereInput = {
   transactionId?: Prisma.IntFilter<"TransactionItem"> | number
   productId?: Prisma.IntFilter<"TransactionItem"> | number
   quantity_sold?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFilter<"TransactionItem"> | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFilter<"TransactionItem"> | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -289,7 +289,7 @@ export type TransactionItemWhereUniqueInput = Prisma.AtLeast<{
   transactionId?: Prisma.IntFilter<"TransactionItem"> | number
   productId?: Prisma.IntFilter<"TransactionItem"> | number
   quantity_sold?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFilter<"TransactionItem"> | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFilter<"TransactionItem"> | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -321,7 +321,7 @@ export type TransactionItemScalarWhereWithAggregatesInput = {
   transactionId?: Prisma.IntWithAggregatesFilter<"TransactionItem"> | number
   productId?: Prisma.IntWithAggregatesFilter<"TransactionItem"> | number
   quantity_sold?: Prisma.DecimalWithAggregatesFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringWithAggregatesFilter<"TransactionItem"> | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureWithAggregatesFilter<"TransactionItem"> | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalWithAggregatesFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalWithAggregatesFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalWithAggregatesFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -329,7 +329,7 @@ export type TransactionItemScalarWhereWithAggregatesInput = {
 
 export type TransactionItemCreateInput = {
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -342,7 +342,7 @@ export type TransactionItemUncheckedCreateInput = {
   transactionId: number
   productId: number
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -350,7 +350,7 @@ export type TransactionItemUncheckedCreateInput = {
 
 export type TransactionItemUpdateInput = {
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -363,7 +363,7 @@ export type TransactionItemUncheckedUpdateInput = {
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -374,7 +374,7 @@ export type TransactionItemCreateManyInput = {
   transactionId: number
   productId: number
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -382,7 +382,7 @@ export type TransactionItemCreateManyInput = {
 
 export type TransactionItemUpdateManyMutationInput = {
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -393,7 +393,7 @@ export type TransactionItemUncheckedUpdateManyInput = {
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -504,8 +504,8 @@ export type TransactionItemUncheckedUpdateManyWithoutTransactionNestedInput = {
   deleteMany?: Prisma.TransactionItemScalarWhereInput | Prisma.TransactionItemScalarWhereInput[]
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type EnumUnitOfMeasureFieldUpdateOperationsInput = {
+  set?: $Enums.UnitOfMeasure
 }
 
 export type TransactionItemCreateNestedManyWithoutProductInput = {
@@ -552,7 +552,7 @@ export type TransactionItemUncheckedUpdateManyWithoutProductNestedInput = {
 
 export type TransactionItemCreateWithoutTransactionInput = {
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -563,7 +563,7 @@ export type TransactionItemUncheckedCreateWithoutTransactionInput = {
   id?: number
   productId: number
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -603,7 +603,7 @@ export type TransactionItemScalarWhereInput = {
   transactionId?: Prisma.IntFilter<"TransactionItem"> | number
   productId?: Prisma.IntFilter<"TransactionItem"> | number
   quantity_sold?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFilter<"TransactionItem"> | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFilter<"TransactionItem"> | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFilter<"TransactionItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -611,7 +611,7 @@ export type TransactionItemScalarWhereInput = {
 
 export type TransactionItemCreateWithoutProductInput = {
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -622,7 +622,7 @@ export type TransactionItemUncheckedCreateWithoutProductInput = {
   id?: number
   transactionId: number
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -658,7 +658,7 @@ export type TransactionItemCreateManyTransactionInput = {
   id?: number
   productId: number
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -666,7 +666,7 @@ export type TransactionItemCreateManyTransactionInput = {
 
 export type TransactionItemUpdateWithoutTransactionInput = {
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -677,7 +677,7 @@ export type TransactionItemUncheckedUpdateWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -687,7 +687,7 @@ export type TransactionItemUncheckedUpdateManyWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -697,7 +697,7 @@ export type TransactionItemCreateManyProductInput = {
   id?: number
   transactionId: number
   quantity_sold: runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: string
+  unit_of_measure?: $Enums.UnitOfMeasure
   unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -705,7 +705,7 @@ export type TransactionItemCreateManyProductInput = {
 
 export type TransactionItemUpdateWithoutProductInput = {
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -716,7 +716,7 @@ export type TransactionItemUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -726,7 +726,7 @@ export type TransactionItemUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity_sold?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  unit_of_measure?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_of_measure?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -809,7 +809,7 @@ export type $TransactionItemPayload<ExtArgs extends runtime.Types.Extensions.Int
     transactionId: number
     productId: number
     quantity_sold: runtime.Decimal
-    unit_of_measure: string
+    unit_of_measure: $Enums.UnitOfMeasure
     unit_price: runtime.Decimal
     discount: runtime.Decimal
     subtotal: runtime.Decimal
@@ -1242,7 +1242,7 @@ export interface TransactionItemFieldRefs {
   readonly transactionId: Prisma.FieldRef<"TransactionItem", 'Int'>
   readonly productId: Prisma.FieldRef<"TransactionItem", 'Int'>
   readonly quantity_sold: Prisma.FieldRef<"TransactionItem", 'Decimal'>
-  readonly unit_of_measure: Prisma.FieldRef<"TransactionItem", 'String'>
+  readonly unit_of_measure: Prisma.FieldRef<"TransactionItem", 'UnitOfMeasure'>
   readonly unit_price: Prisma.FieldRef<"TransactionItem", 'Decimal'>
   readonly discount: Prisma.FieldRef<"TransactionItem", 'Decimal'>
   readonly subtotal: Prisma.FieldRef<"TransactionItem", 'Decimal'>

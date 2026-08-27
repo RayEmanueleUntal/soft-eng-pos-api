@@ -2483,6 +2483,20 @@ export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMo
 
 
 /**
+ * Reference to a field of type 'UnitOfMeasure'
+ */
+export type EnumUnitOfMeasureFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UnitOfMeasure'>
+    
+
+
+/**
+ * Reference to a field of type 'UnitOfMeasure[]'
+ */
+export type ListEnumUnitOfMeasureFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UnitOfMeasure[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>

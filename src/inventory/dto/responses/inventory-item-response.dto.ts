@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product } from 'src/generated/prisma/client';
+import {
+  Product,
+  BinLocation,
+  UnitOfMeasure,
+} from 'src/generated/prisma/client';
 
 export class InventoryItemResponseDto {
   @ApiProperty({ example: 42 })
@@ -23,8 +27,8 @@ export class InventoryItemResponseDto {
   @ApiProperty({ example: 'Stainless 304', nullable: true })
   material_grade!: string | null;
 
-  @ApiProperty({ example: 'pcs' })
-  base_uom!: string;
+  @ApiProperty({ example: UnitOfMeasure.PCS })
+  base_uom!: UnitOfMeasure;
 
   @ApiProperty({ example: 150.0 })
   current_quantity!: number;
@@ -35,8 +39,8 @@ export class InventoryItemResponseDto {
   @ApiProperty({ example: false })
   needsRecount!: boolean;
 
-  @ApiProperty({ example: 'pcs' })
-  pricing_uom!: string;
+  @ApiProperty({ example: UnitOfMeasure.PCS })
+  pricing_uom!: UnitOfMeasure;
 
   @ApiProperty({ example: 1.0 })
   pricing_unit_qty!: number;
@@ -53,6 +57,12 @@ export class InventoryItemResponseDto {
   @ApiProperty({ example: 12, nullable: true })
   binId!: number | null;
 
+  @ApiProperty({ example: 'Aisle 3', nullable: true })
+  bin_aisle_number!: string | null;
+
+  @ApiProperty({ example: 'Shelf B-2', nullable: true })
+  bin_shelf_location!: string | null;
+
   @ApiProperty({ example: '2026-03-31T10:00:00.000Z' })
   createdAt!: Date;
 
@@ -62,7 +72,9 @@ export class InventoryItemResponseDto {
   /**
    * Static Factory Method to transform Prisma Product model into response DTO
    */
-  static fromEntity(product: Product): InventoryItemResponseDto {
+  static fromEntity(
+    product: Product & { bin_location?: BinLocation | null },
+  ): InventoryItemResponseDto {
     return {
       ...product,
       current_quantity: product.current_quantity.toNumber(),
@@ -73,6 +85,8 @@ export class InventoryItemResponseDto {
       wholesale_price: product.wholesale_price
         ? product.wholesale_price.toNumber()
         : null,
+      bin_aisle_number: product.bin_location?.aisle_number ?? null,
+      bin_shelf_location: product.bin_location?.shelf_location ?? null,
     };
   }
 }

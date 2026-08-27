@@ -53,7 +53,7 @@ export type StockMovementMinAggregateOutputType = {
   approvedById: number | null
   date: Date | null
   type: $Enums.MovementType | null
-  current_uom: string | null
+  current_uom: $Enums.UnitOfMeasure | null
   quantity_changed: runtime.Decimal | null
   previous_quantity: runtime.Decimal | null
   new_quantity: runtime.Decimal | null
@@ -68,7 +68,7 @@ export type StockMovementMaxAggregateOutputType = {
   approvedById: number | null
   date: Date | null
   type: $Enums.MovementType | null
-  current_uom: string | null
+  current_uom: $Enums.UnitOfMeasure | null
   quantity_changed: runtime.Decimal | null
   previous_quantity: runtime.Decimal | null
   new_quantity: runtime.Decimal | null
@@ -252,7 +252,7 @@ export type StockMovementGroupByOutputType = {
   approvedById: number | null
   date: Date
   type: $Enums.MovementType
-  current_uom: string
+  current_uom: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal
   previous_quantity: runtime.Decimal
   new_quantity: runtime.Decimal
@@ -290,7 +290,7 @@ export type StockMovementWhereInput = {
   approvedById?: Prisma.IntNullableFilter<"StockMovement"> | number | null
   date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
   type?: Prisma.EnumMovementTypeFilter<"StockMovement"> | $Enums.MovementType
-  current_uom?: Prisma.StringFilter<"StockMovement"> | string
+  current_uom?: Prisma.EnumUnitOfMeasureFilter<"StockMovement"> | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -329,7 +329,7 @@ export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
   approvedById?: Prisma.IntNullableFilter<"StockMovement"> | number | null
   date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
   type?: Prisma.EnumMovementTypeFilter<"StockMovement"> | $Enums.MovementType
-  current_uom?: Prisma.StringFilter<"StockMovement"> | string
+  current_uom?: Prisma.EnumUnitOfMeasureFilter<"StockMovement"> | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -370,7 +370,7 @@ export type StockMovementScalarWhereWithAggregatesInput = {
   approvedById?: Prisma.IntNullableWithAggregatesFilter<"StockMovement"> | number | null
   date?: Prisma.DateTimeWithAggregatesFilter<"StockMovement"> | Date | string
   type?: Prisma.EnumMovementTypeWithAggregatesFilter<"StockMovement"> | $Enums.MovementType
-  current_uom?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
+  current_uom?: Prisma.EnumUnitOfMeasureWithAggregatesFilter<"StockMovement"> | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalWithAggregatesFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalWithAggregatesFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalWithAggregatesFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -381,7 +381,7 @@ export type StockMovementScalarWhereWithAggregatesInput = {
 export type StockMovementCreateInput = {
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -399,7 +399,7 @@ export type StockMovementUncheckedCreateInput = {
   approvedById?: number | null
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -410,7 +410,7 @@ export type StockMovementUncheckedCreateInput = {
 export type StockMovementUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -428,7 +428,7 @@ export type StockMovementUncheckedUpdateInput = {
   approvedById?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -443,7 +443,7 @@ export type StockMovementCreateManyInput = {
   approvedById?: number | null
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -454,7 +454,7 @@ export type StockMovementCreateManyInput = {
 export type StockMovementUpdateManyMutationInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -469,7 +469,7 @@ export type StockMovementUncheckedUpdateManyInput = {
   approvedById?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -685,7 +685,7 @@ export type EnumMovementTypeFieldUpdateOperationsInput = {
 export type StockMovementCreateWithoutStaffInput = {
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -701,7 +701,7 @@ export type StockMovementUncheckedCreateWithoutStaffInput = {
   approvedById?: number | null
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -722,7 +722,7 @@ export type StockMovementCreateManyStaffInputEnvelope = {
 export type StockMovementCreateWithoutApprovedByInput = {
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -738,7 +738,7 @@ export type StockMovementUncheckedCreateWithoutApprovedByInput = {
   staffId: number
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -782,7 +782,7 @@ export type StockMovementScalarWhereInput = {
   approvedById?: Prisma.IntNullableFilter<"StockMovement"> | number | null
   date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
   type?: Prisma.EnumMovementTypeFilter<"StockMovement"> | $Enums.MovementType
-  current_uom?: Prisma.StringFilter<"StockMovement"> | string
+  current_uom?: Prisma.EnumUnitOfMeasureFilter<"StockMovement"> | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFilter<"StockMovement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -809,7 +809,7 @@ export type StockMovementUpdateManyWithWhereWithoutApprovedByInput = {
 export type StockMovementCreateWithoutProductInput = {
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -825,7 +825,7 @@ export type StockMovementUncheckedCreateWithoutProductInput = {
   approvedById?: number | null
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -865,7 +865,7 @@ export type StockMovementCreateManyStaffInput = {
   approvedById?: number | null
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -879,7 +879,7 @@ export type StockMovementCreateManyApprovedByInput = {
   staffId: number
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -890,7 +890,7 @@ export type StockMovementCreateManyApprovedByInput = {
 export type StockMovementUpdateWithoutStaffInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -906,7 +906,7 @@ export type StockMovementUncheckedUpdateWithoutStaffInput = {
   approvedById?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -920,7 +920,7 @@ export type StockMovementUncheckedUpdateManyWithoutStaffInput = {
   approvedById?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -931,7 +931,7 @@ export type StockMovementUncheckedUpdateManyWithoutStaffInput = {
 export type StockMovementUpdateWithoutApprovedByInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -947,7 +947,7 @@ export type StockMovementUncheckedUpdateWithoutApprovedByInput = {
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -961,7 +961,7 @@ export type StockMovementUncheckedUpdateManyWithoutApprovedByInput = {
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -975,7 +975,7 @@ export type StockMovementCreateManyProductInput = {
   approvedById?: number | null
   date?: Date | string
   type: $Enums.MovementType
-  current_uom?: string
+  current_uom?: $Enums.UnitOfMeasure
   quantity_changed: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -986,7 +986,7 @@ export type StockMovementCreateManyProductInput = {
 export type StockMovementUpdateWithoutProductInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1002,7 +1002,7 @@ export type StockMovementUncheckedUpdateWithoutProductInput = {
   approvedById?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1016,7 +1016,7 @@ export type StockMovementUncheckedUpdateManyWithoutProductInput = {
   approvedById?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  current_uom?: Prisma.StringFieldUpdateOperationsInput | string
+  current_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
   quantity_changed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   new_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1126,7 +1126,7 @@ export type $StockMovementPayload<ExtArgs extends runtime.Types.Extensions.Inter
     approvedById: number | null
     date: Date
     type: $Enums.MovementType
-    current_uom: string
+    current_uom: $Enums.UnitOfMeasure
     quantity_changed: runtime.Decimal
     previous_quantity: runtime.Decimal
     new_quantity: runtime.Decimal
@@ -1564,7 +1564,7 @@ export interface StockMovementFieldRefs {
   readonly approvedById: Prisma.FieldRef<"StockMovement", 'Int'>
   readonly date: Prisma.FieldRef<"StockMovement", 'DateTime'>
   readonly type: Prisma.FieldRef<"StockMovement", 'MovementType'>
-  readonly current_uom: Prisma.FieldRef<"StockMovement", 'String'>
+  readonly current_uom: Prisma.FieldRef<"StockMovement", 'UnitOfMeasure'>
   readonly quantity_changed: Prisma.FieldRef<"StockMovement", 'Decimal'>
   readonly previous_quantity: Prisma.FieldRef<"StockMovement", 'Decimal'>
   readonly new_quantity: Prisma.FieldRef<"StockMovement", 'Decimal'>

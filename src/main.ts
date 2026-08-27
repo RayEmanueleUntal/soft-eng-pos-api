@@ -6,8 +6,9 @@ import { CustomExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
+    // Set up logger
     logger: new ConsoleLogger({
-      logLevels: ['log', 'fatal', 'warn', 'error'],
+      logLevels: ['log', 'fatal', 'warn', 'error', 'debug', 'verbose'],
       timestamp: true,
       prefix: 'Chris Bolts App',
       json: true,
@@ -15,6 +16,7 @@ async function bootstrap() {
     }),
   });
 
+  // Set up global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,16 +27,22 @@ async function bootstrap() {
 
   app.useGlobalFilters(new CustomExceptionFilter());
 
-  const config = new DocumentBuilder()
-    .setTitle('POS and IMS')
-    .setDescription('POS and IMS API description')
-    .setVersion('1.0')
-    .addTag('pos and ims')
-    .build();
+  // Set up Swagger API (for development only!!!)
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('POS and IMS')
+      .setDescription('POS and IMS API description')
+      .setVersion('1.0')
+      .addTag('pos and ims')
+      .addBearerAuth()
+      .addSecurityRequirements('bearer')
+      .build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, documentFactory);
+  }
 
+  // Run app
   await app.listen(process.env.PORT ?? process.env.API_PORT ?? 3000);
 }
 bootstrap();

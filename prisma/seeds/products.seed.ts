@@ -1,3 +1,4 @@
+import { UnitOfMeasure } from 'src/generated/prisma/enums';
 import { prisma } from '../client';
 
 export async function seedProducts() {
@@ -22,10 +23,10 @@ export async function seedProducts() {
       size_dimensions: 'M8 x 30mm',
       thread_type: 'M8x1.25',
       material_grade: 'Stainless 304',
-      base_uom: 'pcs',
+      base_uom: UnitOfMeasure.PCS,
       current_quantity: 500,
       reorder_point_ROP: 100,
-      pricing_uom: 'pcs',
+      pricing_uom: UnitOfMeasure.PCS,
       pricing_unit_qty: 1,
       cost_price: 8.5,
       retail_price: 15.0,
@@ -39,10 +40,10 @@ export async function seedProducts() {
       size_dimensions: 'M10 x 50mm',
       thread_type: 'M10x1.5',
       material_grade: 'Grade 8',
-      base_uom: 'pcs',
+      base_uom: UnitOfMeasure.PCS,
       current_quantity: 250,
       reorder_point_ROP: 50,
-      pricing_uom: 'pcs',
+      pricing_uom: UnitOfMeasure.PCS,
       pricing_unit_qty: 1,
       cost_price: 18.0,
       retail_price: 30.0,

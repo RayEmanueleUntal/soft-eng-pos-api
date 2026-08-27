@@ -500,6 +500,10 @@ export type ReturnUncheckedUpdateManyWithoutTransactionNestedInput = {
   deleteMany?: Prisma.ReturnScalarWhereInput | Prisma.ReturnScalarWhereInput[]
 }
 
+export type StringFieldUpdateOperationsInput = {
+  set?: string
+}
+
 export type ReturnCreateNestedManyWithoutStaffInput = {
   create?: Prisma.XOR<Prisma.ReturnCreateWithoutStaffInput, Prisma.ReturnUncheckedCreateWithoutStaffInput> | Prisma.ReturnCreateWithoutStaffInput[] | Prisma.ReturnUncheckedCreateWithoutStaffInput[]
   connectOrCreate?: Prisma.ReturnCreateOrConnectWithoutStaffInput | Prisma.ReturnCreateOrConnectWithoutStaffInput[]
