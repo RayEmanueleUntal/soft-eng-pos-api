@@ -33,7 +33,7 @@ export class CheckoutDto {
     description: 'Classification of transaction rate type',
   })
   @IsOptional()
-  @IsEnum(() => TransactionType)
+  @IsEnum(TransactionType)
   transaction_type?: TransactionType = TransactionType.RETAIL;
 
   @ApiProperty({
