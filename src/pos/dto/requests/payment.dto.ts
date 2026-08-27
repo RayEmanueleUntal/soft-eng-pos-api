@@ -46,6 +46,29 @@ export class PaymentDto {
       { $ref: getSchemaPath(GCashDetailsDto) },
       { $ref: getSchemaPath(CreditDetailsDto) },
     ],
+    // Provide explicit examples so Swagger UI doesn't fallback to "string"
+    examples: {
+      cash: {
+        summary: 'Cash Payment Details',
+        value: {
+          cash_tendered: 500.0,
+          change_given: 50.0,
+        },
+      },
+      gcash: {
+        summary: 'GCash Payment Details',
+        value: {
+          reference_number: '123456789012',
+          gcash_mobile_number: '09171234567',
+        },
+      },
+      credit: {
+        summary: 'Credit Payment Details',
+        value: {
+          date: '2026-08-28T00:00:00.000Z',
+        },
+      },
+    },
   })
   @IsOptional()
   @ValidateNested()

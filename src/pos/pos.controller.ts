@@ -11,11 +11,13 @@ import {
 import { PosService } from './pos.service';
 import { JwtAuthGuard, RolesGuard } from 'src/auth/guards';
 import {
+  ApiBody,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
 import {
+  CheckoutApiBodyOptions,
   CheckoutDto,
   CheckoutTransactionResponseDto,
   GetProductsDto,
@@ -37,6 +39,7 @@ export class PosController {
   @Post('/checkout')
   @Idempotent()
   @ApiOperation({ summary: 'Checkout transaction of items' })
+  @ApiBody(CheckoutApiBodyOptions)
   @ApiOkResponse({
     description: 'Transaction record created successfully',
     type: CheckoutTransactionResponseDto,
