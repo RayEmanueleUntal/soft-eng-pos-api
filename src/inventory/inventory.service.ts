@@ -12,11 +12,9 @@ import {
 import { Prisma } from 'src/generated/prisma/client';
 import { MovementType, UnitOfMeasure } from 'src/generated/prisma/enums';
 import { UOMMismatchException } from 'src/common/exceptions/uom-mismatch.exception';
-import { Decimal } from '@prisma/client/runtime/client';
 import { StockInDto } from './dto/requests/stock-in.dto';
 import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace';
 import { Product } from 'src/generated/prisma/client';
-import { OutOfStockException } from 'src/common/exceptions/out-of-stock.exception';
 import { StockMovementResponseDto } from './dto/responses/stock-movement-response.dto';
 import { InsufficientStockException } from 'src/common/exceptions/insufficient-stock.exception';
 
@@ -165,8 +163,8 @@ export class InventoryService {
         'Inventory adjustment',
       );
 
-      const previousQty = new Decimal(product.current_quantity);
-      const newQty = new Decimal(adjustDto.new_count);
+      const previousQty = new Prisma.Decimal(product.current_quantity);
+      const newQty = new Prisma.Decimal(adjustDto.new_count);
       const qtyChanged = newQty.minus(previousQty);
 
       const createdMovement = await tx.stockMovement.create({
@@ -227,8 +225,8 @@ export class InventoryService {
         'Stock-In',
       );
 
-      const prevQty = new Decimal(product.current_quantity);
-      const addedQty = new Decimal(stockInDto.added_qty);
+      const prevQty = new Prisma.Decimal(product.current_quantity);
+      const addedQty = new Prisma.Decimal(stockInDto.added_qty);
       const newQty = prevQty.plus(addedQty);
 
       const createdMovement = await tx.stockMovement.create({
@@ -297,8 +295,8 @@ export class InventoryService {
       operation_name,
     );
 
-    const prevQty = new Decimal(product.current_quantity);
-    const takenQty = new Decimal(quantityToDeduct);
+    const prevQty = new Prisma.Decimal(product.current_quantity);
+    const takenQty = new Prisma.Decimal(quantityToDeduct);
     const newQty = prevQty.minus(takenQty);
 
     if (newQty.isNegative()) {
