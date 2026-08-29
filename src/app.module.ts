@@ -12,6 +12,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ProductsModule } from './products/products.module';
 import { BinLocationModule } from './bin-location/bin-location.module';
 import { PosModule } from './pos/pos.module';
+import { CustomersModule } from './customers/customers.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -46,6 +47,7 @@ import KeyvRedis from '@keyv/redis';
     ProductsModule,
     BinLocationModule,
     PosModule,
+    CustomersModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
