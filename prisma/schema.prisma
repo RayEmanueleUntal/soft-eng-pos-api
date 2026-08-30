@@ -214,6 +214,8 @@ model Customer {
 
   createdAt      DateTime           @default(now())
 
+  @@index([name, contact_number])
+  @@index([contact_number])
   @@map("customer")
 }
 
