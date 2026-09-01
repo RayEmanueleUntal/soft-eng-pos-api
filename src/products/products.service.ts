@@ -6,4 +6,9 @@ export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
   constructor(private readonly prisma: PrismaService) {}
+
+  /*
+  Create a product profile
+  */
+  createProduct() {}
 }
