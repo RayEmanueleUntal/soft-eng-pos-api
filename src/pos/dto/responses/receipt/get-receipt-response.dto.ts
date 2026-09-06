@@ -3,6 +3,9 @@ import { TransactionType } from 'src/generated/prisma/enums';
 import { ReceiptCustomerDto } from './receipt-customer.dto';
 import { ReceiptItemDto } from './receipt-item.dto';
 import { ReceiptPaymentDto } from './receipt-payment.dto';
+import { ReceiptShipmentDto } from './receipt-shipment.dto';
+import { ReceiptReturnDto } from './receipt-return.dto';
+import { ReceiptExchangeDto } from './receipt-exchange.dto';
 
 export class GetReceiptResponseDto {
   @ApiProperty({
@@ -42,10 +45,30 @@ export class GetReceiptResponseDto {
   @ApiProperty({ type: [ReceiptPaymentDto] })
   payments!: ReceiptPaymentDto[];
 
+  @ApiPropertyOptional({
+    type: [ReceiptShipmentDto],
+    description: 'Logistics and delivery records associated with transaction',
+  })
+  shipments?: ReceiptShipmentDto[];
+
+  @ApiPropertyOptional({
+    type: [ReceiptReturnDto],
+    description: 'Return records linked to this invoice',
+  })
+  returns?: ReceiptReturnDto[];
+
+  @ApiPropertyOptional({
+    type: [ReceiptExchangeDto],
+    description: 'Product exchange records linked to this invoice',
+  })
+  exchanges?: ReceiptExchangeDto[];
+
   /**
-   * Transforms raw Prisma transaction entity (with relations) into presentation-safe DTO
+   * Transforms raw Prisma transaction entity into presentation-safe DTO
    */
   static fromEntity(entity: any): GetReceiptResponseDto {
+    const returnsList = entity.returns ?? [];
+
     return {
       transactionId: entity.id,
       invoice_number: entity.invoice_number,
@@ -66,14 +89,22 @@ export class GetReceiptResponseDto {
         const discount = item.discount.toNumber();
         const lineSubtotal = unitPrice * qty;
 
+        // Calculate cumulative returned quantity for this specific product
+        const returnedQtyForProduct = returnsList
+          .filter((r: any) => r.productId === item.productId)
+          .reduce((sum: number, r: any) => sum + r.quantity.toNumber(), 0);
+
         return {
+          productId: item.productId,
           product_name: item.product?.name ?? 'Unknown Product',
           quantity: qty,
           applied_price: unitPrice,
           subtotal: lineSubtotal,
           discounted_price: lineSubtotal - discount,
           net_price: item.subtotal.toNumber(),
+          pricing_uom: item.pricing_uom,
           type: item.transaction_type ?? entity.transaction_type,
+          already_returned_qty: returnedQtyForProduct,
         };
       }),
       payments: (entity.payments ?? []).map((p: any) => ({
@@ -82,7 +113,43 @@ export class GetReceiptResponseDto {
         cash_tendered: p.cashPayment?.cash_tendered?.toNumber(),
         change_given: p.cashPayment?.change_given?.toNumber(),
         reference_number: p.gCashPayment?.reference_number,
+        gcash_mobile_number: p.gCashPayment?.gcash_mobile_number,
+        due_date: p.creditPayment?.due_date,
+        remaining_credit_balance:
+          p.creditPayment?.remaining_credit_balance?.toNumber(),
       })),
+      ...(entity.shipments && {
+        shipments: entity.shipments.map((s: any) => ({
+          id: s.id,
+          forwarder_name: s.forwarder?.name ?? 'Unknown Forwarder',
+          dispatch_date: s.dispatch_date,
+          tracking_status: s.tracking_status,
+        })),
+      }),
+      ...(entity.returns && {
+        returns: returnsList.map((r: any) => ({
+          id: r.id,
+          productId: r.productId,
+          product_name: r.product?.name ?? 'Unknown Product',
+          quantity: r.quantity.toNumber(),
+          date: r.date,
+          defect_reason: r.defect_reason,
+          refund_amount: r.refund_amount.toNumber(),
+          processed_by_staff:
+            r.staff?.name ?? r.staff?.username ?? 'Unknown Staff',
+        })),
+      }),
+      ...(entity.exchanges && {
+        exchanges: (entity.exchanges ?? []).map((e: any) => ({
+          id: e.id,
+          productId: e.productId,
+          product_name: e.product?.name ?? 'Unknown Product',
+          quantity: e.quantity.toNumber(),
+          date: e.date,
+          price_difference: e.price_difference.toNumber(),
+          is_within_7_days: e.is_within_7_days,
+        })),
+      }),
     };
   }
 }

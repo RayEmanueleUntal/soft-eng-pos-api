@@ -395,7 +395,12 @@ export class PosService {
   /*
   Get receipt by transaction ID
   */
-  async getReceipt(transactionId: number): Promise<GetReceiptResponseDto> {
+  async getReceipt(
+    transactionId: number,
+    includeShipments: boolean = false,
+    includeReturns: boolean = false,
+    includeExchanges: boolean = false,
+  ): Promise<GetReceiptResponseDto> {
     const transaction = await this.prisma.transaction.findUnique({
       where: { id: transactionId },
       include: {
@@ -413,6 +418,28 @@ export class PosService {
             creditPayment: true,
           },
         },
+        shipments: includeShipments
+          ? {
+              include: {
+                forwarder: true,
+              },
+            }
+          : false,
+        returns: includeReturns
+          ? {
+              include: {
+                product: true,
+                staff: true,
+              },
+            }
+          : false,
+        exchanges: includeExchanges
+          ? {
+              include: {
+                product: true,
+              },
+            }
+          : false,
       },
     });
 

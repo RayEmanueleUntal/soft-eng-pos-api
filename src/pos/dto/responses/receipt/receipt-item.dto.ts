@@ -1,7 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { TransactionType } from 'src/generated/prisma/enums';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { TransactionType, UnitOfMeasure } from 'src/generated/prisma/enums';
 
 export class ReceiptItemDto {
+  @ApiProperty({
+    example: 1,
+    description: 'Product ID',
+  })
+  productId!: number;
+
   @ApiProperty({
     example: 'San Miguel Beer 330ml Can',
     description: 'Product name',
@@ -29,6 +35,21 @@ export class ReceiptItemDto {
   @ApiProperty({ example: 360.0, description: 'Final net line price paid' })
   net_price!: number;
 
+  @ApiProperty({
+    enum: UnitOfMeasure,
+    example: UnitOfMeasure.PCS,
+    description: 'Pricing Unit of Measure of the Transaction Item',
+  })
+  pricing_uom!: UnitOfMeasure;
+
   @ApiProperty({ enum: TransactionType, example: TransactionType.RETAIL })
   type!: TransactionType;
+
+  @ApiPropertyOptional({
+    example: 2,
+    description:
+      'Calculated quantity of items already returned across return logs',
+    default: 0,
+  })
+  already_returned_qty?: number;
 }
