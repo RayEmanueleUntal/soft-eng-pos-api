@@ -23,10 +23,15 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateProductDto, ProductResponseDto } from './dto';
-import { UpdateProductDto } from './dto/request/update-product.dto';
-import { DeleteProductResponseDto } from './dto/response/delete-product-response.dto';
-import { DeleteProductQueryDto } from './dto/request/delete-product-query.dto';
+import {
+  CreateProductDto,
+  GetProductsDto,
+  PaginatedProductsResponseDto,
+  ProductResponseDto,
+  UpdateProductDto,
+  DeleteProductResponseDto,
+  DeleteProductQueryDto,
+} from './dto';
 import { JwtAuthGuard, RolesGuard } from 'src/auth/guards';
 
 @ApiTags('Products')
@@ -34,6 +39,23 @@ import { JwtAuthGuard, RolesGuard } from 'src/auth/guards';
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
+
+  /*
+    Get a list of products based on the query
+    */
+  @Get('/products')
+  @ApiOperation({
+    summary: 'Get all products from inventory based on the query parameters.',
+  })
+  @ApiOkResponse({
+    description: 'Paginated list of product items successfully retrieved.',
+    type: PaginatedProductsResponseDto,
+  })
+  getProducts(
+    @Query() productsDto: GetProductsDto,
+  ): Promise<PaginatedProductsResponseDto> {
+    return this.productsService.getProducts(productsDto);
+  }
 
   /**
    * Update an existing Product by ID

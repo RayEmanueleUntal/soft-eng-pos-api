@@ -20,9 +20,6 @@ import {
   CheckoutApiBodyOptions,
   CheckoutDto,
   CheckoutTransactionResponseDto,
-  GetProductsDto,
-  GetReceiptResponseDto,
-  PaginatedProductsResponseDto,
 } from './dto';
 import { Idempotent } from 'src/common/decorators';
 import { CurrentUser, Roles } from 'src/auth/decorators';
@@ -50,38 +47,5 @@ export class PosController {
     @Body() checkoutDto: CheckoutDto,
   ) {
     return this.posService.checkout(user.id, checkoutDto);
-  }
-
-  /*
-  Get a list of products based on the query
-  */
-  @Get('/products')
-  @ApiOperation({
-    summary: 'Get all products from inventory based on the query parameters.',
-  })
-  @ApiOkResponse({
-    description: 'Paginated list of product items successfully retrieved.',
-    type: PaginatedProductsResponseDto,
-  })
-  getProducts(
-    @Query() productsDto: GetProductsDto,
-  ): Promise<PaginatedProductsResponseDto> {
-    return this.posService.getProducts(productsDto);
-  }
-
-  /*
-  Get receipt by transaction ID
-  */
-  @Get('receipt/:id')
-  @ApiOperation({ summary: 'Get printable receipt details by transaction ID' })
-  @ApiOkResponse({
-    description: 'Receipt details retrieved successfully.',
-    type: GetReceiptResponseDto,
-  })
-  @ApiNotFoundResponse({ description: 'Transaction ID not found.' })
-  async getReceipt(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<GetReceiptResponseDto> {
-    return await this.posService.getReceipt(id);
   }
 }

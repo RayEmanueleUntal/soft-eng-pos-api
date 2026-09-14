@@ -1,19 +1,91 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateProductDto, ProductResponseDto } from './dto';
+import {
+  CreateProductDto,
+  GetProductsDto,
+  PaginatedProductsResponseDto,
+  ProductResponseDto,
+} from './dto';
 import { DuplicateProductException } from 'src/common/exceptions/duplicate-product.exception';
 import { Prisma } from 'src/generated/prisma/client';
 import { UomChangeRequiredException } from 'src/common/exceptions/uom-change-required.exception';
 import { UpdateProductDto } from './dto/request/update-product.dto';
 import { ProductHasHistoryException } from 'src/common/exceptions/product-has-history.exception';
 import { DeleteProductQueryDto } from './dto/request/delete-product-query.dto';
-import { DeleteProductResponseDto } from './dto/response/delete-product-response.dto';
+import { DeleteProductResponseDto } from './dto';
 
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
   constructor(private readonly prisma: PrismaService) {}
+
+  /*
+    Get a list of products based on the query
+    */
+  async getProducts(
+    productsDto: GetProductsDto,
+  ): Promise<PaginatedProductsResponseDto> {
+    const {
+      search,
+      categoryId,
+      size,
+      thread,
+      material,
+      page = 1,
+      limit = 15,
+    } = productsDto;
+
+    this.logger.debug('Fetching products list', { filters: productsDto });
+    const searchKeywords = search ? search.trim().split(/\s+/) : [];
+
+    const where: any = {};
+
+    if (searchKeywords.length > 0) {
+      // Every keyword typed must match AT LEAST ONE of the searchable fields
+      where.AND = searchKeywords.map((keyword) => ({
+        OR: [
+          { name: { contains: keyword, mode: 'insensitive' } },
+          { sku: { contains: keyword, mode: 'insensitive' } },
+          { size_dimensions: { contains: keyword, mode: 'insensitive' } },
+          { thread_type: { contains: keyword, mode: 'insensitive' } },
+          { material_grade: { contains: keyword, mode: 'insensitive' } },
+        ],
+      }));
+    }
+
+    // B. Keep explicit filters if they are provided via dropdowns
+    if (categoryId) where.categoryId = categoryId;
+    if (size) {
+      where.size_dimensions = { contains: size, mode: 'insensitive' };
+    }
+    if (thread) {
+      where.thread_type = { contains: thread, mode: 'insensitive' };
+    }
+    if (material) {
+      where.material_grade = { contains: material, mode: 'insensitive' };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: { bin_location: true },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return PaginatedProductsResponseDto.fromEntities(
+      products,
+      total,
+      page,
+      limit,
+    );
+  }
 
   // Helper function for generating SKU
   private generateAutoSku(
