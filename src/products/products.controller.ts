@@ -43,7 +43,7 @@ export class ProductsController {
   /*
     Get a list of products based on the query
     */
-  @Get('/products')
+  @Get('')
   @ApiOperation({
     summary: 'Get all products from inventory based on the query parameters.',
   })
