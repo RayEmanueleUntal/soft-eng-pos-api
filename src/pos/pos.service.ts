@@ -12,9 +12,6 @@ import {
   CheckoutTransactionResponseDto,
   CreditDetailsDto,
   GCashDetailsDto,
-  GetProductsDto,
-  GetReceiptResponseDto,
-  PaginatedProductsResponseDto,
 } from './dto';
 import {
   CustomerType,
@@ -34,73 +31,6 @@ export class PosService {
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
   ) {}
-
-  /*
-  Get a list of products based on the query
-  */
-  async getProducts(
-    productsDto: GetProductsDto,
-  ): Promise<PaginatedProductsResponseDto> {
-    const {
-      search,
-      categoryId,
-      size,
-      thread,
-      material,
-      page = 1,
-      limit = 15,
-    } = productsDto;
-
-    this.logger.debug('Fetching products list', { filters: productsDto });
-    const searchKeywords = search ? search.trim().split(/\s+/) : [];
-
-    const where: any = {};
-
-    if (searchKeywords.length > 0) {
-      // Every keyword typed must match AT LEAST ONE of the searchable fields
-      where.AND = searchKeywords.map((keyword) => ({
-        OR: [
-          { name: { contains: keyword, mode: 'insensitive' } },
-          { sku: { contains: keyword, mode: 'insensitive' } },
-          { size_dimensions: { contains: keyword, mode: 'insensitive' } },
-          { thread_type: { contains: keyword, mode: 'insensitive' } },
-          { material_grade: { contains: keyword, mode: 'insensitive' } },
-        ],
-      }));
-    }
-
-    // B. Keep explicit filters if they are provided via dropdowns
-    if (categoryId) where.categoryId = categoryId;
-    if (size) {
-      where.size_dimensions = { contains: size, mode: 'insensitive' };
-    }
-    if (thread) {
-      where.thread_type = { contains: thread, mode: 'insensitive' };
-    }
-    if (material) {
-      where.material_grade = { contains: material, mode: 'insensitive' };
-    }
-
-    const skip = (page - 1) * limit;
-
-    const [products, total] = await this.prisma.$transaction([
-      this.prisma.product.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: { bin_location: true },
-      }),
-      this.prisma.product.count({ where }),
-    ]);
-
-    return PaginatedProductsResponseDto.fromEntities(
-      products,
-      total,
-      page,
-      limit,
-    );
-  }
 
   // Helper function: generating invoice number
   private async getNextInvoiceNumber(
@@ -390,38 +320,5 @@ export class PosService {
         newTransaction.transactionItems,
       );
     });
-  }
-
-  /*
-  Get receipt by transaction ID
-  */
-  async getReceipt(transactionId: number): Promise<GetReceiptResponseDto> {
-    const transaction = await this.prisma.transaction.findUnique({
-      where: { id: transactionId },
-      include: {
-        staff: true,
-        customer: true,
-        transactionItems: {
-          include: {
-            product: true,
-          },
-        },
-        payments: {
-          include: {
-            cashPayment: true,
-            gCashPayment: true,
-            creditPayment: true,
-          },
-        },
-      },
-    });
-
-    if (!transaction) {
-      throw new NotFoundException(
-        `Receipt for Transaction #${transactionId} not found.`,
-      );
-    }
-
-    return GetReceiptResponseDto.fromEntity(transaction);
   }
 }

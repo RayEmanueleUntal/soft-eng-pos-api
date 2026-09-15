@@ -13,6 +13,10 @@ import { ProductsModule } from './products/products.module';
 import { BinLocationModule } from './bin-location/bin-location.module';
 import { PosModule } from './pos/pos.module';
 import { CustomersModule } from './customers/customers.module';
+import { TransactionsModule } from './transactions/transactions.module';
+import { ReturnsModule } from './returns/returns.module';
+import { ExchangesModule } from './exchanges/exchanges.module';
+import { ProductCategoriesModule } from './product-categories/product-categories.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -22,7 +26,7 @@ import KeyvRedis from '@keyv/redis';
       throttlers: [
         {
           ttl: 60000,
-          limit: 10,
+          limit: 100,
         },
       ],
     }),
@@ -48,6 +52,10 @@ import KeyvRedis from '@keyv/redis';
     BinLocationModule,
     PosModule,
     CustomersModule,
+    TransactionsModule,
+    ReturnsModule,
+    ExchangesModule,
+    ProductCategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
