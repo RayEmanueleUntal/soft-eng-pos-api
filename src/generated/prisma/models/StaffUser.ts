@@ -235,6 +235,8 @@ export type StaffUserWhereInput = {
   transactions?: Prisma.TransactionListRelationFilter
   initiatedMovements?: Prisma.StockMovementListRelationFilter
   approvedMovements?: Prisma.StockMovementListRelationFilter
+  approvalRequests?: Prisma.ApprovalRequestListRelationFilter
+  reviewedRequests?: Prisma.ApprovalRequestListRelationFilter
   purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
   deliveries?: Prisma.DeliveryListRelationFilter
   returns?: Prisma.ReturnListRelationFilter
@@ -251,6 +253,8 @@ export type StaffUserOrderByWithRelationInput = {
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   initiatedMovements?: Prisma.StockMovementOrderByRelationAggregateInput
   approvedMovements?: Prisma.StockMovementOrderByRelationAggregateInput
+  approvalRequests?: Prisma.ApprovalRequestOrderByRelationAggregateInput
+  reviewedRequests?: Prisma.ApprovalRequestOrderByRelationAggregateInput
   purchaseOrders?: Prisma.PurchaseOrderOrderByRelationAggregateInput
   deliveries?: Prisma.DeliveryOrderByRelationAggregateInput
   returns?: Prisma.ReturnOrderByRelationAggregateInput
@@ -270,6 +274,8 @@ export type StaffUserWhereUniqueInput = Prisma.AtLeast<{
   transactions?: Prisma.TransactionListRelationFilter
   initiatedMovements?: Prisma.StockMovementListRelationFilter
   approvedMovements?: Prisma.StockMovementListRelationFilter
+  approvalRequests?: Prisma.ApprovalRequestListRelationFilter
+  reviewedRequests?: Prisma.ApprovalRequestListRelationFilter
   purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
   deliveries?: Prisma.DeliveryListRelationFilter
   returns?: Prisma.ReturnListRelationFilter
@@ -313,6 +319,8 @@ export type StaffUserCreateInput = {
   transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
@@ -329,6 +337,8 @@ export type StaffUserUncheckedCreateInput = {
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
@@ -344,6 +354,8 @@ export type StaffUserUpdateInput = {
   transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
@@ -360,6 +372,8 @@ export type StaffUserUncheckedUpdateInput = {
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
@@ -532,6 +546,36 @@ export type StaffUserUpdateOneRequiredWithoutDeliveriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUserUpdateToOneWithWhereWithoutDeliveriesInput, Prisma.StaffUserUpdateWithoutDeliveriesInput>, Prisma.StaffUserUncheckedUpdateWithoutDeliveriesInput>
 }
 
+export type StaffUserCreateNestedOneWithoutApprovalRequestsInput = {
+  create?: Prisma.XOR<Prisma.StaffUserCreateWithoutApprovalRequestsInput, Prisma.StaffUserUncheckedCreateWithoutApprovalRequestsInput>
+  connectOrCreate?: Prisma.StaffUserCreateOrConnectWithoutApprovalRequestsInput
+  connect?: Prisma.StaffUserWhereUniqueInput
+}
+
+export type StaffUserCreateNestedOneWithoutReviewedRequestsInput = {
+  create?: Prisma.XOR<Prisma.StaffUserCreateWithoutReviewedRequestsInput, Prisma.StaffUserUncheckedCreateWithoutReviewedRequestsInput>
+  connectOrCreate?: Prisma.StaffUserCreateOrConnectWithoutReviewedRequestsInput
+  connect?: Prisma.StaffUserWhereUniqueInput
+}
+
+export type StaffUserUpdateOneRequiredWithoutApprovalRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.StaffUserCreateWithoutApprovalRequestsInput, Prisma.StaffUserUncheckedCreateWithoutApprovalRequestsInput>
+  connectOrCreate?: Prisma.StaffUserCreateOrConnectWithoutApprovalRequestsInput
+  upsert?: Prisma.StaffUserUpsertWithoutApprovalRequestsInput
+  connect?: Prisma.StaffUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUserUpdateToOneWithWhereWithoutApprovalRequestsInput, Prisma.StaffUserUpdateWithoutApprovalRequestsInput>, Prisma.StaffUserUncheckedUpdateWithoutApprovalRequestsInput>
+}
+
+export type StaffUserUpdateOneWithoutReviewedRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.StaffUserCreateWithoutReviewedRequestsInput, Prisma.StaffUserUncheckedCreateWithoutReviewedRequestsInput>
+  connectOrCreate?: Prisma.StaffUserCreateOrConnectWithoutReviewedRequestsInput
+  upsert?: Prisma.StaffUserUpsertWithoutReviewedRequestsInput
+  disconnect?: Prisma.StaffUserWhereInput | boolean
+  delete?: Prisma.StaffUserWhereInput | boolean
+  connect?: Prisma.StaffUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUserUpdateToOneWithWhereWithoutReviewedRequestsInput, Prisma.StaffUserUpdateWithoutReviewedRequestsInput>, Prisma.StaffUserUncheckedUpdateWithoutReviewedRequestsInput>
+}
+
 export type StaffUserCreateWithoutTransactionsInput = {
   username: string
   password_hash: string
@@ -541,6 +585,8 @@ export type StaffUserCreateWithoutTransactionsInput = {
   is_active?: boolean
   initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
@@ -556,6 +602,8 @@ export type StaffUserUncheckedCreateWithoutTransactionsInput = {
   is_active?: boolean
   initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
@@ -586,6 +634,8 @@ export type StaffUserUpdateWithoutTransactionsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
@@ -601,6 +651,8 @@ export type StaffUserUncheckedUpdateWithoutTransactionsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
@@ -616,6 +668,8 @@ export type StaffUserCreateWithoutReturnsInput = {
   transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
 }
@@ -631,6 +685,8 @@ export type StaffUserUncheckedCreateWithoutReturnsInput = {
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
 }
@@ -661,6 +717,8 @@ export type StaffUserUpdateWithoutReturnsInput = {
   transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
 }
@@ -676,6 +734,8 @@ export type StaffUserUncheckedUpdateWithoutReturnsInput = {
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
 }
@@ -689,6 +749,8 @@ export type StaffUserCreateWithoutInitiatedMovementsInput = {
   is_active?: boolean
   transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
@@ -704,6 +766,8 @@ export type StaffUserUncheckedCreateWithoutInitiatedMovementsInput = {
   is_active?: boolean
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
@@ -723,6 +787,8 @@ export type StaffUserCreateWithoutApprovedMovementsInput = {
   is_active?: boolean
   transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
@@ -738,6 +804,8 @@ export type StaffUserUncheckedCreateWithoutApprovedMovementsInput = {
   is_active?: boolean
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
@@ -768,6 +836,8 @@ export type StaffUserUpdateWithoutInitiatedMovementsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
@@ -783,6 +853,8 @@ export type StaffUserUncheckedUpdateWithoutInitiatedMovementsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
@@ -808,6 +880,8 @@ export type StaffUserUpdateWithoutApprovedMovementsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
@@ -823,6 +897,8 @@ export type StaffUserUncheckedUpdateWithoutApprovedMovementsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
@@ -838,6 +914,8 @@ export type StaffUserCreateWithoutPurchaseOrdersInput = {
   transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
 }
@@ -853,6 +931,8 @@ export type StaffUserUncheckedCreateWithoutPurchaseOrdersInput = {
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
 }
@@ -883,6 +963,8 @@ export type StaffUserUpdateWithoutPurchaseOrdersInput = {
   transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
 }
@@ -898,6 +980,8 @@ export type StaffUserUncheckedUpdateWithoutPurchaseOrdersInput = {
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
 }
@@ -912,6 +996,8 @@ export type StaffUserCreateWithoutDeliveriesInput = {
   transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
 }
@@ -927,6 +1013,8 @@ export type StaffUserUncheckedCreateWithoutDeliveriesInput = {
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
   initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
   approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
 }
@@ -957,6 +1045,8 @@ export type StaffUserUpdateWithoutDeliveriesInput = {
   transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
 }
@@ -972,7 +1062,173 @@ export type StaffUserUncheckedUpdateWithoutDeliveriesInput = {
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
   approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
+  returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+}
+
+export type StaffUserCreateWithoutApprovalRequestsInput = {
+  username: string
+  password_hash: string
+  first_name: string
+  last_name: string
+  assigned_role: $Enums.AssignedRole
+  is_active?: boolean
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
+  initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
+  approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
+  returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+}
+
+export type StaffUserUncheckedCreateWithoutApprovalRequestsInput = {
+  id?: number
+  username: string
+  password_hash: string
+  first_name: string
+  last_name: string
+  assigned_role: $Enums.AssignedRole
+  is_active?: boolean
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
+  initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
+  approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
+  returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+}
+
+export type StaffUserCreateOrConnectWithoutApprovalRequestsInput = {
+  where: Prisma.StaffUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.StaffUserCreateWithoutApprovalRequestsInput, Prisma.StaffUserUncheckedCreateWithoutApprovalRequestsInput>
+}
+
+export type StaffUserCreateWithoutReviewedRequestsInput = {
+  username: string
+  password_hash: string
+  first_name: string
+  last_name: string
+  assigned_role: $Enums.AssignedRole
+  is_active?: boolean
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
+  initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
+  approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
+  returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+}
+
+export type StaffUserUncheckedCreateWithoutReviewedRequestsInput = {
+  id?: number
+  username: string
+  password_hash: string
+  first_name: string
+  last_name: string
+  assigned_role: $Enums.AssignedRole
+  is_active?: boolean
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
+  initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
+  approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
+  returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+}
+
+export type StaffUserCreateOrConnectWithoutReviewedRequestsInput = {
+  where: Prisma.StaffUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.StaffUserCreateWithoutReviewedRequestsInput, Prisma.StaffUserUncheckedCreateWithoutReviewedRequestsInput>
+}
+
+export type StaffUserUpsertWithoutApprovalRequestsInput = {
+  update: Prisma.XOR<Prisma.StaffUserUpdateWithoutApprovalRequestsInput, Prisma.StaffUserUncheckedUpdateWithoutApprovalRequestsInput>
+  create: Prisma.XOR<Prisma.StaffUserCreateWithoutApprovalRequestsInput, Prisma.StaffUserUncheckedCreateWithoutApprovalRequestsInput>
+  where?: Prisma.StaffUserWhereInput
+}
+
+export type StaffUserUpdateToOneWithWhereWithoutApprovalRequestsInput = {
+  where?: Prisma.StaffUserWhereInput
+  data: Prisma.XOR<Prisma.StaffUserUpdateWithoutApprovalRequestsInput, Prisma.StaffUserUncheckedUpdateWithoutApprovalRequestsInput>
+}
+
+export type StaffUserUpdateWithoutApprovalRequestsInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  first_name?: Prisma.StringFieldUpdateOperationsInput | string
+  last_name?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
+  initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
+  approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
+  returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+}
+
+export type StaffUserUncheckedUpdateWithoutApprovalRequestsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  first_name?: Prisma.StringFieldUpdateOperationsInput | string
+  last_name?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
+  initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
+  approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
+  returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+}
+
+export type StaffUserUpsertWithoutReviewedRequestsInput = {
+  update: Prisma.XOR<Prisma.StaffUserUpdateWithoutReviewedRequestsInput, Prisma.StaffUserUncheckedUpdateWithoutReviewedRequestsInput>
+  create: Prisma.XOR<Prisma.StaffUserCreateWithoutReviewedRequestsInput, Prisma.StaffUserUncheckedCreateWithoutReviewedRequestsInput>
+  where?: Prisma.StaffUserWhereInput
+}
+
+export type StaffUserUpdateToOneWithWhereWithoutReviewedRequestsInput = {
+  where?: Prisma.StaffUserWhereInput
+  data: Prisma.XOR<Prisma.StaffUserUpdateWithoutReviewedRequestsInput, Prisma.StaffUserUncheckedUpdateWithoutReviewedRequestsInput>
+}
+
+export type StaffUserUpdateWithoutReviewedRequestsInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  first_name?: Prisma.StringFieldUpdateOperationsInput | string
+  last_name?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
+  initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
+  approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
+  returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+}
+
+export type StaffUserUncheckedUpdateWithoutReviewedRequestsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  first_name?: Prisma.StringFieldUpdateOperationsInput | string
+  last_name?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
+  initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
+  approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
 }
 
@@ -985,6 +1241,8 @@ export type StaffUserCountOutputType = {
   transactions: number
   initiatedMovements: number
   approvedMovements: number
+  approvalRequests: number
+  reviewedRequests: number
   purchaseOrders: number
   deliveries: number
   returns: number
@@ -994,6 +1252,8 @@ export type StaffUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   transactions?: boolean | StaffUserCountOutputTypeCountTransactionsArgs
   initiatedMovements?: boolean | StaffUserCountOutputTypeCountInitiatedMovementsArgs
   approvedMovements?: boolean | StaffUserCountOutputTypeCountApprovedMovementsArgs
+  approvalRequests?: boolean | StaffUserCountOutputTypeCountApprovalRequestsArgs
+  reviewedRequests?: boolean | StaffUserCountOutputTypeCountReviewedRequestsArgs
   purchaseOrders?: boolean | StaffUserCountOutputTypeCountPurchaseOrdersArgs
   deliveries?: boolean | StaffUserCountOutputTypeCountDeliveriesArgs
   returns?: boolean | StaffUserCountOutputTypeCountReturnsArgs
@@ -1033,6 +1293,20 @@ export type StaffUserCountOutputTypeCountApprovedMovementsArgs<ExtArgs extends r
 /**
  * StaffUserCountOutputType without action
  */
+export type StaffUserCountOutputTypeCountApprovalRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApprovalRequestWhereInput
+}
+
+/**
+ * StaffUserCountOutputType without action
+ */
+export type StaffUserCountOutputTypeCountReviewedRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApprovalRequestWhereInput
+}
+
+/**
+ * StaffUserCountOutputType without action
+ */
 export type StaffUserCountOutputTypeCountPurchaseOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PurchaseOrderWhereInput
 }
@@ -1063,6 +1337,8 @@ export type StaffUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   transactions?: boolean | Prisma.StaffUser$transactionsArgs<ExtArgs>
   initiatedMovements?: boolean | Prisma.StaffUser$initiatedMovementsArgs<ExtArgs>
   approvedMovements?: boolean | Prisma.StaffUser$approvedMovementsArgs<ExtArgs>
+  approvalRequests?: boolean | Prisma.StaffUser$approvalRequestsArgs<ExtArgs>
+  reviewedRequests?: boolean | Prisma.StaffUser$reviewedRequestsArgs<ExtArgs>
   purchaseOrders?: boolean | Prisma.StaffUser$purchaseOrdersArgs<ExtArgs>
   deliveries?: boolean | Prisma.StaffUser$deliveriesArgs<ExtArgs>
   returns?: boolean | Prisma.StaffUser$returnsArgs<ExtArgs>
@@ -1104,6 +1380,8 @@ export type StaffUserInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   transactions?: boolean | Prisma.StaffUser$transactionsArgs<ExtArgs>
   initiatedMovements?: boolean | Prisma.StaffUser$initiatedMovementsArgs<ExtArgs>
   approvedMovements?: boolean | Prisma.StaffUser$approvedMovementsArgs<ExtArgs>
+  approvalRequests?: boolean | Prisma.StaffUser$approvalRequestsArgs<ExtArgs>
+  reviewedRequests?: boolean | Prisma.StaffUser$reviewedRequestsArgs<ExtArgs>
   purchaseOrders?: boolean | Prisma.StaffUser$purchaseOrdersArgs<ExtArgs>
   deliveries?: boolean | Prisma.StaffUser$deliveriesArgs<ExtArgs>
   returns?: boolean | Prisma.StaffUser$returnsArgs<ExtArgs>
@@ -1118,6 +1396,8 @@ export type $StaffUserPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
     initiatedMovements: Prisma.$StockMovementPayload<ExtArgs>[]
     approvedMovements: Prisma.$StockMovementPayload<ExtArgs>[]
+    approvalRequests: Prisma.$ApprovalRequestPayload<ExtArgs>[]
+    reviewedRequests: Prisma.$ApprovalRequestPayload<ExtArgs>[]
     purchaseOrders: Prisma.$PurchaseOrderPayload<ExtArgs>[]
     deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
     returns: Prisma.$ReturnPayload<ExtArgs>[]
@@ -1527,6 +1807,8 @@ export interface Prisma__StaffUserClient<T, Null = never, ExtArgs extends runtim
   transactions<T extends Prisma.StaffUser$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   initiatedMovements<T extends Prisma.StaffUser$initiatedMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$initiatedMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   approvedMovements<T extends Prisma.StaffUser$approvedMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$approvedMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  approvalRequests<T extends Prisma.StaffUser$approvalRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$approvalRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reviewedRequests<T extends Prisma.StaffUser$reviewedRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$reviewedRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchaseOrders<T extends Prisma.StaffUser$purchaseOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$purchaseOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deliveries<T extends Prisma.StaffUser$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   returns<T extends Prisma.StaffUser$returnsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$returnsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReturnPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2028,6 +2310,54 @@ export type StaffUser$approvedMovementsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.StockMovementScalarFieldEnum | Prisma.StockMovementScalarFieldEnum[]
+}
+
+/**
+ * StaffUser.approvalRequests
+ */
+export type StaffUser$approvalRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApprovalRequest
+   */
+  select?: Prisma.ApprovalRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApprovalRequest
+   */
+  omit?: Prisma.ApprovalRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApprovalRequestInclude<ExtArgs> | null
+  where?: Prisma.ApprovalRequestWhereInput
+  orderBy?: Prisma.ApprovalRequestOrderByWithRelationInput | Prisma.ApprovalRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ApprovalRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApprovalRequestScalarFieldEnum | Prisma.ApprovalRequestScalarFieldEnum[]
+}
+
+/**
+ * StaffUser.reviewedRequests
+ */
+export type StaffUser$reviewedRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApprovalRequest
+   */
+  select?: Prisma.ApprovalRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApprovalRequest
+   */
+  omit?: Prisma.ApprovalRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApprovalRequestInclude<ExtArgs> | null
+  where?: Prisma.ApprovalRequestWhereInput
+  orderBy?: Prisma.ApprovalRequestOrderByWithRelationInput | Prisma.ApprovalRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ApprovalRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApprovalRequestScalarFieldEnum | Prisma.ApprovalRequestScalarFieldEnum[]
 }
 
 /**

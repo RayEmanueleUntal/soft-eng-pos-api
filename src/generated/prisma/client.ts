@@ -149,3 +149,13 @@ export type Delivery = Prisma.DeliveryModel
  * 
  */
 export type DeliveryItem = Prisma.DeliveryItemModel
+/**
+ * Model ApprovalRequest
+ * 
+ */
+export type ApprovalRequest = Prisma.ApprovalRequestModel
+/**
+ * Model SystemSetting
+ * 
+ */
+export type SystemSetting = Prisma.SystemSettingModel
