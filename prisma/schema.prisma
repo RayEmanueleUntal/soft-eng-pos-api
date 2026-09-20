@@ -229,6 +229,7 @@ model WholeSaleCustomer {
 
   customer            Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
+  @@index([customerId])
   @@map("wholesale_profile")
 }
 
