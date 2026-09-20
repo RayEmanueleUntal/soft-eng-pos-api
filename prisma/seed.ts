@@ -7,6 +7,7 @@ import { seedSuppliers } from './seeds/suppliers.seed';
 import { seedForwarders } from './seeds/forwarders.seed';
 import { seedCustomers } from './seeds/customers.seed';
 import { seedProducts } from './seeds/products.seed';
+import { seedSystemSettings } from './seeds/system-settings.seed';
 
 async function main() {
   console.log('🌱 Starting database seeding...');
@@ -19,6 +20,7 @@ async function main() {
   await seedSuppliers();
   await seedForwarders();
   await seedCustomers();
+  await seedSystemSettings();
 
   // Dependent entities (Requires Categories & Bins)
   await seedProducts();

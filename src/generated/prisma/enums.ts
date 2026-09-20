@@ -9,6 +9,25 @@
 * 🟢 You can import this file directly.
 */
 
+export const RequestType = {
+  OVERRIDE_DISCOUNT: 'OVERRIDE_DISCOUNT',
+  STOCK_OUT_OVERRIDE: 'STOCK_OUT_OVERRIDE',
+  DELETE_TRANSACTION: 'DELETE_TRANSACTION',
+  REFUND_TRANSACTION: 'REFUND_TRANSACTION'
+} as const
+
+export type RequestType = (typeof RequestType)[keyof typeof RequestType]
+
+
+export const RequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]
+
+
 export const UnitOfMeasure = {
   PCS: 'PCS',
   BOX: 'BOX',

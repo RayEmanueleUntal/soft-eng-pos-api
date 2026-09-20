@@ -17,6 +17,8 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { ReturnsModule } from './returns/returns.module';
 import { ExchangesModule } from './exchanges/exchanges.module';
 import { ProductCategoriesModule } from './product-categories/product-categories.module';
+import { SystemSettingsModule } from './system-settings/system-settings.module';
+import { ApprovalModule } from './approval/approval.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -56,6 +58,8 @@ import KeyvRedis from '@keyv/redis';
     ReturnsModule,
     ExchangesModule,
     ProductCategoriesModule,
+    SystemSettingsModule,
+    ApprovalModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
