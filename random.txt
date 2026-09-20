@@ -1,0 +1,102 @@
+The Scalable Approach: Handler Registry Pattern
+
+Instead of hardcoding business logic inside the approval engine, you treat each approval type as its own plug-and-play Handler.
+
+Here is how you can structure this cleanly in NestJS:
+1. Define a Common Interface
+
+Create an interface that every approval handler must implement. It forces them to accept the Prisma transaction client and the payload.
+TypeScript
+
+// approval-handler.interface.ts
+import { Prisma } from '@prisma/client';
+
+export interface ApprovalHandler {
+  execute(payload: any, tx: Prisma.TransactionClient): Promise<void>;
+}
+
+2. Create Specific Handlers
+
+Instead of cluttering one file, you create a dedicated folder (approvals/handlers/) and write isolated classes for each action:
+TypeScript
+
+// refund-approval.handler.ts
+@Injectable()
+export class RefundApprovalHandler implements ApprovalHandler {
+  constructor(private prisma: PrismaService) {}
+
+  async execute(payload: { refundId: string; amount: number }, tx: Prisma.TransactionClient) {
+    // Specific business logic for refunds
+    await tx.refund.update({
+      where: { id: payload.refundId },
+      data: { status: 'PROCESSED' },
+    });
+  }
+}
+
+TypeScript
+
+// transaction-approval.handler.ts
+@Injectable()
+export class TransactionApprovalHandler implements ApprovalHandler {
+  async execute(payload: any, tx: Prisma.TransactionClient) {
+    // Specific business logic for transactions
+    await tx.transaction.create({ data: payload });
+  }
+}
+
+3. Build an Approval Registry
+
+You create a central service that registers these handlers and dispatches them dynamically based on the request type. NestJS makes this easy using a Map.
+TypeScript
+
+// approval-registry.service.ts
+@Injectable()
+export class ApprovalRegistry {
+  private handlers = new Map<string, ApprovalHandler>();
+
+  register(type: string, handler: ApprovalHandler) {
+    this.handlers.set(type, handler);
+  }
+
+  getHandler(type: string): ApprovalHandler {
+    const handler = this.handlers.get(type);
+    if (!handler) throw new BadRequestException(`No handler for type: ${type}`);
+    return handler;
+  }
+}
+
+You can auto-register these handlers on app startup or via module configuration.
+4. Keep Your Main Engine Clean
+
+Now, your main approveRequest method becomes remarkably short, decoupled, and agnostic of what it's actually approving:
+TypeScript
+
+async approveRequest(requestId: number, managerId: string) {
+  return this.prisma.$transaction(async (tx) => {
+    const request = await tx.approvalRequest.findUnique({ where: { id: requestId } });
+    
+    // 1. Get the correct handler dynamically
+    const handler = this.approvalRegistry.getHandler(request.type);
+
+    // 2. Execute the handler's logic
+    await handler.execute(request.payload, tx);
+
+    // 3. Mark request as approved
+    return tx.approvalRequest.update({
+      where: { id: requestId },
+      data: { status: 'APPROVED', approvedById: managerId },
+    });
+  });
+}
+
+Why this works long-term:
+
+    Isolated Code: If a bug happens in Refund, you only touch refund-approval.handler.ts. You won't risk breaking Transaction logic.
+
+    Easy Testing: You can unit test each handler completely independently without mocking the entire approval workflow engine.
+
+    Open for Extension: When a new action type comes along (e.g., DELETE_USER), you just create a new handler class and register it—zero changes needed in your core approval service.
+
+
+

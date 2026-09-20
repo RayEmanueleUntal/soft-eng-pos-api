@@ -196,6 +196,8 @@ model StaffUser {
   transactions   Transaction[]
   initiatedMovements StockMovement[] @relation("InitiatedMovements")
   approvedMovements  StockMovement[] @relation("ApprovedMovements")
+  approvalRequests ApprovalRequest[] @relation("RequestedBy")
+  reviewedRequests ApprovalRequest[] @relation("ReviewedBy")
   purchaseOrders PurchaseOrder[]
   deliveries     Delivery[]
   returns        Return[]
@@ -399,8 +401,58 @@ model DeliveryItem {
 }
 
 // ==========================================
+// ADMIN-RELATED MODELS
+// ==========================================
+
+model ApprovalRequest {
+  id           Int           @id @default(autoincrement())
+  type         RequestType
+  status       RequestStatus @default(PENDING)
+  
+  // Who asked?
+  requestedById Int
+  requestedBy   StaffUser    @relation("RequestedBy", fields: [requestedById], references: [id])
+  
+  // Who approved/rejected? (Nullable until resolved)
+  reviewedById  Int?
+  reviewedBy    StaffUser?   @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  
+  // Payload storing details needed to execute the action upon approval
+  // e.g., { "productId": 12, "requestedDiscount": 15.00, "reason": "Damaged box" }
+  payload      Json
+  
+  rejectionReason String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("approval_request")
+}
+
+model SystemSetting {
+  key         String   @id // e.g., "RETURN_WINDOW_DAYS"
+  value       String   // e.g., "14"
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_setting")
+}
+
+// ==========================================
 // ENUMS
 // ==========================================
+
+enum RequestType {
+  OVERRIDE_DISCOUNT
+  STOCK_OUT_OVERRIDE
+  REFUND_EXCEED_LIMIT
+  DELETE_TRANSACTION
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
 
 enum UnitOfMeasure {
   PCS
