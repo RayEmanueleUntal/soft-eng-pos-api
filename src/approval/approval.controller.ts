@@ -30,7 +30,7 @@ import {
   RequestType,
   AssignedRole as Role,
 } from 'src/generated/prisma/enums';
-import { CurrentUser } from 'src/auth/decorators';
+import { CurrentUser, Roles } from 'src/auth/decorators';
 import { Idempotent } from 'src/common/decorators';
 
 @ApiTags('Approval Requests')
@@ -105,6 +105,7 @@ export class ApprovalController {
     Approve a pending request
   */
   @Patch(':id/approve')
+  @Roles(Role.ADMIN, Role.MANAGER)
   @Idempotent()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Approve a pending request (Manager only)' })
@@ -133,6 +134,7 @@ export class ApprovalController {
     Reject a pending request
   */
   @Patch(':id/reject')
+  @Roles(Role.ADMIN, Role.MANAGER)
   @Idempotent()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reject a pending request (Manager only)' })

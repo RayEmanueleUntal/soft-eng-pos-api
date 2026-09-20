@@ -229,6 +229,7 @@ model WholeSaleCustomer {
 
   customer            Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
+  @@index([customerId])
   @@map("wholesale_profile")
 }
 
@@ -446,6 +447,7 @@ enum RequestType {
   STOCK_OUT_OVERRIDE
   DELETE_TRANSACTION
   REFUND_TRANSACTION
+  EXCHANGE_TRANSACTION
 }
 
 enum RequestStatus {
