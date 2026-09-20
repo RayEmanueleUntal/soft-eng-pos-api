@@ -444,8 +444,8 @@ model SystemSetting {
 enum RequestType {
   OVERRIDE_DISCOUNT
   STOCK_OUT_OVERRIDE
-  REFUND_EXCEED_LIMIT
   DELETE_TRANSACTION
+  REFUND_TRANSACTION
 }
 
 enum RequestStatus {
