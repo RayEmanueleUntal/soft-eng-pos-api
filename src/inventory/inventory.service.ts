@@ -204,9 +204,80 @@ export class InventoryService {
     return StockMovementResponseDto.fromEntity(movement);
   }
 
+  /**
+   * Helper function that increases product stock inside an active database transaction.
+   * Serves as the single source of truth for all stock-in / restock operations.
+   */
+  async restockProductStock(
+    tx: Prisma.TransactionClient,
+    params: {
+      productId: number;
+      quantityToAdd: number | Prisma.Decimal;
+      provided_uom: UnitOfMeasure;
+      userId: number;
+      reason: string;
+      date?: Date;
+      operation_name?: string;
+    },
+  ) {
+    const {
+      productId,
+      quantityToAdd,
+      provided_uom,
+      userId,
+      reason,
+      date,
+      operation_name = 'RESTOCK',
+    } = params;
+
+    // 1. Validate UOM and fetch product
+    const product = await this.validateAndGetProduct(
+      tx,
+      productId,
+      provided_uom,
+      userId,
+      operation_name,
+    );
+
+    const prevQty = new Prisma.Decimal(product.current_quantity);
+    const addedQty = new Prisma.Decimal(quantityToAdd);
+    const newQty = prevQty.plus(addedQty);
+
+    // 2. Update stock level
+    await tx.product.update({
+      where: { id: product.id },
+      data: { current_quantity: newQty },
+    });
+
+    // 3. Log Movement
+    const movement = await tx.stockMovement.create({
+      data: {
+        productId: product.id,
+        staffId: userId,
+        date: date ?? new Date(),
+        type: MovementType.IN,
+        current_uom: product.pricing_uom ?? UnitOfMeasure.PCS,
+        quantity_changed: addedQty,
+        previous_quantity: prevQty,
+        new_quantity: newQty,
+        reason,
+      },
+    });
+
+    this.logger.log(`Stock restocked successfully`, {
+      movementId: movement.id,
+      productId: product.id,
+      addedQty: addedQty.toString(),
+      newQty: newQty.toString(),
+      operation: operation_name,
+    });
+
+    return movement;
+  }
+
   /*
   Stock-In
-  */
+*/
   async stockIn(
     userId: number,
     stockInDto: StockInDto,
@@ -217,46 +288,15 @@ export class InventoryService {
     });
 
     const movement = await this.prisma.$transaction(async (tx) => {
-      const product = await this.validateAndGetProduct(
-        tx,
-        stockInDto.productId,
-        stockInDto.current_uom,
+      return await this.restockProductStock(tx, {
+        productId: stockInDto.productId,
+        quantityToAdd: stockInDto.added_qty,
+        provided_uom: stockInDto.current_uom,
         userId,
-        'Stock-In',
-      );
-
-      const prevQty = new Prisma.Decimal(product.current_quantity);
-      const addedQty = new Prisma.Decimal(stockInDto.added_qty);
-      const newQty = prevQty.plus(addedQty);
-
-      const createdMovement = await tx.stockMovement.create({
-        data: {
-          productId: product.id,
-          staffId: userId,
-          date: stockInDto.date ?? new Date(),
-          type: MovementType.IN,
-          current_uom: product.base_uom,
-          quantity_changed: addedQty,
-          previous_quantity: prevQty,
-          new_quantity: newQty,
-          reason: stockInDto.reason ?? 'Stock-In',
-        },
+        reason: stockInDto.reason ?? 'Stock-In',
+        date: stockInDto.date, // Pass custom date if provided in DTO
+        operation_name: 'STOCK_IN',
       });
-
-      await tx.product.update({
-        where: { id: product.id },
-        data: { current_quantity: newQty },
-      });
-
-      this.logger.log('Stock-in completed successfully', {
-        movementId: createdMovement.id,
-        productId: product.id,
-        userId,
-        addedQty: addedQty.toString(),
-        newQty: newQty.toString(),
-      });
-
-      return createdMovement;
     });
 
     return StockMovementResponseDto.fromEntity(movement);

@@ -3,6 +3,7 @@ import { ApprovalRegistry } from 'src/approval/approval-registry.service';
 import { ApprovalHandler } from 'src/approval/interfaces/approval-handler.interface';
 import { Prisma } from 'src/generated/prisma/client';
 import { MovementType, RequestType } from 'src/generated/prisma/enums';
+import { InventoryService } from 'src/inventory/inventory.service';
 import { ItemCondition } from 'src/returns/dto';
 
 export interface RefundApprovalPayload {
@@ -20,7 +21,10 @@ export class RefundApprovalHandler
   readonly type = RequestType.REFUND_TRANSACTION;
   private readonly logger = new Logger(RefundApprovalHandler.name);
 
-  constructor(private readonly registry: ApprovalRegistry) {}
+  constructor(
+    private readonly registry: ApprovalRegistry,
+    private readonly inventoryService: InventoryService,
+  ) {}
 
   onModuleInit() {
     this.registry.register(this);
@@ -78,25 +82,19 @@ export class RefundApprovalHandler
       const product = await tx.product.findUniqueOrThrow({
         where: { id: payload.productId },
       });
-      const newQty = product.current_quantity.add(payload.quantity);
 
-      await tx.product.update({
-        where: { id: payload.productId },
-        data: { current_quantity: newQty },
+      await this.inventoryService.restockProductStock(tx, {
+        productId: payload.productId,
+        quantityToAdd: payload.quantity,
+        provided_uom: product.base_uom,
+        userId: requestedById,
+        reason: `RETURN RESTOCK: ${payload.reason} (Tx #${payload.transactionId})`,
+        operation_name: 'REFUND_RESTOCK',
       });
-
-      await tx.stockMovement.create({
-        data: {
-          productId: payload.productId,
-          staffId: requestedById,
-          type: MovementType.IN,
-          current_uom: product.base_uom,
-          quantity_changed: payload.quantity,
-          previous_quantity: product.current_quantity,
-          new_quantity: newQty,
-          reason: `RETURN RESTOCK: ${payload.reason}`,
-        },
-      });
+    } else {
+      this.logger.warn(
+        `Product #${payload.productId} returned as ${payload.condition}. Skipping inventory restock.`,
+      );
     }
 
     // 5. Handle Wholesale Credit Payments (Debt Reduction)

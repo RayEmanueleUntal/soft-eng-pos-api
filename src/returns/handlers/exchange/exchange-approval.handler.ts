@@ -103,40 +103,17 @@ export class ExchangeApprovalHandler
 
     // 6. Restock Old Item if not defective
     if (payload.condition === ItemCondition.CHANGE_OF_MIND) {
-      this.logger.log(
-        `Restocking returned product #${payload.oldProductId} (Condition: ${payload.condition})`,
-      );
-
-      // A. Fetch current stock state of the old product
       const oldProduct = await tx.product.findUniqueOrThrow({
         where: { id: payload.oldProductId },
       });
 
-      const prevQty = oldProduct.current_quantity;
-      const restockQty = new Prisma.Decimal(payload.oldQuantity);
-      const newQty = prevQty.add(restockQty);
-
-      // B. Add returned units back to available inventory
-      await tx.product.update({
-        where: { id: payload.oldProductId },
-        data: {
-          current_quantity: newQty,
-        },
-      });
-
-      // C. Log the positive stock movement
-      await tx.stockMovement.create({
-        data: {
-          productId: payload.oldProductId,
-          staffId: requestedById,
-          date: new Date(),
-          type: MovementType.IN,
-          current_uom: oldProduct.base_uom,
-          quantity_changed: restockQty,
-          previous_quantity: prevQty,
-          new_quantity: newQty,
-          reason: `EXCHANGE RESTOCK: Returned in sellable condition (Tx #${payload.transactionId})`,
-        },
+      await this.inventoryService.restockProductStock(tx, {
+        productId: payload.oldProductId,
+        quantityToAdd: payload.oldQuantity,
+        provided_uom: oldProduct.base_uom,
+        userId: requestedById,
+        reason: `EXCHANGE RESTOCK: Returned in sellable condition (Tx #${payload.transactionId})`,
+        operation_name: 'EXCHANGE_RESTOCK',
       });
     } else {
       this.logger.warn(
