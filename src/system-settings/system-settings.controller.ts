@@ -20,7 +20,6 @@ import { Idempotent } from 'src/common/decorators';
 @ApiTags('System Settings')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('system-settings')
-@Roles(Role.ADMIN, Role.MANAGER)
 export class SystemSettingsController {
   constructor(private readonly systemSettingsService: SystemSettingsService) {}
 
@@ -29,6 +28,7 @@ export class SystemSettingsController {
   */
   @Post()
   @Idempotent()
+  @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({ summary: 'Create a new system setting' })
   @ApiResponse({ status: HttpStatus.CREATED, type: SettingResponseDto })
   @ApiResponse({
@@ -55,7 +55,6 @@ export class SystemSettingsController {
     Get a system setting by key
   */
   @Get(':key')
-  @Idempotent()
   @ApiOperation({ summary: 'Get a specific system setting by key' })
   @ApiParam({ name: 'key', example: 'RETURN_WINDOW_DAYS' })
   @ApiResponse({ status: HttpStatus.OK, type: SettingResponseDto })
@@ -72,6 +71,7 @@ export class SystemSettingsController {
   */
   @Patch(':key')
   @Idempotent()
+  @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({ summary: 'Update an existing system setting' })
   @ApiParam({ name: 'key', example: 'RETURN_WINDOW_DAYS' })
   @ApiResponse({ status: HttpStatus.OK, type: SettingResponseDto })
@@ -91,6 +91,7 @@ export class SystemSettingsController {
   */
   @Delete(':key')
   @Idempotent()
+  @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({ summary: 'Delete a system setting' })
   @ApiParam({ name: 'key', example: 'RETURN_WINDOW_DAYS' })
   @ApiResponse({ status: HttpStatus.OK, type: SettingResponseDto })
