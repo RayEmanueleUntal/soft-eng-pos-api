@@ -15,7 +15,6 @@ import { PosModule } from './pos/pos.module';
 import { CustomersModule } from './customers/customers.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ReturnsModule } from './returns/returns.module';
-import { ExchangesModule } from './exchanges/exchanges.module';
 import { ProductCategoriesModule } from './product-categories/product-categories.module';
 import { SystemSettingsModule } from './system-settings/system-settings.module';
 import { ApprovalModule } from './approval/approval.module';
@@ -56,7 +55,6 @@ import KeyvRedis from '@keyv/redis';
     CustomersModule,
     TransactionsModule,
     ReturnsModule,
-    ExchangesModule,
     ProductCategoriesModule,
     SystemSettingsModule,
     ApprovalModule,
