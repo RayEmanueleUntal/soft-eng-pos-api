@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
@@ -12,12 +13,36 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-import { GetReceiptResponseDto } from './dto';
+import {
+  GetReceiptResponseDto,
+  GetTransactionsQueryDto,
+  PaginatedTransactionsResponseDto,
+} from './dto';
 
 @Controller('transactions')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
+
+  /*
+   * Fetch paginated list of transactions filtered by status, types, dates, or search criteria.
+   */
+  @Get()
+  @ApiOperation({
+    summary: 'Retrieve paginated transaction records',
+    description:
+      'Fetches transaction history with flexible filters (date range, staff, customer, status) and optional includes (shipments, returns, exchanges).',
+  })
+  @ApiOkResponse({
+    type: PaginatedTransactionsResponseDto,
+    description:
+      'Paginated list of transactions with calculated summary metrics.',
+  })
+  async getTransactions(
+    @Query() queryDto: GetTransactionsQueryDto,
+  ): Promise<PaginatedTransactionsResponseDto> {
+    return this.transactionsService.getTransactions(queryDto);
+  }
 
   /*
   Get receipt by transaction ID
