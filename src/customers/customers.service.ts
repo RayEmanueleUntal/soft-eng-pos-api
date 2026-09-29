@@ -322,4 +322,45 @@ export class CustomersService {
     // Re-use your existing CustomerResponseDto mapper
     return CustomerResponseDto.fromEntity(updatedCustomer);
   }
+
+  /**
+   * Adjusts the outstanding credit balance of a wholesale customer inside an existing transaction.
+   *
+   * @param tx Active Prisma transaction client
+   * @param customerId Primary key of the Customer
+   * @param amountDelta Positive value increases debt (e.g., credit purchase),
+   *                    Negative value decreases debt (e.g., payment / return credit)
+   */
+  async adjustWholesaleBalance(
+    tx: Prisma.TransactionClient,
+    customerId: number,
+    amountDelta: number | Prisma.Decimal,
+  ) {
+    const wholesaleAccount = await tx.wholeSaleCustomer.findUnique({
+      where: { customerId },
+    });
+
+    if (!wholesaleAccount) {
+      throw new NotFoundException(
+        `Wholesale account for Customer #${customerId} not found.`,
+      );
+    }
+
+    const delta = new Prisma.Decimal(amountDelta);
+
+    const updatedWholesale = await tx.wholeSaleCustomer.update({
+      where: { customerId },
+      data: {
+        outstanding_balance: {
+          increment: delta,
+        },
+      },
+    });
+
+    this.logger.log(
+      `Adjusted wholesale balance for Customer #${customerId} by ${delta.toFixed(2)}. New balance: ${updatedWholesale.outstanding_balance.toFixed(2)}`,
+    );
+
+    return updatedWholesale;
+  }
 }

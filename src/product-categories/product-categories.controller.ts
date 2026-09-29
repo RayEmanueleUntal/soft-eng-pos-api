@@ -11,9 +11,11 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { GetProductCategoryResponseDto } from './dto/responses';
 
+@ApiTags('Product Categories')
 @Controller('product-categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProductCategoriesController {

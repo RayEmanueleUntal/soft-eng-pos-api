@@ -214,4 +214,41 @@ export class TransactionsService {
 
     return GetReceiptResponseDto.fromEntity(transaction);
   }
+
+  // Helper function: generating invoice number
+  async getNextInvoiceNumber(tx: Prisma.TransactionClient): Promise<string> {
+    const year = new Date().getFullYear();
+
+    // ATOMIC: PostgreSQL increments and returns the next value in a single lock-free operation
+    const result = await tx.$queryRaw<{ nextval: bigint }[]>`
+      SELECT nextval('invoice_number_seq')
+    `;
+
+    const seq = Number(result[0].nextval);
+    const paddedSequence = String(seq).padStart(4, '0');
+
+    return `INV-${year}-${paddedSequence}`;
+  }
+
+  /**
+   * Accepts a transaction client and creates the transaction.
+   */
+  async createTransaction(
+    tx: Prisma.TransactionClient,
+    data: Prisma.TransactionUncheckedCreateInput,
+  ) {
+    return await tx.transaction.create({
+      data,
+      include: {
+        transactionItems: true,
+        payments: {
+          include: {
+            cashPayment: true,
+            gCashPayment: true,
+            creditPayment: true,
+          },
+        },
+      },
+    });
+  }
 }

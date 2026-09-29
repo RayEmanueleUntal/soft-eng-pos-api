@@ -15,6 +15,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import {
   CheckoutApiBodyOptions,
@@ -25,6 +26,7 @@ import { Idempotent } from 'src/common/decorators';
 import { CurrentUser, Roles } from 'src/auth/decorators';
 import { AssignedRole as Role } from 'src/generated/prisma/enums';
 
+@ApiTags('POS')
 @Controller('pos')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PosController {

@@ -23,6 +23,8 @@ import { InsufficientCreditException } from 'src/common/exceptions/insufficient-
 import { TransactionTypeMismatchException } from 'src/common/exceptions/transaction-type-mismatch.exception';
 import { Prisma } from 'src/generated/prisma/client';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { TransactionsService } from 'src/transactions/transactions.service';
+import { CustomersService } from 'src/customers/customers.service';
 
 @Injectable()
 export class PosService {
@@ -30,24 +32,9 @@ export class PosService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
+    private readonly transactionsService: TransactionsService,
+    private readonly customersService: CustomersService,
   ) {}
-
-  // Helper function: generating invoice number
-  private async getNextInvoiceNumber(
-    tx: Prisma.TransactionClient,
-  ): Promise<string> {
-    const year = new Date().getFullYear();
-
-    // ATOMIC: PostgreSQL increments and returns the next value in a single lock-free operation
-    const result = await tx.$queryRaw<{ nextval: bigint }[]>`
-    SELECT nextval('invoice_number_seq')
-  `;
-
-    const seq = Number(result[0].nextval);
-    const paddedSequence = String(seq).padStart(4, '0');
-
-    return `INV-${year}-${paddedSequence}`;
-  }
 
   /*
   Checkout items
@@ -215,7 +202,8 @@ export class PosService {
       }
 
       // 6. Generate Serial Invoice Number
-      const invoice_number = await this.getNextInvoiceNumber(tx);
+      const invoice_number =
+        await this.transactionsService.getNextInvoiceNumber(tx);
 
       // 7. Deduct Inventory Stock
       // Verify and adjust products stock in real-time
@@ -271,49 +259,60 @@ export class PosService {
 
       // 9. Update Wholesale Account Outstanding Balance
       if (creditPaymentDto && customer?.wholesale) {
-        const creditAmountUsed = new Prisma.Decimal(
+        await this.customersService.adjustWholesaleBalance(
+          tx,
+          customerId!,
           creditPaymentDto.amount_paid,
         );
-        await tx.wholeSaleCustomer.update({
-          where: { customerId: customer.wholesale.customerId },
-          data: {
-            outstanding_balance: {
-              increment: creditAmountUsed,
-            },
-          },
-        });
       }
 
       // 10. Persist Transaction, Items, and Payments
-      // Create the Transaction and TransactionItems
-      const newTransaction = await tx.transaction.create({
-        data: {
+      // POS prepares the data, TransactionService writes it.
+
+      // const newTransaction = await tx.transaction.create({
+      //   data: {
+      //     invoice_number,
+      //     transaction_type,
+      //     customerId: customerId ?? null,
+      //     staffId: userId,
+      //     subtotal: subtotal,
+      //     tax_total: taxTotal,
+      //     discount_total: discountTotal,
+      //     grand_total: grandTotal,
+      //     transactionItems: {
+      //       create: transactionItemsData,
+      //     },
+      //     payments: {
+      //       create: paymentsCreateData,
+      //     },
+      //   },
+      //   include: {
+      //     transactionItems: true,
+      //     payments: {
+      //       include: {
+      //         cashPayment: true,
+      //         gCashPayment: true,
+      //         creditPayment: true,
+      //       },
+      //     },
+      //   },
+      // });
+
+      const newTransaction = await this.transactionsService.createTransaction(
+        tx,
+        {
           invoice_number,
           transaction_type,
           customerId: customerId ?? null,
           staffId: userId,
-          subtotal: subtotal,
+          subtotal,
           tax_total: taxTotal,
           discount_total: discountTotal,
           grand_total: grandTotal,
-          transactionItems: {
-            create: transactionItemsData,
-          },
-          payments: {
-            create: paymentsCreateData,
-          },
+          transactionItems: { create: transactionItemsData },
+          payments: { create: paymentsCreateData },
         },
-        include: {
-          transactionItems: true,
-          payments: {
-            include: {
-              cashPayment: true,
-              gCashPayment: true,
-              creditPayment: true,
-            },
-          },
-        },
-      });
+      );
 
       return CheckoutTransactionResponseDto.fromEntities(
         newTransaction,

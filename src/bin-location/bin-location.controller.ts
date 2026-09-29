@@ -4,7 +4,9 @@ import { CreateBinLocDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from 'src/auth/guards';
 import { Roles } from 'src/auth/decorators';
 import { AssignedRole as Role } from 'src/generated/prisma/enums';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Bin Location')
 @Controller('bin-location')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class BinLocationController {
