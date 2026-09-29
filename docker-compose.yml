@@ -54,7 +54,8 @@ services:
       - '${API_PORT:-3000}:3000'
     environment:
       DATABASE_URL: 'postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-pos_secure_pass_dev}@pos-db:5432/${DB_NAME:-pos_inventory_dev}?schema=public'
-      REDIS_URL: ${REDIS_URL:-redis://pos-redis:6379}
+      # REDIS_URL: ${REDIS_URL:-redis://pos-redis:6379}
+      REDISS_URL: 'redis://pos-redis:6379'
       PORT: 3000
       NODE_ENV: development
     volumes:
