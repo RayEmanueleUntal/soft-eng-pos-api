@@ -1,1 +1,2 @@
-export * from './create-bin-location.dto';
+export * from './requests';
+export * from './responses';
