@@ -1,25 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GetProductCategoryResponseDto {
-  @ApiProperty({
-    example: 101,
-    description: 'Unique product category primary key ID',
-  })
+  @ApiProperty({ example: 1, description: 'Unique category identifier' })
   id!: number;
 
-  @ApiProperty({
-    example: 'Nuts',
-    description: 'Product category name',
-  })
-  categoryName!: string;
+  @ApiProperty({ example: 'Bolts', description: 'Category name' })
+  name!: string;
 
-  static fromEntities(
-    id: number,
-    categoryName: string,
-  ): GetProductCategoryResponseDto {
+  static fromEntity(entity: {
+    id: number;
+    name: string;
+  }): GetProductCategoryResponseDto {
     return {
-      id,
-      categoryName,
+      id: entity.id,
+      name: entity.name,
     };
   }
 }
