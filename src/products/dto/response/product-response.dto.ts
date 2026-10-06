@@ -6,7 +6,7 @@ import {
   UnitOfMeasure,
 } from 'src/generated/prisma/client';
 import { CategoryResponseDto } from './category-response.dto';
-import { BinLocationResponseDto } from './bin-location-response.dto';
+import { ProductBinLocationResponseDto } from './bin-location-response.dto';
 
 type ProductWithRelations = Product & {
   category?: Category | null;
@@ -68,8 +68,8 @@ export class ProductResponseDto {
   @ApiPropertyOptional({ example: 4, nullable: true })
   binId!: number | null;
 
-  @ApiPropertyOptional({ type: BinLocationResponseDto, nullable: true })
-  bin_location!: BinLocationResponseDto | null;
+  @ApiPropertyOptional({ type: ProductBinLocationResponseDto, nullable: true })
+  bin_location!: ProductBinLocationResponseDto | null;
 
   @ApiProperty({ example: '2026-09-01T10:00:00.000Z' })
   createdAt!: Date;
@@ -102,7 +102,7 @@ export class ProductResponseDto {
         : null,
       binId: entity.binId,
       bin_location: entity.bin_location
-        ? BinLocationResponseDto.fromEntity(entity.bin_location)
+        ? ProductBinLocationResponseDto.fromEntity(entity.bin_location)
         : null,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
