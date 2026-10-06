@@ -1,12 +1,19 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   AdjustInventoryDto,
   AssignBinDto,
   AssignBinResponseDto,
+  GetStockMovementsDto,
   InventoryDto,
   LowStockAlertsResponseDto,
   PaginatedInventoryResponseDto,
+  PaginatedStockMovementsResponseDto,
   StockOutDto,
 } from './dto';
 import { Prisma } from 'src/generated/prisma/client';
@@ -506,5 +513,73 @@ export class InventoryService {
     });
 
     return LowStockAlertsResponseDto.fromEntities(products);
+  }
+
+  /*
+  Retrieve paginated stock movement audit history
+  */
+  async getStockMovements(
+    queryDto: GetStockMovementsDto,
+  ): Promise<PaginatedStockMovementsResponseDto> {
+    const {
+      productId,
+      type,
+      staffId,
+      approvedById,
+      isOverride,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 20,
+    } = queryDto;
+
+    this.logger.debug('Fetching stock movement history', { filters: queryDto });
+
+    // Validate date logic
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      this.logger.warn('Stock movement query failed: startDate after endDate', {
+        startDate,
+        endDate,
+      });
+      throw new BadRequestException('startDate cannot be later than endDate');
+    }
+
+    const where: Prisma.StockMovementWhereInput = {
+      ...(productId && { productId }),
+      ...(type && { type }),
+      ...(staffId && { staffId }),
+      ...(approvedById && { approvedById }),
+      ...(isOverride !== undefined && { isOverride }),
+      ...((startDate || endDate) && {
+        date: {
+          ...(startDate && { gte: new Date(startDate) }),
+          ...(endDate && { lte: new Date(endDate) }),
+        },
+      }),
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [movements, total] = await this.prisma.$transaction([
+      this.prisma.stockMovement.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { date: 'desc' },
+        include: {
+          product: true,
+          staff: true,
+          approvedBy: true,
+        },
+      }),
+      this.prisma.stockMovement.count({ where }),
+    ]);
+
+    return PaginatedStockMovementsResponseDto.fromEntities(
+      movements,
+      total,
+      page,
+      limit,
+    );
   }
 }

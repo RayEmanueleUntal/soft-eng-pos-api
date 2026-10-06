@@ -17,15 +17,23 @@ import {
   AdjustInventoryDto,
   AssignBinDto,
   AssignBinResponseDto,
+  GetStockMovementsDto,
   InventoryDto,
   LowStockAlertsResponseDto,
   PaginatedInventoryResponseDto,
+  PaginatedStockMovementsResponseDto,
   StockInDto,
   StockMovementResponseDto,
   StockOutDto,
 } from './dto';
 import { Idempotent } from 'src/common/decorators';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @Controller('inventory')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -118,6 +126,35 @@ export class InventoryController {
   })
   getProductsBelowROP() {
     return this.inventoryService.getProductsBelowROP();
+  }
+
+  /*
+  Retrieve paginated stock movement audit history
+  */
+  @Get('movements')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.SECRETARY, Role.STOCK_MANAGEMENT)
+  @ApiOperation({
+    summary: 'Get paginated stock movement history',
+    description:
+      'Retrieves audit records of inventory movements (IN, OUT, SALE, RETURN, ADJUSTMENT) filtered by product, staff, type, override flag, and date range.',
+  })
+  @ApiOkResponse({
+    description: 'Successfully fetched stock movement history',
+    type: PaginatedStockMovementsResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid query parameters or date bounds provided',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authentication JWT token',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not possess sufficient role privileges',
+  })
+  async getStockMovements(
+    @Query() queryDto: GetStockMovementsDto,
+  ): Promise<PaginatedStockMovementsResponseDto> {
+    return this.inventoryService.getStockMovements(queryDto);
   }
 
   /*
