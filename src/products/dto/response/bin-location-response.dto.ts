@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BinLocation } from 'src/generated/prisma/client';
 
-export class BinLocationResponseDto {
+export class ProductBinLocationResponseDto {
   @ApiProperty({ example: 1 })
   id!: number;
 
@@ -11,7 +11,7 @@ export class BinLocationResponseDto {
   @ApiProperty({ example: 'Shelf B' })
   shelf_location!: string;
 
-  static fromEntity(entity: BinLocation): BinLocationResponseDto {
+  static fromEntity(entity: BinLocation): ProductBinLocationResponseDto {
     return {
       id: entity.id,
       aisle_number: entity.aisle_number,
