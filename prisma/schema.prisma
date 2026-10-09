@@ -370,9 +370,15 @@ model Supplier {
   contact_info   String
   location       String
   lead_time_days Int
+  is_active      Boolean         @default(true) // Industry Standard for vendor state management
 
   purchaseOrders PurchaseOrder[]
 
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @default(now()) @updatedAt
+  
+  @@index([name])       
+  @@index([is_active])  
   @@map("supplier")
 }
 
