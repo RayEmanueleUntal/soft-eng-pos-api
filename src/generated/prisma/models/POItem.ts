@@ -248,6 +248,7 @@ export type POItemOrderByWithRelationInput = {
 
 export type POItemWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  poId_productId?: Prisma.POItemPoIdProductIdCompoundUniqueInput
   AND?: Prisma.POItemWhereInput | Prisma.POItemWhereInput[]
   OR?: Prisma.POItemWhereInput[]
   NOT?: Prisma.POItemWhereInput | Prisma.POItemWhereInput[]
@@ -257,7 +258,7 @@ export type POItemWhereUniqueInput = Prisma.AtLeast<{
   unit_cost?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderScalarRelationFilter, Prisma.PurchaseOrderWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
-}, "id">
+}, "id" | "poId_productId">
 
 export type POItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -342,6 +343,11 @@ export type POItemListRelationFilter = {
 
 export type POItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type POItemPoIdProductIdCompoundUniqueInput = {
+  poId: number
+  productId: number
 }
 
 export type POItemCountOrderByAggregateInput = {

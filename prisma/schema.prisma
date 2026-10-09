@@ -348,6 +348,9 @@ model PurchaseOrder {
   deliveries  Delivery[]
   poItems     POItem[]
 
+  @@index([supplierId])
+  @@index([po_status])
+  @@index([order_date])
   @@map("purchase_order")
 }
 
@@ -361,6 +364,9 @@ model POItem {
   purchaseOrder      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
   product            Product       @relation(fields: [productId], references: [id])
 
+  @@index([poId])
+  @@index([productId])
+  @@unique([poId, productId])
   @@map("po_item")
 }
 
@@ -524,4 +530,6 @@ enum MovementType {
 enum POStatus {
   PENDING
   FULFILLED
+  CANCELLED
+  PARTIALLY_FULFILLED
 }

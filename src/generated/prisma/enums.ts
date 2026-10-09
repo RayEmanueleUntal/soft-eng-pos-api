@@ -114,7 +114,9 @@ export type MovementType = (typeof MovementType)[keyof typeof MovementType]
 
 export const POStatus = {
   PENDING: 'PENDING',
-  FULFILLED: 'FULFILLED'
+  FULFILLED: 'FULFILLED',
+  CANCELLED: 'CANCELLED',
+  PARTIALLY_FULFILLED: 'PARTIALLY_FULFILLED'
 } as const
 
 export type POStatus = (typeof POStatus)[keyof typeof POStatus]

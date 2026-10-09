@@ -19,8 +19,8 @@ import {
   TransactionType,
   UnitOfMeasure,
 } from 'src/generated/prisma/enums';
-import { InsufficientCreditException } from 'src/common/exceptions/insufficient-credit.exception';
-import { TransactionTypeMismatchException } from 'src/common/exceptions/transaction-type-mismatch.exception';
+import { InsufficientCreditException } from 'src/common/exceptions';
+import { TransactionTypeMismatchException } from 'src/common/exceptions';
 import { Prisma } from 'src/generated/prisma/client';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { TransactionsService } from 'src/transactions/transactions.service';

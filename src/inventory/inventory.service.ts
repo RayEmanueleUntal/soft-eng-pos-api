@@ -18,12 +18,12 @@ import {
 } from './dto';
 import { Prisma } from 'src/generated/prisma/client';
 import { MovementType, UnitOfMeasure } from 'src/generated/prisma/enums';
-import { UOMMismatchException } from 'src/common/exceptions/uom-mismatch.exception';
+import { UOMMismatchException } from 'src/common/exceptions';
 import { StockInDto } from './dto/requests/stock-in.dto';
 import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace';
 import { Product } from 'src/generated/prisma/client';
 import { StockMovementResponseDto } from './dto/responses/stock-movement-response.dto';
-import { InsufficientStockException } from 'src/common/exceptions/insufficient-stock.exception';
+import { InsufficientStockException } from 'src/common/exceptions';
 
 @Injectable()
 export class InventoryService {

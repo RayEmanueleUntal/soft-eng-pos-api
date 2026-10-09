@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCustomerDto, GetCustomerDto, UpdateCustomerDto } from './dto';
-import { DuplicateCustomerException } from 'src/common/exceptions/duplicate-customer.exception';
+import { DuplicateCustomerException } from 'src/common/exceptions';
 import { CustomerType } from 'src/generated/prisma/enums';
 import { CustomerResponseDto } from './dto/response/customer-response.dto';
 import { Prisma } from 'src/generated/prisma/client';

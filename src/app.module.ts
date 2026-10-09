@@ -19,6 +19,7 @@ import { ProductCategoriesModule } from './product-categories/product-categories
 import { SystemSettingsModule } from './system-settings/system-settings.module';
 import { ApprovalModule } from './approval/approval.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -60,6 +61,7 @@ import KeyvRedis from '@keyv/redis';
     SystemSettingsModule,
     ApprovalModule,
     SuppliersModule,
+    PurchaseOrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

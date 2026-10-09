@@ -6,11 +6,11 @@ import {
   PaginatedProductsResponseDto,
   ProductResponseDto,
 } from './dto';
-import { DuplicateProductException } from 'src/common/exceptions/duplicate-product.exception';
+import { DuplicateProductException } from 'src/common/exceptions';
 import { Prisma } from 'src/generated/prisma/client';
-import { UomChangeRequiredException } from 'src/common/exceptions/uom-change-required.exception';
+import { UomChangeRequiredException } from 'src/common/exceptions';
 import { UpdateProductDto } from './dto/request/update-product.dto';
-import { ProductHasHistoryException } from 'src/common/exceptions/product-has-history.exception';
+import { ProductHasHistoryException } from 'src/common/exceptions';
 import { DeleteProductQueryDto } from './dto/request/delete-product-query.dto';
 import { DeleteProductResponseDto } from './dto';
 
