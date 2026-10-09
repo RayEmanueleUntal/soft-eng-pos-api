@@ -2492,7 +2492,10 @@ export const SupplierScalarFieldEnum = {
   name: 'name',
   contact_info: 'contact_info',
   location: 'location',
-  lead_time_days: 'lead_time_days'
+  lead_time_days: 'lead_time_days',
+  is_active: 'is_active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type SupplierScalarFieldEnum = (typeof SupplierScalarFieldEnum)[keyof typeof SupplierScalarFieldEnum]
