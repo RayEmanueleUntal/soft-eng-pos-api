@@ -9,3 +9,4 @@ export * from './uom-change-required.exception';
 export * from './uom-mismatch.exception';
 
 export * from './procurement';
+export * from './deliveries';

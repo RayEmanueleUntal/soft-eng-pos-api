@@ -398,6 +398,9 @@ model Delivery {
   staff         StaffUser     @relation(fields: [staffId], references: [id])
   deliveryItems DeliveryItem[]
 
+  @@index([poId])
+  @@index([staffId])
+  @@index([delivery_date])
   @@map("delivery")
 }
 
@@ -407,6 +410,8 @@ model DeliveryItem {
   productId     Int
   received_quantity Decimal   @db.Decimal(10, 3)
 
+  @@index([deliveryId])
+  @@index([productId])
   delivery      Delivery      @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
   product       Product       @relation(fields: [productId], references: [id])
   
