@@ -161,22 +161,37 @@ model Shipment {
   id              Int            @id @default(autoincrement())
   transactionId   Int
   forwarderId     Int
+  tracking_number String?
   dispatch_date   DateTime       @default(now())
   tracking_status TrackingStatus @default(PENDING)
+  notes           String?       
 
   transaction     Transaction    @relation(fields: [transactionId], references: [id])
-  forwarder       Forwarder      @relation(fields: [forwarderId], references: [id])
+  forwarder       Forwarder      @relation(fields: [forwarderId], references: [id])  
 
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([tracking_status])
+  @@index([forwarderId])
+  @@index([transactionId])
+  @@index([dispatch_date])
   @@map("shipment")
 }
 
 model Forwarder {
   id                    Int        @id @default(autoincrement())
-  company_name          String
+  company_name          String     @unique
   tracking_contact_info String
+  is_active             Boolean    @default(true)
 
   shipments             Shipment[]
 
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([company_name])
+  @@index([is_active])
   @@map("forwarder")
 }
 

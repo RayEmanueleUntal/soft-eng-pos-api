@@ -38,18 +38,27 @@ export type ForwarderMinAggregateOutputType = {
   id: number | null
   company_name: string | null
   tracking_contact_info: string | null
+  is_active: boolean | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type ForwarderMaxAggregateOutputType = {
   id: number | null
   company_name: string | null
   tracking_contact_info: string | null
+  is_active: boolean | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type ForwarderCountAggregateOutputType = {
   id: number
   company_name: number
   tracking_contact_info: number
+  is_active: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -66,18 +75,27 @@ export type ForwarderMinAggregateInputType = {
   id?: true
   company_name?: true
   tracking_contact_info?: true
+  is_active?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ForwarderMaxAggregateInputType = {
   id?: true
   company_name?: true
   tracking_contact_info?: true
+  is_active?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ForwarderCountAggregateInputType = {
   id?: true
   company_name?: true
   tracking_contact_info?: true
+  is_active?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -171,6 +189,9 @@ export type ForwarderGroupByOutputType = {
   id: number
   company_name: string
   tracking_contact_info: string
+  is_active: boolean
+  createdAt: Date
+  updatedAt: Date
   _count: ForwarderCountAggregateOutputType | null
   _avg: ForwarderAvgAggregateOutputType | null
   _sum: ForwarderSumAggregateOutputType | null
@@ -200,6 +221,9 @@ export type ForwarderWhereInput = {
   id?: Prisma.IntFilter<"Forwarder"> | number
   company_name?: Prisma.StringFilter<"Forwarder"> | string
   tracking_contact_info?: Prisma.StringFilter<"Forwarder"> | string
+  is_active?: Prisma.BoolFilter<"Forwarder"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Forwarder"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Forwarder"> | Date | string
   shipments?: Prisma.ShipmentListRelationFilter
 }
 
@@ -207,23 +231,32 @@ export type ForwarderOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   company_name?: Prisma.SortOrder
   tracking_contact_info?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   shipments?: Prisma.ShipmentOrderByRelationAggregateInput
 }
 
 export type ForwarderWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  company_name?: string
   AND?: Prisma.ForwarderWhereInput | Prisma.ForwarderWhereInput[]
   OR?: Prisma.ForwarderWhereInput[]
   NOT?: Prisma.ForwarderWhereInput | Prisma.ForwarderWhereInput[]
-  company_name?: Prisma.StringFilter<"Forwarder"> | string
   tracking_contact_info?: Prisma.StringFilter<"Forwarder"> | string
+  is_active?: Prisma.BoolFilter<"Forwarder"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Forwarder"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Forwarder"> | Date | string
   shipments?: Prisma.ShipmentListRelationFilter
-}, "id">
+}, "id" | "company_name">
 
 export type ForwarderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   company_name?: Prisma.SortOrder
   tracking_contact_info?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.ForwarderCountOrderByAggregateInput
   _avg?: Prisma.ForwarderAvgOrderByAggregateInput
   _max?: Prisma.ForwarderMaxOrderByAggregateInput
@@ -238,11 +271,17 @@ export type ForwarderScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Forwarder"> | number
   company_name?: Prisma.StringWithAggregatesFilter<"Forwarder"> | string
   tracking_contact_info?: Prisma.StringWithAggregatesFilter<"Forwarder"> | string
+  is_active?: Prisma.BoolWithAggregatesFilter<"Forwarder"> | boolean
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Forwarder"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Forwarder"> | Date | string
 }
 
 export type ForwarderCreateInput = {
   company_name: string
   tracking_contact_info: string
+  is_active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
   shipments?: Prisma.ShipmentCreateNestedManyWithoutForwarderInput
 }
 
@@ -250,12 +289,18 @@ export type ForwarderUncheckedCreateInput = {
   id?: number
   company_name: string
   tracking_contact_info: string
+  is_active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
   shipments?: Prisma.ShipmentUncheckedCreateNestedManyWithoutForwarderInput
 }
 
 export type ForwarderUpdateInput = {
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   tracking_contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shipments?: Prisma.ShipmentUpdateManyWithoutForwarderNestedInput
 }
 
@@ -263,6 +308,9 @@ export type ForwarderUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   tracking_contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   shipments?: Prisma.ShipmentUncheckedUpdateManyWithoutForwarderNestedInput
 }
 
@@ -270,17 +318,26 @@ export type ForwarderCreateManyInput = {
   id?: number
   company_name: string
   tracking_contact_info: string
+  is_active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ForwarderUpdateManyMutationInput = {
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   tracking_contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ForwarderUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   tracking_contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ForwarderScalarRelationFilter = {
@@ -292,6 +349,9 @@ export type ForwarderCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   company_name?: Prisma.SortOrder
   tracking_contact_info?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ForwarderAvgOrderByAggregateInput = {
@@ -302,12 +362,18 @@ export type ForwarderMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   company_name?: Prisma.SortOrder
   tracking_contact_info?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ForwarderMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   company_name?: Prisma.SortOrder
   tracking_contact_info?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ForwarderSumOrderByAggregateInput = {
@@ -331,12 +397,18 @@ export type ForwarderUpdateOneRequiredWithoutShipmentsNestedInput = {
 export type ForwarderCreateWithoutShipmentsInput = {
   company_name: string
   tracking_contact_info: string
+  is_active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ForwarderUncheckedCreateWithoutShipmentsInput = {
   id?: number
   company_name: string
   tracking_contact_info: string
+  is_active?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ForwarderCreateOrConnectWithoutShipmentsInput = {
@@ -358,12 +430,18 @@ export type ForwarderUpdateToOneWithWhereWithoutShipmentsInput = {
 export type ForwarderUpdateWithoutShipmentsInput = {
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   tracking_contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ForwarderUncheckedUpdateWithoutShipmentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   tracking_contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -401,6 +479,9 @@ export type ForwarderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   company_name?: boolean
   tracking_contact_info?: boolean
+  is_active?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   shipments?: boolean | Prisma.Forwarder$shipmentsArgs<ExtArgs>
   _count?: boolean | Prisma.ForwarderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["forwarder"]>
@@ -409,21 +490,30 @@ export type ForwarderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   company_name?: boolean
   tracking_contact_info?: boolean
+  is_active?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["forwarder"]>
 
 export type ForwarderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   company_name?: boolean
   tracking_contact_info?: boolean
+  is_active?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["forwarder"]>
 
 export type ForwarderSelectScalar = {
   id?: boolean
   company_name?: boolean
   tracking_contact_info?: boolean
+  is_active?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ForwarderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "company_name" | "tracking_contact_info", ExtArgs["result"]["forwarder"]>
+export type ForwarderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "company_name" | "tracking_contact_info" | "is_active" | "createdAt" | "updatedAt", ExtArgs["result"]["forwarder"]>
 export type ForwarderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   shipments?: boolean | Prisma.Forwarder$shipmentsArgs<ExtArgs>
   _count?: boolean | Prisma.ForwarderCountOutputTypeDefaultArgs<ExtArgs>
@@ -440,6 +530,9 @@ export type $ForwarderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     id: number
     company_name: string
     tracking_contact_info: string
+    is_active: boolean
+    createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["forwarder"]>
   composites: {}
 }
@@ -867,6 +960,9 @@ export interface ForwarderFieldRefs {
   readonly id: Prisma.FieldRef<"Forwarder", 'Int'>
   readonly company_name: Prisma.FieldRef<"Forwarder", 'String'>
   readonly tracking_contact_info: Prisma.FieldRef<"Forwarder", 'String'>
+  readonly is_active: Prisma.FieldRef<"Forwarder", 'Boolean'>
+  readonly createdAt: Prisma.FieldRef<"Forwarder", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Forwarder", 'DateTime'>
 }
     
 

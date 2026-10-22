@@ -21,6 +21,7 @@ import { ApprovalModule } from './approval/approval.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
+import { ForwarderModule } from './forwarder/forwarder.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -64,6 +65,7 @@ import KeyvRedis from '@keyv/redis';
     SuppliersModule,
     PurchaseOrdersModule,
     DeliveriesModule,
+    ForwarderModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

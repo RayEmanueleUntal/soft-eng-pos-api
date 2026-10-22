@@ -42,24 +42,36 @@ export type ShipmentMinAggregateOutputType = {
   id: number | null
   transactionId: number | null
   forwarderId: number | null
+  tracking_number: string | null
   dispatch_date: Date | null
   tracking_status: $Enums.TrackingStatus | null
+  notes: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type ShipmentMaxAggregateOutputType = {
   id: number | null
   transactionId: number | null
   forwarderId: number | null
+  tracking_number: string | null
   dispatch_date: Date | null
   tracking_status: $Enums.TrackingStatus | null
+  notes: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type ShipmentCountAggregateOutputType = {
   id: number
   transactionId: number
   forwarderId: number
+  tracking_number: number
   dispatch_date: number
   tracking_status: number
+  notes: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -80,24 +92,36 @@ export type ShipmentMinAggregateInputType = {
   id?: true
   transactionId?: true
   forwarderId?: true
+  tracking_number?: true
   dispatch_date?: true
   tracking_status?: true
+  notes?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ShipmentMaxAggregateInputType = {
   id?: true
   transactionId?: true
   forwarderId?: true
+  tracking_number?: true
   dispatch_date?: true
   tracking_status?: true
+  notes?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ShipmentCountAggregateInputType = {
   id?: true
   transactionId?: true
   forwarderId?: true
+  tracking_number?: true
   dispatch_date?: true
   tracking_status?: true
+  notes?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -191,8 +215,12 @@ export type ShipmentGroupByOutputType = {
   id: number
   transactionId: number
   forwarderId: number
+  tracking_number: string | null
   dispatch_date: Date
   tracking_status: $Enums.TrackingStatus
+  notes: string | null
+  createdAt: Date
+  updatedAt: Date
   _count: ShipmentCountAggregateOutputType | null
   _avg: ShipmentAvgAggregateOutputType | null
   _sum: ShipmentSumAggregateOutputType | null
@@ -222,8 +250,12 @@ export type ShipmentWhereInput = {
   id?: Prisma.IntFilter<"Shipment"> | number
   transactionId?: Prisma.IntFilter<"Shipment"> | number
   forwarderId?: Prisma.IntFilter<"Shipment"> | number
+  tracking_number?: Prisma.StringNullableFilter<"Shipment"> | string | null
   dispatch_date?: Prisma.DateTimeFilter<"Shipment"> | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFilter<"Shipment"> | $Enums.TrackingStatus
+  notes?: Prisma.StringNullableFilter<"Shipment"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Shipment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Shipment"> | Date | string
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
   forwarder?: Prisma.XOR<Prisma.ForwarderScalarRelationFilter, Prisma.ForwarderWhereInput>
 }
@@ -232,8 +264,12 @@ export type ShipmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   forwarderId?: Prisma.SortOrder
+  tracking_number?: Prisma.SortOrderInput | Prisma.SortOrder
   dispatch_date?: Prisma.SortOrder
   tracking_status?: Prisma.SortOrder
+  notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   transaction?: Prisma.TransactionOrderByWithRelationInput
   forwarder?: Prisma.ForwarderOrderByWithRelationInput
 }
@@ -245,8 +281,12 @@ export type ShipmentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ShipmentWhereInput | Prisma.ShipmentWhereInput[]
   transactionId?: Prisma.IntFilter<"Shipment"> | number
   forwarderId?: Prisma.IntFilter<"Shipment"> | number
+  tracking_number?: Prisma.StringNullableFilter<"Shipment"> | string | null
   dispatch_date?: Prisma.DateTimeFilter<"Shipment"> | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFilter<"Shipment"> | $Enums.TrackingStatus
+  notes?: Prisma.StringNullableFilter<"Shipment"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Shipment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Shipment"> | Date | string
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
   forwarder?: Prisma.XOR<Prisma.ForwarderScalarRelationFilter, Prisma.ForwarderWhereInput>
 }, "id">
@@ -255,8 +295,12 @@ export type ShipmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   forwarderId?: Prisma.SortOrder
+  tracking_number?: Prisma.SortOrderInput | Prisma.SortOrder
   dispatch_date?: Prisma.SortOrder
   tracking_status?: Prisma.SortOrder
+  notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.ShipmentCountOrderByAggregateInput
   _avg?: Prisma.ShipmentAvgOrderByAggregateInput
   _max?: Prisma.ShipmentMaxOrderByAggregateInput
@@ -271,13 +315,21 @@ export type ShipmentScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Shipment"> | number
   transactionId?: Prisma.IntWithAggregatesFilter<"Shipment"> | number
   forwarderId?: Prisma.IntWithAggregatesFilter<"Shipment"> | number
+  tracking_number?: Prisma.StringNullableWithAggregatesFilter<"Shipment"> | string | null
   dispatch_date?: Prisma.DateTimeWithAggregatesFilter<"Shipment"> | Date | string
   tracking_status?: Prisma.EnumTrackingStatusWithAggregatesFilter<"Shipment"> | $Enums.TrackingStatus
+  notes?: Prisma.StringNullableWithAggregatesFilter<"Shipment"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Shipment"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Shipment"> | Date | string
 }
 
 export type ShipmentCreateInput = {
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   transaction: Prisma.TransactionCreateNestedOneWithoutShipmentsInput
   forwarder: Prisma.ForwarderCreateNestedOneWithoutShipmentsInput
 }
@@ -286,13 +338,21 @@ export type ShipmentUncheckedCreateInput = {
   id?: number
   transactionId: number
   forwarderId: number
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShipmentUpdateInput = {
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutShipmentsNestedInput
   forwarder?: Prisma.ForwarderUpdateOneRequiredWithoutShipmentsNestedInput
 }
@@ -301,29 +361,45 @@ export type ShipmentUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   forwarderId?: Prisma.IntFieldUpdateOperationsInput | number
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShipmentCreateManyInput = {
   id?: number
   transactionId: number
   forwarderId: number
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShipmentUpdateManyMutationInput = {
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShipmentUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   forwarderId?: Prisma.IntFieldUpdateOperationsInput | number
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShipmentListRelationFilter = {
@@ -340,8 +416,12 @@ export type ShipmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   forwarderId?: Prisma.SortOrder
+  tracking_number?: Prisma.SortOrder
   dispatch_date?: Prisma.SortOrder
   tracking_status?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ShipmentAvgOrderByAggregateInput = {
@@ -354,16 +434,24 @@ export type ShipmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   forwarderId?: Prisma.SortOrder
+  tracking_number?: Prisma.SortOrder
   dispatch_date?: Prisma.SortOrder
   tracking_status?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ShipmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   forwarderId?: Prisma.SortOrder
+  tracking_number?: Prisma.SortOrder
   dispatch_date?: Prisma.SortOrder
   tracking_status?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ShipmentSumOrderByAggregateInput = {
@@ -461,16 +549,24 @@ export type ShipmentUncheckedUpdateManyWithoutForwarderNestedInput = {
 }
 
 export type ShipmentCreateWithoutTransactionInput = {
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   forwarder: Prisma.ForwarderCreateNestedOneWithoutShipmentsInput
 }
 
 export type ShipmentUncheckedCreateWithoutTransactionInput = {
   id?: number
   forwarderId: number
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShipmentCreateOrConnectWithoutTransactionInput = {
@@ -506,21 +602,33 @@ export type ShipmentScalarWhereInput = {
   id?: Prisma.IntFilter<"Shipment"> | number
   transactionId?: Prisma.IntFilter<"Shipment"> | number
   forwarderId?: Prisma.IntFilter<"Shipment"> | number
+  tracking_number?: Prisma.StringNullableFilter<"Shipment"> | string | null
   dispatch_date?: Prisma.DateTimeFilter<"Shipment"> | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFilter<"Shipment"> | $Enums.TrackingStatus
+  notes?: Prisma.StringNullableFilter<"Shipment"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Shipment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Shipment"> | Date | string
 }
 
 export type ShipmentCreateWithoutForwarderInput = {
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   transaction: Prisma.TransactionCreateNestedOneWithoutShipmentsInput
 }
 
 export type ShipmentUncheckedCreateWithoutForwarderInput = {
   id?: number
   transactionId: number
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShipmentCreateOrConnectWithoutForwarderInput = {
@@ -552,55 +660,87 @@ export type ShipmentUpdateManyWithWhereWithoutForwarderInput = {
 export type ShipmentCreateManyTransactionInput = {
   id?: number
   forwarderId: number
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShipmentUpdateWithoutTransactionInput = {
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forwarder?: Prisma.ForwarderUpdateOneRequiredWithoutShipmentsNestedInput
 }
 
 export type ShipmentUncheckedUpdateWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   forwarderId?: Prisma.IntFieldUpdateOperationsInput | number
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShipmentUncheckedUpdateManyWithoutTransactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   forwarderId?: Prisma.IntFieldUpdateOperationsInput | number
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShipmentCreateManyForwarderInput = {
   id?: number
   transactionId: number
+  tracking_number?: string | null
   dispatch_date?: Date | string
   tracking_status?: $Enums.TrackingStatus
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShipmentUpdateWithoutForwarderInput = {
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutShipmentsNestedInput
 }
 
 export type ShipmentUncheckedUpdateWithoutForwarderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShipmentUncheckedUpdateManyWithoutForwarderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
+  tracking_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dispatch_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tracking_status?: Prisma.EnumTrackingStatusFieldUpdateOperationsInput | $Enums.TrackingStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -609,8 +749,12 @@ export type ShipmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   transactionId?: boolean
   forwarderId?: boolean
+  tracking_number?: boolean
   dispatch_date?: boolean
   tracking_status?: boolean
+  notes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   forwarder?: boolean | Prisma.ForwarderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shipment"]>
@@ -619,8 +763,12 @@ export type ShipmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   transactionId?: boolean
   forwarderId?: boolean
+  tracking_number?: boolean
   dispatch_date?: boolean
   tracking_status?: boolean
+  notes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   forwarder?: boolean | Prisma.ForwarderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shipment"]>
@@ -629,8 +777,12 @@ export type ShipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   transactionId?: boolean
   forwarderId?: boolean
+  tracking_number?: boolean
   dispatch_date?: boolean
   tracking_status?: boolean
+  notes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   forwarder?: boolean | Prisma.ForwarderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shipment"]>
@@ -639,11 +791,15 @@ export type ShipmentSelectScalar = {
   id?: boolean
   transactionId?: boolean
   forwarderId?: boolean
+  tracking_number?: boolean
   dispatch_date?: boolean
   tracking_status?: boolean
+  notes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ShipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "forwarderId" | "dispatch_date" | "tracking_status", ExtArgs["result"]["shipment"]>
+export type ShipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "forwarderId" | "tracking_number" | "dispatch_date" | "tracking_status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["shipment"]>
 export type ShipmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   forwarder?: boolean | Prisma.ForwarderDefaultArgs<ExtArgs>
@@ -667,8 +823,12 @@ export type $ShipmentPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: number
     transactionId: number
     forwarderId: number
+    tracking_number: string | null
     dispatch_date: Date
     tracking_status: $Enums.TrackingStatus
+    notes: string | null
+    createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["shipment"]>
   composites: {}
 }
@@ -1097,8 +1257,12 @@ export interface ShipmentFieldRefs {
   readonly id: Prisma.FieldRef<"Shipment", 'Int'>
   readonly transactionId: Prisma.FieldRef<"Shipment", 'Int'>
   readonly forwarderId: Prisma.FieldRef<"Shipment", 'Int'>
+  readonly tracking_number: Prisma.FieldRef<"Shipment", 'String'>
   readonly dispatch_date: Prisma.FieldRef<"Shipment", 'DateTime'>
   readonly tracking_status: Prisma.FieldRef<"Shipment", 'TrackingStatus'>
+  readonly notes: Prisma.FieldRef<"Shipment", 'String'>
+  readonly createdAt: Prisma.FieldRef<"Shipment", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Shipment", 'DateTime'>
 }
     
 
