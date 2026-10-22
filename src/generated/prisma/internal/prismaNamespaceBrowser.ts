@@ -193,8 +193,12 @@ export const ShipmentScalarFieldEnum = {
   id: 'id',
   transactionId: 'transactionId',
   forwarderId: 'forwarderId',
+  tracking_number: 'tracking_number',
   dispatch_date: 'dispatch_date',
-  tracking_status: 'tracking_status'
+  tracking_status: 'tracking_status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ShipmentScalarFieldEnum = (typeof ShipmentScalarFieldEnum)[keyof typeof ShipmentScalarFieldEnum]
@@ -203,7 +207,10 @@ export type ShipmentScalarFieldEnum = (typeof ShipmentScalarFieldEnum)[keyof typ
 export const ForwarderScalarFieldEnum = {
   id: 'id',
   company_name: 'company_name',
-  tracking_contact_info: 'tracking_contact_info'
+  tracking_contact_info: 'tracking_contact_info',
+  is_active: 'is_active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ForwarderScalarFieldEnum = (typeof ForwarderScalarFieldEnum)[keyof typeof ForwarderScalarFieldEnum]

@@ -10,3 +10,4 @@ export * from './uom-mismatch.exception';
 
 export * from './procurement';
 export * from './deliveries';
+export * from './forwarder';
