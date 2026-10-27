@@ -31,6 +31,8 @@ export type DeliveryItemAvgAggregateOutputType = {
   deliveryId: number | null
   productId: number | null
   received_quantity: runtime.Decimal | null
+  uom_conversion_factor: runtime.Decimal | null
+  actual_base_quantity: runtime.Decimal | null
 }
 
 export type DeliveryItemSumAggregateOutputType = {
@@ -38,6 +40,8 @@ export type DeliveryItemSumAggregateOutputType = {
   deliveryId: number | null
   productId: number | null
   received_quantity: runtime.Decimal | null
+  uom_conversion_factor: runtime.Decimal | null
+  actual_base_quantity: runtime.Decimal | null
 }
 
 export type DeliveryItemMinAggregateOutputType = {
@@ -45,6 +49,9 @@ export type DeliveryItemMinAggregateOutputType = {
   deliveryId: number | null
   productId: number | null
   received_quantity: runtime.Decimal | null
+  received_uom: $Enums.UnitOfMeasure | null
+  uom_conversion_factor: runtime.Decimal | null
+  actual_base_quantity: runtime.Decimal | null
 }
 
 export type DeliveryItemMaxAggregateOutputType = {
@@ -52,6 +59,9 @@ export type DeliveryItemMaxAggregateOutputType = {
   deliveryId: number | null
   productId: number | null
   received_quantity: runtime.Decimal | null
+  received_uom: $Enums.UnitOfMeasure | null
+  uom_conversion_factor: runtime.Decimal | null
+  actual_base_quantity: runtime.Decimal | null
 }
 
 export type DeliveryItemCountAggregateOutputType = {
@@ -59,6 +69,9 @@ export type DeliveryItemCountAggregateOutputType = {
   deliveryId: number
   productId: number
   received_quantity: number
+  received_uom: number
+  uom_conversion_factor: number
+  actual_base_quantity: number
   _all: number
 }
 
@@ -68,6 +81,8 @@ export type DeliveryItemAvgAggregateInputType = {
   deliveryId?: true
   productId?: true
   received_quantity?: true
+  uom_conversion_factor?: true
+  actual_base_quantity?: true
 }
 
 export type DeliveryItemSumAggregateInputType = {
@@ -75,6 +90,8 @@ export type DeliveryItemSumAggregateInputType = {
   deliveryId?: true
   productId?: true
   received_quantity?: true
+  uom_conversion_factor?: true
+  actual_base_quantity?: true
 }
 
 export type DeliveryItemMinAggregateInputType = {
@@ -82,6 +99,9 @@ export type DeliveryItemMinAggregateInputType = {
   deliveryId?: true
   productId?: true
   received_quantity?: true
+  received_uom?: true
+  uom_conversion_factor?: true
+  actual_base_quantity?: true
 }
 
 export type DeliveryItemMaxAggregateInputType = {
@@ -89,6 +109,9 @@ export type DeliveryItemMaxAggregateInputType = {
   deliveryId?: true
   productId?: true
   received_quantity?: true
+  received_uom?: true
+  uom_conversion_factor?: true
+  actual_base_quantity?: true
 }
 
 export type DeliveryItemCountAggregateInputType = {
@@ -96,6 +119,9 @@ export type DeliveryItemCountAggregateInputType = {
   deliveryId?: true
   productId?: true
   received_quantity?: true
+  received_uom?: true
+  uom_conversion_factor?: true
+  actual_base_quantity?: true
   _all?: true
 }
 
@@ -190,6 +216,9 @@ export type DeliveryItemGroupByOutputType = {
   deliveryId: number
   productId: number
   received_quantity: runtime.Decimal
+  received_uom: $Enums.UnitOfMeasure
+  uom_conversion_factor: runtime.Decimal
+  actual_base_quantity: runtime.Decimal
   _count: DeliveryItemCountAggregateOutputType | null
   _avg: DeliveryItemAvgAggregateOutputType | null
   _sum: DeliveryItemSumAggregateOutputType | null
@@ -220,6 +249,9 @@ export type DeliveryItemWhereInput = {
   deliveryId?: Prisma.IntFilter<"DeliveryItem"> | number
   productId?: Prisma.IntFilter<"DeliveryItem"> | number
   received_quantity?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFilter<"DeliveryItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   delivery?: Prisma.XOR<Prisma.DeliveryScalarRelationFilter, Prisma.DeliveryWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
 }
@@ -229,6 +261,9 @@ export type DeliveryItemOrderByWithRelationInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  received_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
   delivery?: Prisma.DeliveryOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
 }
@@ -241,6 +276,9 @@ export type DeliveryItemWhereUniqueInput = Prisma.AtLeast<{
   deliveryId?: Prisma.IntFilter<"DeliveryItem"> | number
   productId?: Prisma.IntFilter<"DeliveryItem"> | number
   received_quantity?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFilter<"DeliveryItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   delivery?: Prisma.XOR<Prisma.DeliveryScalarRelationFilter, Prisma.DeliveryWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
 }, "id">
@@ -250,6 +288,9 @@ export type DeliveryItemOrderByWithAggregationInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  received_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
   _count?: Prisma.DeliveryItemCountOrderByAggregateInput
   _avg?: Prisma.DeliveryItemAvgOrderByAggregateInput
   _max?: Prisma.DeliveryItemMaxOrderByAggregateInput
@@ -265,10 +306,16 @@ export type DeliveryItemScalarWhereWithAggregatesInput = {
   deliveryId?: Prisma.IntWithAggregatesFilter<"DeliveryItem"> | number
   productId?: Prisma.IntWithAggregatesFilter<"DeliveryItem"> | number
   received_quantity?: Prisma.DecimalWithAggregatesFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureWithAggregatesFilter<"DeliveryItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalWithAggregatesFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalWithAggregatesFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemCreateInput = {
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   delivery: Prisma.DeliveryCreateNestedOneWithoutDeliveryItemsInput
   product: Prisma.ProductCreateNestedOneWithoutDeliveryItemsInput
 }
@@ -278,10 +325,16 @@ export type DeliveryItemUncheckedCreateInput = {
   deliveryId: number
   productId: number
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUpdateInput = {
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   delivery?: Prisma.DeliveryUpdateOneRequiredWithoutDeliveryItemsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutDeliveryItemsNestedInput
 }
@@ -291,6 +344,9 @@ export type DeliveryItemUncheckedUpdateInput = {
   deliveryId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemCreateManyInput = {
@@ -298,10 +354,16 @@ export type DeliveryItemCreateManyInput = {
   deliveryId: number
   productId: number
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUpdateManyMutationInput = {
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUncheckedUpdateManyInput = {
@@ -309,6 +371,9 @@ export type DeliveryItemUncheckedUpdateManyInput = {
   deliveryId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemListRelationFilter = {
@@ -326,6 +391,9 @@ export type DeliveryItemCountOrderByAggregateInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  received_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
 }
 
 export type DeliveryItemAvgOrderByAggregateInput = {
@@ -333,6 +401,8 @@ export type DeliveryItemAvgOrderByAggregateInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
 }
 
 export type DeliveryItemMaxOrderByAggregateInput = {
@@ -340,6 +410,9 @@ export type DeliveryItemMaxOrderByAggregateInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  received_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
 }
 
 export type DeliveryItemMinOrderByAggregateInput = {
@@ -347,6 +420,9 @@ export type DeliveryItemMinOrderByAggregateInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  received_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
 }
 
 export type DeliveryItemSumOrderByAggregateInput = {
@@ -354,6 +430,8 @@ export type DeliveryItemSumOrderByAggregateInput = {
   deliveryId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   received_quantity?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  actual_base_quantity?: Prisma.SortOrder
 }
 
 export type DeliveryItemCreateNestedManyWithoutProductInput = {
@@ -442,6 +520,9 @@ export type DeliveryItemUncheckedUpdateManyWithoutDeliveryNestedInput = {
 
 export type DeliveryItemCreateWithoutProductInput = {
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   delivery: Prisma.DeliveryCreateNestedOneWithoutDeliveryItemsInput
 }
 
@@ -449,6 +530,9 @@ export type DeliveryItemUncheckedCreateWithoutProductInput = {
   id?: number
   deliveryId: number
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemCreateOrConnectWithoutProductInput = {
@@ -485,10 +569,16 @@ export type DeliveryItemScalarWhereInput = {
   deliveryId?: Prisma.IntFilter<"DeliveryItem"> | number
   productId?: Prisma.IntFilter<"DeliveryItem"> | number
   received_quantity?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFilter<"DeliveryItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFilter<"DeliveryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemCreateWithoutDeliveryInput = {
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   product: Prisma.ProductCreateNestedOneWithoutDeliveryItemsInput
 }
 
@@ -496,6 +586,9 @@ export type DeliveryItemUncheckedCreateWithoutDeliveryInput = {
   id?: number
   productId: number
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemCreateOrConnectWithoutDeliveryInput = {
@@ -528,10 +621,16 @@ export type DeliveryItemCreateManyProductInput = {
   id?: number
   deliveryId: number
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUpdateWithoutProductInput = {
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   delivery?: Prisma.DeliveryUpdateOneRequiredWithoutDeliveryItemsNestedInput
 }
 
@@ -539,22 +638,34 @@ export type DeliveryItemUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryId?: Prisma.IntFieldUpdateOperationsInput | number
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryId?: Prisma.IntFieldUpdateOperationsInput | number
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemCreateManyDeliveryInput = {
   id?: number
   productId: number
   received_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUpdateWithoutDeliveryInput = {
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   product?: Prisma.ProductUpdateOneRequiredWithoutDeliveryItemsNestedInput
 }
 
@@ -562,12 +673,18 @@ export type DeliveryItemUncheckedUpdateWithoutDeliveryInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type DeliveryItemUncheckedUpdateManyWithoutDeliveryInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   received_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  received_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actual_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -577,6 +694,9 @@ export type DeliveryItemSelect<ExtArgs extends runtime.Types.Extensions.Internal
   deliveryId?: boolean
   productId?: boolean
   received_quantity?: boolean
+  received_uom?: boolean
+  uom_conversion_factor?: boolean
+  actual_base_quantity?: boolean
   delivery?: boolean | Prisma.DeliveryDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryItem"]>
@@ -586,6 +706,9 @@ export type DeliveryItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   deliveryId?: boolean
   productId?: boolean
   received_quantity?: boolean
+  received_uom?: boolean
+  uom_conversion_factor?: boolean
+  actual_base_quantity?: boolean
   delivery?: boolean | Prisma.DeliveryDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryItem"]>
@@ -595,6 +718,9 @@ export type DeliveryItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   deliveryId?: boolean
   productId?: boolean
   received_quantity?: boolean
+  received_uom?: boolean
+  uom_conversion_factor?: boolean
+  actual_base_quantity?: boolean
   delivery?: boolean | Prisma.DeliveryDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryItem"]>
@@ -604,9 +730,12 @@ export type DeliveryItemSelectScalar = {
   deliveryId?: boolean
   productId?: boolean
   received_quantity?: boolean
+  received_uom?: boolean
+  uom_conversion_factor?: boolean
+  actual_base_quantity?: boolean
 }
 
-export type DeliveryItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "deliveryId" | "productId" | "received_quantity", ExtArgs["result"]["deliveryItem"]>
+export type DeliveryItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "deliveryId" | "productId" | "received_quantity" | "received_uom" | "uom_conversion_factor" | "actual_base_quantity", ExtArgs["result"]["deliveryItem"]>
 export type DeliveryItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   delivery?: boolean | Prisma.DeliveryDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -631,6 +760,9 @@ export type $DeliveryItemPayload<ExtArgs extends runtime.Types.Extensions.Intern
     deliveryId: number
     productId: number
     received_quantity: runtime.Decimal
+    received_uom: $Enums.UnitOfMeasure
+    uom_conversion_factor: runtime.Decimal
+    actual_base_quantity: runtime.Decimal
   }, ExtArgs["result"]["deliveryItem"]>
   composites: {}
 }
@@ -1060,6 +1192,9 @@ export interface DeliveryItemFieldRefs {
   readonly deliveryId: Prisma.FieldRef<"DeliveryItem", 'Int'>
   readonly productId: Prisma.FieldRef<"DeliveryItem", 'Int'>
   readonly received_quantity: Prisma.FieldRef<"DeliveryItem", 'Decimal'>
+  readonly received_uom: Prisma.FieldRef<"DeliveryItem", 'UnitOfMeasure'>
+  readonly uom_conversion_factor: Prisma.FieldRef<"DeliveryItem", 'Decimal'>
+  readonly actual_base_quantity: Prisma.FieldRef<"DeliveryItem", 'Decimal'>
 }
     
 

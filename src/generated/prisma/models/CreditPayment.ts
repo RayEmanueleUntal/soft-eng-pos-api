@@ -40,18 +40,21 @@ export type CreditPaymentMinAggregateOutputType = {
   paymentId: number | null
   due_date: Date | null
   remaining_credit_balance: runtime.Decimal | null
+  status: $Enums.CreditStatus | null
 }
 
 export type CreditPaymentMaxAggregateOutputType = {
   paymentId: number | null
   due_date: Date | null
   remaining_credit_balance: runtime.Decimal | null
+  status: $Enums.CreditStatus | null
 }
 
 export type CreditPaymentCountAggregateOutputType = {
   paymentId: number
   due_date: number
   remaining_credit_balance: number
+  status: number
   _all: number
 }
 
@@ -70,18 +73,21 @@ export type CreditPaymentMinAggregateInputType = {
   paymentId?: true
   due_date?: true
   remaining_credit_balance?: true
+  status?: true
 }
 
 export type CreditPaymentMaxAggregateInputType = {
   paymentId?: true
   due_date?: true
   remaining_credit_balance?: true
+  status?: true
 }
 
 export type CreditPaymentCountAggregateInputType = {
   paymentId?: true
   due_date?: true
   remaining_credit_balance?: true
+  status?: true
   _all?: true
 }
 
@@ -175,6 +181,7 @@ export type CreditPaymentGroupByOutputType = {
   paymentId: number
   due_date: Date
   remaining_credit_balance: runtime.Decimal
+  status: $Enums.CreditStatus
   _count: CreditPaymentCountAggregateOutputType | null
   _avg: CreditPaymentAvgAggregateOutputType | null
   _sum: CreditPaymentSumAggregateOutputType | null
@@ -204,6 +211,7 @@ export type CreditPaymentWhereInput = {
   paymentId?: Prisma.IntFilter<"CreditPayment"> | number
   due_date?: Prisma.DateTimeFilter<"CreditPayment"> | Date | string
   remaining_credit_balance?: Prisma.DecimalFilter<"CreditPayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFilter<"CreditPayment"> | $Enums.CreditStatus
   payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
 }
 
@@ -211,6 +219,7 @@ export type CreditPaymentOrderByWithRelationInput = {
   paymentId?: Prisma.SortOrder
   due_date?: Prisma.SortOrder
   remaining_credit_balance?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   payment?: Prisma.PaymentOrderByWithRelationInput
 }
 
@@ -221,6 +230,7 @@ export type CreditPaymentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CreditPaymentWhereInput | Prisma.CreditPaymentWhereInput[]
   due_date?: Prisma.DateTimeFilter<"CreditPayment"> | Date | string
   remaining_credit_balance?: Prisma.DecimalFilter<"CreditPayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFilter<"CreditPayment"> | $Enums.CreditStatus
   payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
 }, "paymentId">
 
@@ -228,6 +238,7 @@ export type CreditPaymentOrderByWithAggregationInput = {
   paymentId?: Prisma.SortOrder
   due_date?: Prisma.SortOrder
   remaining_credit_balance?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   _count?: Prisma.CreditPaymentCountOrderByAggregateInput
   _avg?: Prisma.CreditPaymentAvgOrderByAggregateInput
   _max?: Prisma.CreditPaymentMaxOrderByAggregateInput
@@ -242,11 +253,13 @@ export type CreditPaymentScalarWhereWithAggregatesInput = {
   paymentId?: Prisma.IntWithAggregatesFilter<"CreditPayment"> | number
   due_date?: Prisma.DateTimeWithAggregatesFilter<"CreditPayment"> | Date | string
   remaining_credit_balance?: Prisma.DecimalWithAggregatesFilter<"CreditPayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusWithAggregatesFilter<"CreditPayment"> | $Enums.CreditStatus
 }
 
 export type CreditPaymentCreateInput = {
   due_date: Date | string
   remaining_credit_balance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.CreditStatus
   payment: Prisma.PaymentCreateNestedOneWithoutCreditPaymentInput
 }
 
@@ -254,11 +267,13 @@ export type CreditPaymentUncheckedCreateInput = {
   paymentId: number
   due_date: Date | string
   remaining_credit_balance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.CreditStatus
 }
 
 export type CreditPaymentUpdateInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remaining_credit_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFieldUpdateOperationsInput | $Enums.CreditStatus
   payment?: Prisma.PaymentUpdateOneRequiredWithoutCreditPaymentNestedInput
 }
 
@@ -266,23 +281,27 @@ export type CreditPaymentUncheckedUpdateInput = {
   paymentId?: Prisma.IntFieldUpdateOperationsInput | number
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remaining_credit_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFieldUpdateOperationsInput | $Enums.CreditStatus
 }
 
 export type CreditPaymentCreateManyInput = {
   paymentId: number
   due_date: Date | string
   remaining_credit_balance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.CreditStatus
 }
 
 export type CreditPaymentUpdateManyMutationInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remaining_credit_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFieldUpdateOperationsInput | $Enums.CreditStatus
 }
 
 export type CreditPaymentUncheckedUpdateManyInput = {
   paymentId?: Prisma.IntFieldUpdateOperationsInput | number
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remaining_credit_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFieldUpdateOperationsInput | $Enums.CreditStatus
 }
 
 export type CreditPaymentNullableScalarRelationFilter = {
@@ -294,6 +313,7 @@ export type CreditPaymentCountOrderByAggregateInput = {
   paymentId?: Prisma.SortOrder
   due_date?: Prisma.SortOrder
   remaining_credit_balance?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type CreditPaymentAvgOrderByAggregateInput = {
@@ -305,12 +325,14 @@ export type CreditPaymentMaxOrderByAggregateInput = {
   paymentId?: Prisma.SortOrder
   due_date?: Prisma.SortOrder
   remaining_credit_balance?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type CreditPaymentMinOrderByAggregateInput = {
   paymentId?: Prisma.SortOrder
   due_date?: Prisma.SortOrder
   remaining_credit_balance?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type CreditPaymentSumOrderByAggregateInput = {
@@ -350,14 +372,20 @@ export type CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CreditPaymentUpdateToOneWithWhereWithoutPaymentInput, Prisma.CreditPaymentUpdateWithoutPaymentInput>, Prisma.CreditPaymentUncheckedUpdateWithoutPaymentInput>
 }
 
+export type EnumCreditStatusFieldUpdateOperationsInput = {
+  set?: $Enums.CreditStatus
+}
+
 export type CreditPaymentCreateWithoutPaymentInput = {
   due_date: Date | string
   remaining_credit_balance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.CreditStatus
 }
 
 export type CreditPaymentUncheckedCreateWithoutPaymentInput = {
   due_date: Date | string
   remaining_credit_balance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.CreditStatus
 }
 
 export type CreditPaymentCreateOrConnectWithoutPaymentInput = {
@@ -379,11 +407,13 @@ export type CreditPaymentUpdateToOneWithWhereWithoutPaymentInput = {
 export type CreditPaymentUpdateWithoutPaymentInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remaining_credit_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFieldUpdateOperationsInput | $Enums.CreditStatus
 }
 
 export type CreditPaymentUncheckedUpdateWithoutPaymentInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remaining_credit_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumCreditStatusFieldUpdateOperationsInput | $Enums.CreditStatus
 }
 
 
@@ -392,6 +422,7 @@ export type CreditPaymentSelect<ExtArgs extends runtime.Types.Extensions.Interna
   paymentId?: boolean
   due_date?: boolean
   remaining_credit_balance?: boolean
+  status?: boolean
   payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["creditPayment"]>
 
@@ -399,6 +430,7 @@ export type CreditPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   paymentId?: boolean
   due_date?: boolean
   remaining_credit_balance?: boolean
+  status?: boolean
   payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["creditPayment"]>
 
@@ -406,6 +438,7 @@ export type CreditPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   paymentId?: boolean
   due_date?: boolean
   remaining_credit_balance?: boolean
+  status?: boolean
   payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["creditPayment"]>
 
@@ -413,9 +446,10 @@ export type CreditPaymentSelectScalar = {
   paymentId?: boolean
   due_date?: boolean
   remaining_credit_balance?: boolean
+  status?: boolean
 }
 
-export type CreditPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"paymentId" | "due_date" | "remaining_credit_balance", ExtArgs["result"]["creditPayment"]>
+export type CreditPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"paymentId" | "due_date" | "remaining_credit_balance" | "status", ExtArgs["result"]["creditPayment"]>
 export type CreditPaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
 }
@@ -435,6 +469,7 @@ export type $CreditPaymentPayload<ExtArgs extends runtime.Types.Extensions.Inter
     paymentId: number
     due_date: Date
     remaining_credit_balance: runtime.Decimal
+    status: $Enums.CreditStatus
   }, ExtArgs["result"]["creditPayment"]>
   composites: {}
 }
@@ -862,6 +897,7 @@ export interface CreditPaymentFieldRefs {
   readonly paymentId: Prisma.FieldRef<"CreditPayment", 'Int'>
   readonly due_date: Prisma.FieldRef<"CreditPayment", 'DateTime'>
   readonly remaining_credit_balance: Prisma.FieldRef<"CreditPayment", 'Decimal'>
+  readonly status: Prisma.FieldRef<"CreditPayment", 'CreditStatus'>
 }
     
 

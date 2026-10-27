@@ -39,7 +39,9 @@ export type SupplierSumAggregateOutputType = {
 export type SupplierMinAggregateOutputType = {
   id: number | null
   name: string | null
-  contact_info: string | null
+  contact_person: string | null
+  email: string | null
+  contact_number: string | null
   location: string | null
   lead_time_days: number | null
   is_active: boolean | null
@@ -50,7 +52,9 @@ export type SupplierMinAggregateOutputType = {
 export type SupplierMaxAggregateOutputType = {
   id: number | null
   name: string | null
-  contact_info: string | null
+  contact_person: string | null
+  email: string | null
+  contact_number: string | null
   location: string | null
   lead_time_days: number | null
   is_active: boolean | null
@@ -61,7 +65,9 @@ export type SupplierMaxAggregateOutputType = {
 export type SupplierCountAggregateOutputType = {
   id: number
   name: number
-  contact_info: number
+  contact_person: number
+  email: number
+  contact_number: number
   location: number
   lead_time_days: number
   is_active: number
@@ -84,7 +90,9 @@ export type SupplierSumAggregateInputType = {
 export type SupplierMinAggregateInputType = {
   id?: true
   name?: true
-  contact_info?: true
+  contact_person?: true
+  email?: true
+  contact_number?: true
   location?: true
   lead_time_days?: true
   is_active?: true
@@ -95,7 +103,9 @@ export type SupplierMinAggregateInputType = {
 export type SupplierMaxAggregateInputType = {
   id?: true
   name?: true
-  contact_info?: true
+  contact_person?: true
+  email?: true
+  contact_number?: true
   location?: true
   lead_time_days?: true
   is_active?: true
@@ -106,7 +116,9 @@ export type SupplierMaxAggregateInputType = {
 export type SupplierCountAggregateInputType = {
   id?: true
   name?: true
-  contact_info?: true
+  contact_person?: true
+  email?: true
+  contact_number?: true
   location?: true
   lead_time_days?: true
   is_active?: true
@@ -204,7 +216,9 @@ export type SupplierGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type SupplierGroupByOutputType = {
   id: number
   name: string
-  contact_info: string
+  contact_person: string | null
+  email: string | null
+  contact_number: string | null
   location: string
   lead_time_days: number
   is_active: boolean
@@ -238,7 +252,9 @@ export type SupplierWhereInput = {
   NOT?: Prisma.SupplierWhereInput | Prisma.SupplierWhereInput[]
   id?: Prisma.IntFilter<"Supplier"> | number
   name?: Prisma.StringFilter<"Supplier"> | string
-  contact_info?: Prisma.StringFilter<"Supplier"> | string
+  contact_person?: Prisma.StringNullableFilter<"Supplier"> | string | null
+  email?: Prisma.StringNullableFilter<"Supplier"> | string | null
+  contact_number?: Prisma.StringNullableFilter<"Supplier"> | string | null
   location?: Prisma.StringFilter<"Supplier"> | string
   lead_time_days?: Prisma.IntFilter<"Supplier"> | number
   is_active?: Prisma.BoolFilter<"Supplier"> | boolean
@@ -250,7 +266,9 @@ export type SupplierWhereInput = {
 export type SupplierOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  contact_info?: Prisma.SortOrder
+  contact_person?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  contact_number?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
   lead_time_days?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -261,23 +279,27 @@ export type SupplierOrderByWithRelationInput = {
 
 export type SupplierWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  name?: string
   AND?: Prisma.SupplierWhereInput | Prisma.SupplierWhereInput[]
   OR?: Prisma.SupplierWhereInput[]
   NOT?: Prisma.SupplierWhereInput | Prisma.SupplierWhereInput[]
-  name?: Prisma.StringFilter<"Supplier"> | string
-  contact_info?: Prisma.StringFilter<"Supplier"> | string
+  contact_person?: Prisma.StringNullableFilter<"Supplier"> | string | null
+  email?: Prisma.StringNullableFilter<"Supplier"> | string | null
+  contact_number?: Prisma.StringNullableFilter<"Supplier"> | string | null
   location?: Prisma.StringFilter<"Supplier"> | string
   lead_time_days?: Prisma.IntFilter<"Supplier"> | number
   is_active?: Prisma.BoolFilter<"Supplier"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Supplier"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Supplier"> | Date | string
   purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
-}, "id">
+}, "id" | "name">
 
 export type SupplierOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  contact_info?: Prisma.SortOrder
+  contact_person?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  contact_number?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
   lead_time_days?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -296,7 +318,9 @@ export type SupplierScalarWhereWithAggregatesInput = {
   NOT?: Prisma.SupplierScalarWhereWithAggregatesInput | Prisma.SupplierScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Supplier"> | number
   name?: Prisma.StringWithAggregatesFilter<"Supplier"> | string
-  contact_info?: Prisma.StringWithAggregatesFilter<"Supplier"> | string
+  contact_person?: Prisma.StringNullableWithAggregatesFilter<"Supplier"> | string | null
+  email?: Prisma.StringNullableWithAggregatesFilter<"Supplier"> | string | null
+  contact_number?: Prisma.StringNullableWithAggregatesFilter<"Supplier"> | string | null
   location?: Prisma.StringWithAggregatesFilter<"Supplier"> | string
   lead_time_days?: Prisma.IntWithAggregatesFilter<"Supplier"> | number
   is_active?: Prisma.BoolWithAggregatesFilter<"Supplier"> | boolean
@@ -306,7 +330,9 @@ export type SupplierScalarWhereWithAggregatesInput = {
 
 export type SupplierCreateInput = {
   name: string
-  contact_info: string
+  contact_person?: string | null
+  email?: string | null
+  contact_number?: string | null
   location: string
   lead_time_days: number
   is_active?: boolean
@@ -318,7 +344,9 @@ export type SupplierCreateInput = {
 export type SupplierUncheckedCreateInput = {
   id?: number
   name: string
-  contact_info: string
+  contact_person?: string | null
+  email?: string | null
+  contact_number?: string | null
   location: string
   lead_time_days: number
   is_active?: boolean
@@ -329,7 +357,9 @@ export type SupplierUncheckedCreateInput = {
 
 export type SupplierUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  contact_person?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contact_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   lead_time_days?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -341,7 +371,9 @@ export type SupplierUpdateInput = {
 export type SupplierUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  contact_person?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contact_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   lead_time_days?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -353,7 +385,9 @@ export type SupplierUncheckedUpdateInput = {
 export type SupplierCreateManyInput = {
   id?: number
   name: string
-  contact_info: string
+  contact_person?: string | null
+  email?: string | null
+  contact_number?: string | null
   location: string
   lead_time_days: number
   is_active?: boolean
@@ -363,7 +397,9 @@ export type SupplierCreateManyInput = {
 
 export type SupplierUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  contact_person?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contact_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   lead_time_days?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -374,7 +410,9 @@ export type SupplierUpdateManyMutationInput = {
 export type SupplierUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  contact_person?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contact_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   lead_time_days?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -390,7 +428,9 @@ export type SupplierScalarRelationFilter = {
 export type SupplierCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  contact_info?: Prisma.SortOrder
+  contact_person?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  contact_number?: Prisma.SortOrder
   location?: Prisma.SortOrder
   lead_time_days?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -406,7 +446,9 @@ export type SupplierAvgOrderByAggregateInput = {
 export type SupplierMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  contact_info?: Prisma.SortOrder
+  contact_person?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  contact_number?: Prisma.SortOrder
   location?: Prisma.SortOrder
   lead_time_days?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -417,7 +459,9 @@ export type SupplierMaxOrderByAggregateInput = {
 export type SupplierMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  contact_info?: Prisma.SortOrder
+  contact_person?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  contact_number?: Prisma.SortOrder
   location?: Prisma.SortOrder
   lead_time_days?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -446,7 +490,9 @@ export type SupplierUpdateOneRequiredWithoutPurchaseOrdersNestedInput = {
 
 export type SupplierCreateWithoutPurchaseOrdersInput = {
   name: string
-  contact_info: string
+  contact_person?: string | null
+  email?: string | null
+  contact_number?: string | null
   location: string
   lead_time_days: number
   is_active?: boolean
@@ -457,7 +503,9 @@ export type SupplierCreateWithoutPurchaseOrdersInput = {
 export type SupplierUncheckedCreateWithoutPurchaseOrdersInput = {
   id?: number
   name: string
-  contact_info: string
+  contact_person?: string | null
+  email?: string | null
+  contact_number?: string | null
   location: string
   lead_time_days: number
   is_active?: boolean
@@ -483,7 +531,9 @@ export type SupplierUpdateToOneWithWhereWithoutPurchaseOrdersInput = {
 
 export type SupplierUpdateWithoutPurchaseOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  contact_person?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contact_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   lead_time_days?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -494,7 +544,9 @@ export type SupplierUpdateWithoutPurchaseOrdersInput = {
 export type SupplierUncheckedUpdateWithoutPurchaseOrdersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  contact_info?: Prisma.StringFieldUpdateOperationsInput | string
+  contact_person?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contact_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   lead_time_days?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -536,7 +588,9 @@ export type SupplierCountOutputTypeCountPurchaseOrdersArgs<ExtArgs extends runti
 export type SupplierSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  contact_info?: boolean
+  contact_person?: boolean
+  email?: boolean
+  contact_number?: boolean
   location?: boolean
   lead_time_days?: boolean
   is_active?: boolean
@@ -549,7 +603,9 @@ export type SupplierSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type SupplierSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  contact_info?: boolean
+  contact_person?: boolean
+  email?: boolean
+  contact_number?: boolean
   location?: boolean
   lead_time_days?: boolean
   is_active?: boolean
@@ -560,7 +616,9 @@ export type SupplierSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type SupplierSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  contact_info?: boolean
+  contact_person?: boolean
+  email?: boolean
+  contact_number?: boolean
   location?: boolean
   lead_time_days?: boolean
   is_active?: boolean
@@ -571,7 +629,9 @@ export type SupplierSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type SupplierSelectScalar = {
   id?: boolean
   name?: boolean
-  contact_info?: boolean
+  contact_person?: boolean
+  email?: boolean
+  contact_number?: boolean
   location?: boolean
   lead_time_days?: boolean
   is_active?: boolean
@@ -579,7 +639,7 @@ export type SupplierSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SupplierOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "contact_info" | "location" | "lead_time_days" | "is_active" | "createdAt" | "updatedAt", ExtArgs["result"]["supplier"]>
+export type SupplierOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "contact_person" | "email" | "contact_number" | "location" | "lead_time_days" | "is_active" | "createdAt" | "updatedAt", ExtArgs["result"]["supplier"]>
 export type SupplierInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchaseOrders?: boolean | Prisma.Supplier$purchaseOrdersArgs<ExtArgs>
   _count?: boolean | Prisma.SupplierCountOutputTypeDefaultArgs<ExtArgs>
@@ -595,7 +655,9 @@ export type $SupplierPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
-    contact_info: string
+    contact_person: string | null
+    email: string | null
+    contact_number: string | null
     location: string
     lead_time_days: number
     is_active: boolean
@@ -1027,7 +1089,9 @@ export interface Prisma__SupplierClient<T, Null = never, ExtArgs extends runtime
 export interface SupplierFieldRefs {
   readonly id: Prisma.FieldRef<"Supplier", 'Int'>
   readonly name: Prisma.FieldRef<"Supplier", 'String'>
-  readonly contact_info: Prisma.FieldRef<"Supplier", 'String'>
+  readonly contact_person: Prisma.FieldRef<"Supplier", 'String'>
+  readonly email: Prisma.FieldRef<"Supplier", 'String'>
+  readonly contact_number: Prisma.FieldRef<"Supplier", 'String'>
   readonly location: Prisma.FieldRef<"Supplier", 'String'>
   readonly lead_time_days: Prisma.FieldRef<"Supplier", 'Int'>
   readonly is_active: Prisma.FieldRef<"Supplier", 'Boolean'>

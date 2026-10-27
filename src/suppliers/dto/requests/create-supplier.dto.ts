@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -10,44 +11,60 @@ import {
 
 export class CreateSupplierDto {
   @ApiProperty({
-    description: 'Legal or trade name of the supplier',
-    example: 'AeroFastener Industrial Supplies Inc.',
+    example: 'Hardware Supplies Co.',
+    description: 'Unique name of the vendor or supplier company.',
   })
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   name!: string;
 
-  @ApiProperty({
-    description: 'Primary contact details (phone, email, or contact person)',
-    example: '+63 917 555 0192 / sales@aerofastener.ph',
+  @ApiPropertyOptional({
+    example: 'John Doe',
+    description: 'Primary contact person or sales representative.',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  contact_info!: string;
+  contact_person?: string;
+
+  @ApiPropertyOptional({
+    example: 'john.doe@hardwaresupplies.com',
+    description: 'Official communication email address.',
+  })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({
+    example: '+639171234567',
+    description: 'Primary contact telephone or mobile number.',
+  })
+  @IsOptional()
+  @IsString()
+  contact_number?: string;
 
   @ApiProperty({
-    description: 'Physical warehouse or office location address',
-    example: 'Building 4, Industrial Zone, Davao City',
+    example: '123 Industrial Zone, Valenzuela City',
+    description: 'Physical location or office address of the supplier.',
   })
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   location!: string;
 
   @ApiProperty({
-    description: 'Estimated order delivery lead time in days',
-    example: 5,
-    minimum: 0,
+    example: 7,
+    description: 'Estimated fulfillment lead time in days.',
   })
+  @IsNotEmpty()
   @IsInt()
   @Min(0)
   lead_time_days!: number;
 
   @ApiPropertyOptional({
-    description:
-      'Whether the supplier is active for taking new purchase orders',
+    example: true,
+    description: 'Operational status flag for the supplier.',
     default: true,
   })
   @IsOptional()
   @IsBoolean()
-  is_active?: boolean = true;
+  is_active?: boolean;
 }

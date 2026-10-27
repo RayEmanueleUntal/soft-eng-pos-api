@@ -4,13 +4,15 @@ export async function seedSuppliers() {
   const suppliers = [
     {
       name: 'Apex Fasteners Corp',
-      contact_info: '+63 917 111 2222 | sales@apexfasteners.ph',
+      contact_number: '+63 917 111 2222',
+      email: 'sales@apexfasteners.ph',
       location: 'Valenzuela City, Metro Manila',
       lead_time_days: 3,
     },
     {
       name: 'Industrial Hardware Philippines',
-      contact_info: '+63 918 333 4444 | orders@indhardware.ph',
+      contact_number: '+63 918 333 4444',
+      email: 'orders@indhardware.ph',
       location: 'Cebu City, Cebu',
       lead_time_days: 5,
     },

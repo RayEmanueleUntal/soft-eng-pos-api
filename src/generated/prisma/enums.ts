@@ -29,6 +29,16 @@ export const RequestStatus = {
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]
 
 
+export const CreditStatus = {
+  UNPAID: 'UNPAID',
+  PARTIALLY_PAID: 'PARTIALLY_PAID',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE'
+} as const
+
+export type CreditStatus = (typeof CreditStatus)[keyof typeof CreditStatus]
+
+
 export const UnitOfMeasure = {
   PCS: 'PCS',
   BOX: 'BOX',
@@ -38,7 +48,7 @@ export const UnitOfMeasure = {
   METER: 'METER',
   HUNDRED: 'HUNDRED',
   GROSS: 'GROSS',
-  SACKs: 'SACKs'
+  SACK: 'SACK'
 } as const
 
 export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]

@@ -272,6 +272,23 @@ export type EnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumPaymentMethodFilter<$PrismaModel>
 }
 
+export type EnumCreditStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CreditStatus | Prisma.EnumCreditStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCreditStatusFilter<$PrismaModel> | $Enums.CreditStatus
+}
+
+export type EnumCreditStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CreditStatus | Prisma.EnumCreditStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCreditStatusWithAggregatesFilter<$PrismaModel> | $Enums.CreditStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCreditStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCreditStatusFilter<$PrismaModel>
+}
+
 export type EnumTrackingStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.TrackingStatus | Prisma.EnumTrackingStatusFieldRefInput<$PrismaModel>
   in?: $Enums.TrackingStatus[] | Prisma.ListEnumTrackingStatusFieldRefInput<$PrismaModel>
@@ -738,6 +755,23 @@ export type NestedEnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPaymentMethodFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPaymentMethodFilter<$PrismaModel>
+}
+
+export type NestedEnumCreditStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CreditStatus | Prisma.EnumCreditStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCreditStatusFilter<$PrismaModel> | $Enums.CreditStatus
+}
+
+export type NestedEnumCreditStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CreditStatus | Prisma.EnumCreditStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CreditStatus[] | Prisma.ListEnumCreditStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCreditStatusWithAggregatesFilter<$PrismaModel> | $Enums.CreditStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCreditStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCreditStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumTrackingStatusFilter<$PrismaModel = never> = {

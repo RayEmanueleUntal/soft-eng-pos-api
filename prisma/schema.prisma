@@ -54,13 +54,20 @@ model TransactionItem {
   transactionId  Int
   productId      Int
 
-  // Use Decimal if selling loose items by weight (e.g., 2.5kg of nails). Keep Int if strictly by piece.
+  // Transaction Selling Details
   quantity_sold  Decimal     @db.Decimal(10, 3)
   unit_of_measure UnitOfMeasure   @default(PCS)    // e.g., "pcs", "kg", "box"
 
+  // Conversion Snapshot at moment of sale
+  uom_conversion_factor Decimal   @default(1.000) @db.Decimal(10, 3) // Multiplier used: 100.000
+  base_quantity_deducted  Decimal @db.Decimal(10, 3) // Converted inventory deduction: 200.000 PCS 
+
   unit_price     Decimal     @db.Decimal(10, 2) // Base price per unit at moment of sale
+  cost_price     Decimal     @default(0.00) @db.Decimal(10, 2) // Snapshot of unit cost at moment of sale
   discount       Decimal     @default(0.00) @db.Decimal(10, 2) // Line-item discount amount
   subtotal       Decimal     @db.Decimal(10, 2) // (quantity_sold * unit_price) - discount
+
+  // Gross Profit = subtotal - (base_quantity_deducted x cost_price)
 
   // Relations
   transaction    Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
@@ -147,10 +154,42 @@ model CreditPayment {
   paymentId                Int      @id
   due_date                 DateTime
   remaining_credit_balance Decimal  @db.Decimal(10, 2)
+  status                   CreditStatus @default(UNPAID) 
 
   payment                  Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
+  @@index([due_date])
+  @@index([status])
   @@map("credit_payment")
+}
+
+// ==========================================
+// CUSTOMER CREDIT & ACCOUNTS RECEIVABLE
+// ==========================================
+
+model CustomerPayment {
+  id                      Int       @id @default(autoincrement())
+  wholesaleCustId         Int
+  staffId                 Int       // Cashier / Staff who collected the payment
+
+  amount_paid             Decimal   @db.Decimal(10, 2)
+  payment_method          PaymentMethod  // CASH, GCASH, CHECK, etc.
+  reference_number        String?   // Check number, GCash ref, or bank deposit ref (if applies)
+
+  payment_date            DateTime  @default(now())
+  notes                   String?
+
+  // Snapshots for Audit
+  previous_balance        Decimal   @db.Decimal(10, 2) // Balance before payment
+  new_balance             Decimal   @db.Decimal(10, 2) // Balance after payment
+
+  wholeSaleProfile        WholeSaleCustomer  @relation(fields: [wholesaleCustId], references: [customerId], onDelete: Cascade)
+  staff                   StaffUser @relation(fields: [staffId], references: [id])
+
+  @@index([wholesaleCustId])
+  @@index([payment_date])
+  @@map("customer_payment")
+
 }
 
 // ==========================================
@@ -209,6 +248,7 @@ model StaffUser {
   is_active     Boolean      @default(true)
 
   transactions   Transaction[]
+  customerPayments  CustomerPayment[]
   initiatedMovements StockMovement[] @relation("InitiatedMovements")
   approvedMovements  StockMovement[] @relation("ApprovedMovements")
   approvalRequests ApprovalRequest[] @relation("RequestedBy")
@@ -243,6 +283,7 @@ model WholeSaleCustomer {
   company_name        String
 
   customer            Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerPayments    CustomerPayment[] // Linked directly to Wholesale Profile
 
   @@index([customerId])
   @@map("wholesale_profile")
@@ -277,19 +318,21 @@ model Product {
   reorder_point_ROP Decimal  @default(0.00) @db.Decimal(10,3)
   needsRecount     Boolean   @default(false) // Set to TRUE during forced stock-out overrides
 
-  // Multi-UoM Pricing & Unit Conversion
-  pricing_uom      UnitOfMeasure    @default(PCS)  // "pcs", "kg", "hundred", "gross", "sack"
-  pricing_unit_qty Decimal   @default(1.000)  @db.Decimal(10, 3)  // e.g., 100 for "Per Hundred", 144 for "Gross"
-  cost_price       Decimal   @default(0.00)   @db.Decimal(10, 2)  // Purchasing cost
-  retail_price     Decimal   @db.Decimal(10, 2)  // should be VAT-inclusive
-  wholesale_price  Decimal?  @db.Decimal(10, 2)
-  
+  // Default Base Unit Pricing
+  cost_price       Decimal   @default(0.00)   @db.Decimal(10, 2) // Purchasing cost per Base UoM
+  // New Cost Price = ((Current Qty x Current Cost) + (Received Base Qty x New Unit Cost)) / (Current Qty + Received Base Qty) 
+  retail_price     Decimal   @db.Decimal(10, 2) // Retail price per Base UoM
+  wholesale_price  Decimal?  @db.Decimal(10, 2) // Wholesale price per Base UoM
+
   // Storage Location
-  binId            Int?      // Link to BinLocation
+  binId            Int?      // Link to BinLocation  
   
   // Relations
   category         Category     @relation(fields: [categoryId], references: [id])
   bin_location     BinLocation? @relation(fields: [binId], references: [id])
+
+  // Configured Alternate Units of Measure for this product (e.g., Box, Sack, Bundle)
+  uoms             ProductUom[]
 
   transactionItems TransactionItem[]
   stockMovements   StockMovement[]
@@ -305,6 +348,30 @@ model Product {
   @@index([name])
   @@index([binId])
   @@map("product")
+}
+
+model ProductUom {
+  id              Int           @id @default(autoincrement())
+  productId       Int
+  uom             UnitOfMeasure
+
+  // How many Base UoM units are inside 1 of this UoM?
+  // e.g. If Base UoM is PCS, for BOX: conversion_factor = 100.00 (1 Box = 100 PCS)
+  conversion_factor Decimal     @db.Decimal(10, 3)
+
+  // Pricing Overrides for this specific package size (Optional: falls back to base_price * factor)
+  cost_price      Decimal?      @db.Decimal(10, 2) // Quoted purchase price for 1 Box
+  retail_price    Decimal?      @db.Decimal(10, 2) // Retail checkout price for 1 Box
+  wholesale_price Decimal?      @db.Decimal(10, 2) // Wholesale checkout price for 1 Box
+
+  is_default_purchase Boolean   @default(false) // Default unit selected on Purchase Orders
+  is_default_sales    Boolean   @default(false) // Default unit selected at POS register
+
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, uom])
+  @@map("product_uom")
+
 }
 
 model BinLocation {
@@ -373,7 +440,13 @@ model POItem {
   id                 Int           @id @default(autoincrement())
   poId               Int
   productId          Int
-  requested_quantity Decimal       @db.Decimal(10, 3)
+
+  // Ordering Quantities & Unit Conversion Snapshots
+  requested_quantity Decimal       @db.Decimal(10, 3) // e.g., 2 (Sacks)
+  ordered_uom        UnitOfMeasure @default(PCS) // Unit ordered on PO
+  uom_conversion_factor Decimal    @default(1.000) @db.Decimal(10, 3) // Supplier-specific multiplier to Base UoM (e.g., 2000.000) 
+  expected_base_quantity Decimal   @db.Decimal(10, 3) // requested_quantity * uom_conversion_factor
+
   unit_cost          Decimal       @db.Decimal(10, 2)  // Price quoted by supplier
 
   purchaseOrder      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
@@ -387,19 +460,21 @@ model POItem {
 
 model Supplier {
   id             Int             @id @default(autoincrement())
-  name           String
-  contact_info   String
+  name           String          @unique
+  contact_person String?         // Representative contact name
+  email          String?         // Valid contact email
+  contact_number String?         // Mobile or telephone number
   location       String
   lead_time_days Int
-  is_active      Boolean         @default(true) // Industry Standard for vendor state management
+  is_active      Boolean         @default(true)
 
   purchaseOrders PurchaseOrder[]
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @default(now()) @updatedAt
-  
-  @@index([name])       
-  @@index([is_active])  
+
+  @@index([name])
+  @@index([is_active])
   @@map("supplier")
 }
 
@@ -423,13 +498,18 @@ model DeliveryItem {
   id            Int           @id @default(autoincrement())
   deliveryId    Int
   productId     Int
+
+  // Receiving Quantities & Intake Base Yield Calculation
   received_quantity Decimal   @db.Decimal(10, 3)
+  received_uom      UnitOfMeasure @default(PCS)
+  uom_conversion_factor Decimal   @default(1.000) @db.Decimal(10, 3) // Multiplier used at intake
+  actual_base_quantity  Decimal   @db.Decimal(10, 3) // Exact physical count added to Product.current_quantity
+
+  delivery      Delivery      @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id])
 
   @@index([deliveryId])
   @@index([productId])
-  delivery      Delivery      @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
-  product       Product       @relation(fields: [productId], references: [id])
-  
   @@map("delivery_item")
 }
 
@@ -488,6 +568,13 @@ enum RequestStatus {
   REJECTED
 }
 
+enum CreditStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+}
+
 enum UnitOfMeasure {
   PCS
   BOX
@@ -497,7 +584,7 @@ enum UnitOfMeasure {
   METER
   HUNDRED
   GROSS 
-  SACKs
+  SACK
 }
 
 enum TransactionType {

@@ -31,6 +31,8 @@ export type POItemAvgAggregateOutputType = {
   poId: number | null
   productId: number | null
   requested_quantity: runtime.Decimal | null
+  uom_conversion_factor: runtime.Decimal | null
+  expected_base_quantity: runtime.Decimal | null
   unit_cost: runtime.Decimal | null
 }
 
@@ -39,6 +41,8 @@ export type POItemSumAggregateOutputType = {
   poId: number | null
   productId: number | null
   requested_quantity: runtime.Decimal | null
+  uom_conversion_factor: runtime.Decimal | null
+  expected_base_quantity: runtime.Decimal | null
   unit_cost: runtime.Decimal | null
 }
 
@@ -47,6 +51,9 @@ export type POItemMinAggregateOutputType = {
   poId: number | null
   productId: number | null
   requested_quantity: runtime.Decimal | null
+  ordered_uom: $Enums.UnitOfMeasure | null
+  uom_conversion_factor: runtime.Decimal | null
+  expected_base_quantity: runtime.Decimal | null
   unit_cost: runtime.Decimal | null
 }
 
@@ -55,6 +62,9 @@ export type POItemMaxAggregateOutputType = {
   poId: number | null
   productId: number | null
   requested_quantity: runtime.Decimal | null
+  ordered_uom: $Enums.UnitOfMeasure | null
+  uom_conversion_factor: runtime.Decimal | null
+  expected_base_quantity: runtime.Decimal | null
   unit_cost: runtime.Decimal | null
 }
 
@@ -63,6 +73,9 @@ export type POItemCountAggregateOutputType = {
   poId: number
   productId: number
   requested_quantity: number
+  ordered_uom: number
+  uom_conversion_factor: number
+  expected_base_quantity: number
   unit_cost: number
   _all: number
 }
@@ -73,6 +86,8 @@ export type POItemAvgAggregateInputType = {
   poId?: true
   productId?: true
   requested_quantity?: true
+  uom_conversion_factor?: true
+  expected_base_quantity?: true
   unit_cost?: true
 }
 
@@ -81,6 +96,8 @@ export type POItemSumAggregateInputType = {
   poId?: true
   productId?: true
   requested_quantity?: true
+  uom_conversion_factor?: true
+  expected_base_quantity?: true
   unit_cost?: true
 }
 
@@ -89,6 +106,9 @@ export type POItemMinAggregateInputType = {
   poId?: true
   productId?: true
   requested_quantity?: true
+  ordered_uom?: true
+  uom_conversion_factor?: true
+  expected_base_quantity?: true
   unit_cost?: true
 }
 
@@ -97,6 +117,9 @@ export type POItemMaxAggregateInputType = {
   poId?: true
   productId?: true
   requested_quantity?: true
+  ordered_uom?: true
+  uom_conversion_factor?: true
+  expected_base_quantity?: true
   unit_cost?: true
 }
 
@@ -105,6 +128,9 @@ export type POItemCountAggregateInputType = {
   poId?: true
   productId?: true
   requested_quantity?: true
+  ordered_uom?: true
+  uom_conversion_factor?: true
+  expected_base_quantity?: true
   unit_cost?: true
   _all?: true
 }
@@ -200,6 +226,9 @@ export type POItemGroupByOutputType = {
   poId: number
   productId: number
   requested_quantity: runtime.Decimal
+  ordered_uom: $Enums.UnitOfMeasure
+  uom_conversion_factor: runtime.Decimal
+  expected_base_quantity: runtime.Decimal
   unit_cost: runtime.Decimal
   _count: POItemCountAggregateOutputType | null
   _avg: POItemAvgAggregateOutputType | null
@@ -231,6 +260,9 @@ export type POItemWhereInput = {
   poId?: Prisma.IntFilter<"POItem"> | number
   productId?: Prisma.IntFilter<"POItem"> | number
   requested_quantity?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFilter<"POItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderScalarRelationFilter, Prisma.PurchaseOrderWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -241,6 +273,9 @@ export type POItemOrderByWithRelationInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  ordered_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   purchaseOrder?: Prisma.PurchaseOrderOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
@@ -255,6 +290,9 @@ export type POItemWhereUniqueInput = Prisma.AtLeast<{
   poId?: Prisma.IntFilter<"POItem"> | number
   productId?: Prisma.IntFilter<"POItem"> | number
   requested_quantity?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFilter<"POItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderScalarRelationFilter, Prisma.PurchaseOrderWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -265,6 +303,9 @@ export type POItemOrderByWithAggregationInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  ordered_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   _count?: Prisma.POItemCountOrderByAggregateInput
   _avg?: Prisma.POItemAvgOrderByAggregateInput
@@ -281,11 +322,17 @@ export type POItemScalarWhereWithAggregatesInput = {
   poId?: Prisma.IntWithAggregatesFilter<"POItem"> | number
   productId?: Prisma.IntWithAggregatesFilter<"POItem"> | number
   requested_quantity?: Prisma.DecimalWithAggregatesFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureWithAggregatesFilter<"POItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalWithAggregatesFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalWithAggregatesFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalWithAggregatesFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type POItemCreateInput = {
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder: Prisma.PurchaseOrderCreateNestedOneWithoutPoItemsInput
   product: Prisma.ProductCreateNestedOneWithoutPoItemsInput
@@ -296,11 +343,17 @@ export type POItemUncheckedCreateInput = {
   poId: number
   productId: number
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type POItemUpdateInput = {
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder?: Prisma.PurchaseOrderUpdateOneRequiredWithoutPoItemsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutPoItemsNestedInput
@@ -311,6 +364,9 @@ export type POItemUncheckedUpdateInput = {
   poId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -319,11 +375,17 @@ export type POItemCreateManyInput = {
   poId: number
   productId: number
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type POItemUpdateManyMutationInput = {
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -332,6 +394,9 @@ export type POItemUncheckedUpdateManyInput = {
   poId?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -355,6 +420,9 @@ export type POItemCountOrderByAggregateInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  ordered_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
 }
 
@@ -363,6 +431,8 @@ export type POItemAvgOrderByAggregateInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
 }
 
@@ -371,6 +441,9 @@ export type POItemMaxOrderByAggregateInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  ordered_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
 }
 
@@ -379,6 +452,9 @@ export type POItemMinOrderByAggregateInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  ordered_uom?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
 }
 
@@ -387,6 +463,8 @@ export type POItemSumOrderByAggregateInput = {
   poId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   requested_quantity?: Prisma.SortOrder
+  uom_conversion_factor?: Prisma.SortOrder
+  expected_base_quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
 }
 
@@ -476,6 +554,9 @@ export type POItemUncheckedUpdateManyWithoutPurchaseOrderNestedInput = {
 
 export type POItemCreateWithoutProductInput = {
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder: Prisma.PurchaseOrderCreateNestedOneWithoutPoItemsInput
 }
@@ -484,6 +565,9 @@ export type POItemUncheckedCreateWithoutProductInput = {
   id?: number
   poId: number
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -521,11 +605,17 @@ export type POItemScalarWhereInput = {
   poId?: Prisma.IntFilter<"POItem"> | number
   productId?: Prisma.IntFilter<"POItem"> | number
   requested_quantity?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFilter<"POItem"> | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFilter<"POItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type POItemCreateWithoutPurchaseOrderInput = {
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   product: Prisma.ProductCreateNestedOneWithoutPoItemsInput
 }
@@ -534,6 +624,9 @@ export type POItemUncheckedCreateWithoutPurchaseOrderInput = {
   id?: number
   productId: number
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -567,11 +660,17 @@ export type POItemCreateManyProductInput = {
   id?: number
   poId: number
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type POItemUpdateWithoutProductInput = {
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   purchaseOrder?: Prisma.PurchaseOrderUpdateOneRequiredWithoutPoItemsNestedInput
 }
@@ -580,6 +679,9 @@ export type POItemUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   poId?: Prisma.IntFieldUpdateOperationsInput | number
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -587,6 +689,9 @@ export type POItemUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   poId?: Prisma.IntFieldUpdateOperationsInput | number
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -594,11 +699,17 @@ export type POItemCreateManyPurchaseOrderInput = {
   id?: number
   productId: number
   requested_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: $Enums.UnitOfMeasure
+  uom_conversion_factor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type POItemUpdateWithoutPurchaseOrderInput = {
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   product?: Prisma.ProductUpdateOneRequiredWithoutPoItemsNestedInput
 }
@@ -607,6 +718,9 @@ export type POItemUncheckedUpdateWithoutPurchaseOrderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -614,6 +728,9 @@ export type POItemUncheckedUpdateManyWithoutPurchaseOrderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   requested_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ordered_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  uom_conversion_factor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expected_base_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
@@ -624,6 +741,9 @@ export type POItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   poId?: boolean
   productId?: boolean
   requested_quantity?: boolean
+  ordered_uom?: boolean
+  uom_conversion_factor?: boolean
+  expected_base_quantity?: boolean
   unit_cost?: boolean
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -634,6 +754,9 @@ export type POItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   poId?: boolean
   productId?: boolean
   requested_quantity?: boolean
+  ordered_uom?: boolean
+  uom_conversion_factor?: boolean
+  expected_base_quantity?: boolean
   unit_cost?: boolean
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -644,6 +767,9 @@ export type POItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   poId?: boolean
   productId?: boolean
   requested_quantity?: boolean
+  ordered_uom?: boolean
+  uom_conversion_factor?: boolean
+  expected_base_quantity?: boolean
   unit_cost?: boolean
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -654,10 +780,13 @@ export type POItemSelectScalar = {
   poId?: boolean
   productId?: boolean
   requested_quantity?: boolean
+  ordered_uom?: boolean
+  uom_conversion_factor?: boolean
+  expected_base_quantity?: boolean
   unit_cost?: boolean
 }
 
-export type POItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "poId" | "productId" | "requested_quantity" | "unit_cost", ExtArgs["result"]["pOItem"]>
+export type POItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "poId" | "productId" | "requested_quantity" | "ordered_uom" | "uom_conversion_factor" | "expected_base_quantity" | "unit_cost", ExtArgs["result"]["pOItem"]>
 export type POItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchaseOrder?: boolean | Prisma.PurchaseOrderDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -682,6 +811,9 @@ export type $POItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     poId: number
     productId: number
     requested_quantity: runtime.Decimal
+    ordered_uom: $Enums.UnitOfMeasure
+    uom_conversion_factor: runtime.Decimal
+    expected_base_quantity: runtime.Decimal
     unit_cost: runtime.Decimal
   }, ExtArgs["result"]["pOItem"]>
   composites: {}
@@ -1112,6 +1244,9 @@ export interface POItemFieldRefs {
   readonly poId: Prisma.FieldRef<"POItem", 'Int'>
   readonly productId: Prisma.FieldRef<"POItem", 'Int'>
   readonly requested_quantity: Prisma.FieldRef<"POItem", 'Decimal'>
+  readonly ordered_uom: Prisma.FieldRef<"POItem", 'UnitOfMeasure'>
+  readonly uom_conversion_factor: Prisma.FieldRef<"POItem", 'Decimal'>
+  readonly expected_base_quantity: Prisma.FieldRef<"POItem", 'Decimal'>
   readonly unit_cost: Prisma.FieldRef<"POItem", 'Decimal'>
 }
     

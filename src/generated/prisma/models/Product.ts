@@ -31,7 +31,6 @@ export type ProductAvgAggregateOutputType = {
   categoryId: number | null
   current_quantity: runtime.Decimal | null
   reorder_point_ROP: runtime.Decimal | null
-  pricing_unit_qty: runtime.Decimal | null
   cost_price: runtime.Decimal | null
   retail_price: runtime.Decimal | null
   wholesale_price: runtime.Decimal | null
@@ -43,7 +42,6 @@ export type ProductSumAggregateOutputType = {
   categoryId: number | null
   current_quantity: runtime.Decimal | null
   reorder_point_ROP: runtime.Decimal | null
-  pricing_unit_qty: runtime.Decimal | null
   cost_price: runtime.Decimal | null
   retail_price: runtime.Decimal | null
   wholesale_price: runtime.Decimal | null
@@ -62,8 +60,6 @@ export type ProductMinAggregateOutputType = {
   current_quantity: runtime.Decimal | null
   reorder_point_ROP: runtime.Decimal | null
   needsRecount: boolean | null
-  pricing_uom: $Enums.UnitOfMeasure | null
-  pricing_unit_qty: runtime.Decimal | null
   cost_price: runtime.Decimal | null
   retail_price: runtime.Decimal | null
   wholesale_price: runtime.Decimal | null
@@ -84,8 +80,6 @@ export type ProductMaxAggregateOutputType = {
   current_quantity: runtime.Decimal | null
   reorder_point_ROP: runtime.Decimal | null
   needsRecount: boolean | null
-  pricing_uom: $Enums.UnitOfMeasure | null
-  pricing_unit_qty: runtime.Decimal | null
   cost_price: runtime.Decimal | null
   retail_price: runtime.Decimal | null
   wholesale_price: runtime.Decimal | null
@@ -106,8 +100,6 @@ export type ProductCountAggregateOutputType = {
   current_quantity: number
   reorder_point_ROP: number
   needsRecount: number
-  pricing_uom: number
-  pricing_unit_qty: number
   cost_price: number
   retail_price: number
   wholesale_price: number
@@ -123,7 +115,6 @@ export type ProductAvgAggregateInputType = {
   categoryId?: true
   current_quantity?: true
   reorder_point_ROP?: true
-  pricing_unit_qty?: true
   cost_price?: true
   retail_price?: true
   wholesale_price?: true
@@ -135,7 +126,6 @@ export type ProductSumAggregateInputType = {
   categoryId?: true
   current_quantity?: true
   reorder_point_ROP?: true
-  pricing_unit_qty?: true
   cost_price?: true
   retail_price?: true
   wholesale_price?: true
@@ -154,8 +144,6 @@ export type ProductMinAggregateInputType = {
   current_quantity?: true
   reorder_point_ROP?: true
   needsRecount?: true
-  pricing_uom?: true
-  pricing_unit_qty?: true
   cost_price?: true
   retail_price?: true
   wholesale_price?: true
@@ -176,8 +164,6 @@ export type ProductMaxAggregateInputType = {
   current_quantity?: true
   reorder_point_ROP?: true
   needsRecount?: true
-  pricing_uom?: true
-  pricing_unit_qty?: true
   cost_price?: true
   retail_price?: true
   wholesale_price?: true
@@ -198,8 +184,6 @@ export type ProductCountAggregateInputType = {
   current_quantity?: true
   reorder_point_ROP?: true
   needsRecount?: true
-  pricing_uom?: true
-  pricing_unit_qty?: true
   cost_price?: true
   retail_price?: true
   wholesale_price?: true
@@ -307,8 +291,6 @@ export type ProductGroupByOutputType = {
   current_quantity: runtime.Decimal
   reorder_point_ROP: runtime.Decimal
   needsRecount: boolean
-  pricing_uom: $Enums.UnitOfMeasure
-  pricing_unit_qty: runtime.Decimal
   cost_price: runtime.Decimal
   retail_price: runtime.Decimal
   wholesale_price: runtime.Decimal | null
@@ -352,8 +334,6 @@ export type ProductWhereInput = {
   current_quantity?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFilter<"Product"> | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFilter<"Product"> | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -362,6 +342,7 @@ export type ProductWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   bin_location?: Prisma.XOR<Prisma.BinLocationNullableScalarRelationFilter, Prisma.BinLocationWhereInput> | null
+  uoms?: Prisma.ProductUomListRelationFilter
   transactionItems?: Prisma.TransactionItemListRelationFilter
   stockMovements?: Prisma.StockMovementListRelationFilter
   poItems?: Prisma.POItemListRelationFilter
@@ -382,8 +363,6 @@ export type ProductOrderByWithRelationInput = {
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
   needsRecount?: Prisma.SortOrder
-  pricing_uom?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -392,6 +371,7 @@ export type ProductOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   category?: Prisma.CategoryOrderByWithRelationInput
   bin_location?: Prisma.BinLocationOrderByWithRelationInput
+  uoms?: Prisma.ProductUomOrderByRelationAggregateInput
   transactionItems?: Prisma.TransactionItemOrderByRelationAggregateInput
   stockMovements?: Prisma.StockMovementOrderByRelationAggregateInput
   poItems?: Prisma.POItemOrderByRelationAggregateInput
@@ -415,8 +395,6 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   current_quantity?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFilter<"Product"> | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFilter<"Product"> | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -425,6 +403,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   bin_location?: Prisma.XOR<Prisma.BinLocationNullableScalarRelationFilter, Prisma.BinLocationWhereInput> | null
+  uoms?: Prisma.ProductUomListRelationFilter
   transactionItems?: Prisma.TransactionItemListRelationFilter
   stockMovements?: Prisma.StockMovementListRelationFilter
   poItems?: Prisma.POItemListRelationFilter
@@ -445,8 +424,6 @@ export type ProductOrderByWithAggregationInput = {
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
   needsRecount?: Prisma.SortOrder
-  pricing_uom?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -475,8 +452,6 @@ export type ProductScalarWhereWithAggregatesInput = {
   current_quantity?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureWithAggregatesFilter<"Product"> | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -495,8 +470,6 @@ export type ProductCreateInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -504,6 +477,7 @@ export type ProductCreateInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
@@ -524,14 +498,13 @@ export type ProductUncheckedCreateInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
@@ -550,8 +523,6 @@ export type ProductUpdateInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -559,6 +530,7 @@ export type ProductUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
@@ -579,14 +551,13 @@ export type ProductUncheckedUpdateInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
@@ -607,8 +578,6 @@ export type ProductCreateManyInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -627,8 +596,6 @@ export type ProductUpdateManyMutationInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -648,8 +615,6 @@ export type ProductUncheckedUpdateManyInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -685,8 +650,6 @@ export type ProductCountOrderByAggregateInput = {
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
   needsRecount?: Prisma.SortOrder
-  pricing_uom?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrder
@@ -700,7 +663,6 @@ export type ProductAvgOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrder
@@ -719,8 +681,6 @@ export type ProductMaxOrderByAggregateInput = {
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
   needsRecount?: Prisma.SortOrder
-  pricing_uom?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrder
@@ -741,8 +701,6 @@ export type ProductMinOrderByAggregateInput = {
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
   needsRecount?: Prisma.SortOrder
-  pricing_uom?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrder
@@ -756,7 +714,6 @@ export type ProductSumOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   current_quantity?: Prisma.SortOrder
   reorder_point_ROP?: Prisma.SortOrder
-  pricing_unit_qty?: Prisma.SortOrder
   cost_price?: Prisma.SortOrder
   retail_price?: Prisma.SortOrder
   wholesale_price?: Prisma.SortOrder
@@ -855,6 +812,20 @@ export type NullableDecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type ProductCreateNestedOneWithoutUomsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutUomsInput, Prisma.ProductUncheckedCreateWithoutUomsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutUomsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutUomsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutUomsInput, Prisma.ProductUncheckedCreateWithoutUomsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutUomsInput
+  upsert?: Prisma.ProductUpsertWithoutUomsInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutUomsInput, Prisma.ProductUpdateWithoutUomsInput>, Prisma.ProductUncheckedUpdateWithoutUomsInput>
+}
+
 export type ProductCreateNestedManyWithoutBin_locationInput = {
   create?: Prisma.XOR<Prisma.ProductCreateWithoutBin_locationInput, Prisma.ProductUncheckedCreateWithoutBin_locationInput> | Prisma.ProductCreateWithoutBin_locationInput[] | Prisma.ProductUncheckedCreateWithoutBin_locationInput[]
   connectOrCreate?: Prisma.ProductCreateOrConnectWithoutBin_locationInput | Prisma.ProductCreateOrConnectWithoutBin_locationInput[]
@@ -949,8 +920,6 @@ export type ProductCreateWithoutTransactionItemsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -958,6 +927,7 @@ export type ProductCreateWithoutTransactionItemsInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
   deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutProductInput
@@ -977,14 +947,13 @@ export type ProductUncheckedCreateWithoutTransactionItemsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
   deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutProductInput
@@ -1018,8 +987,6 @@ export type ProductUpdateWithoutTransactionItemsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1027,6 +994,7 @@ export type ProductUpdateWithoutTransactionItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
   deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutProductNestedInput
@@ -1046,14 +1014,13 @@ export type ProductUncheckedUpdateWithoutTransactionItemsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
   deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1071,8 +1038,6 @@ export type ProductCreateWithoutExchangesInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1080,6 +1045,7 @@ export type ProductCreateWithoutExchangesInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
@@ -1099,14 +1065,13 @@ export type ProductUncheckedCreateWithoutExchangesInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
@@ -1140,8 +1105,6 @@ export type ProductUpdateWithoutExchangesInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1149,6 +1112,7 @@ export type ProductUpdateWithoutExchangesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
@@ -1168,14 +1132,13 @@ export type ProductUncheckedUpdateWithoutExchangesInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1193,8 +1156,6 @@ export type ProductCreateWithoutReturnsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1202,6 +1163,7 @@ export type ProductCreateWithoutReturnsInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
@@ -1221,14 +1183,13 @@ export type ProductUncheckedCreateWithoutReturnsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
@@ -1262,8 +1223,6 @@ export type ProductUpdateWithoutReturnsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1271,6 +1230,7 @@ export type ProductUpdateWithoutReturnsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
@@ -1290,14 +1250,13 @@ export type ProductUncheckedUpdateWithoutReturnsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1315,14 +1274,13 @@ export type ProductCreateWithoutCategoryInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
@@ -1342,14 +1300,13 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
@@ -1399,14 +1356,130 @@ export type ProductScalarWhereInput = {
   current_quantity?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFilter<"Product"> | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFilter<"Product"> | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.IntNullableFilter<"Product"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
+}
+
+export type ProductCreateWithoutUomsInput = {
+  sku?: string | null
+  name: string
+  size_dimensions?: string | null
+  thread_type?: string | null
+  material_grade?: string | null
+  base_uom?: $Enums.UnitOfMeasure
+  current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  needsRecount?: boolean
+  cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  category: Prisma.CategoryCreateNestedOneWithoutProductsInput
+  bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
+  poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
+  deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutProductInput
+  returns?: Prisma.ReturnCreateNestedManyWithoutProductInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutUomsInput = {
+  id?: number
+  sku?: string | null
+  name: string
+  categoryId: number
+  size_dimensions?: string | null
+  thread_type?: string | null
+  material_grade?: string | null
+  base_uom?: $Enums.UnitOfMeasure
+  current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  needsRecount?: boolean
+  cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  binId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
+  poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
+  deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutProductInput
+  returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutProductInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutUomsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutUomsInput, Prisma.ProductUncheckedCreateWithoutUomsInput>
+}
+
+export type ProductUpsertWithoutUomsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutUomsInput, Prisma.ProductUncheckedUpdateWithoutUomsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutUomsInput, Prisma.ProductUncheckedCreateWithoutUomsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutUomsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutUomsInput, Prisma.ProductUncheckedUpdateWithoutUomsInput>
+}
+
+export type ProductUpdateWithoutUomsInput = {
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  size_dimensions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thread_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  material_grade?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  base_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
+  bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
+  poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
+  deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutProductNestedInput
+  returns?: Prisma.ReturnUpdateManyWithoutProductNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutUomsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
+  size_dimensions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thread_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  material_grade?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  base_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
+  current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
+  poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
+  deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutProductNestedInput
+  returns?: Prisma.ReturnUncheckedUpdateManyWithoutProductNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutBin_locationInput = {
@@ -1419,14 +1492,13 @@ export type ProductCreateWithoutBin_locationInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
@@ -1447,13 +1519,12 @@ export type ProductUncheckedCreateWithoutBin_locationInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
@@ -1498,8 +1569,6 @@ export type ProductCreateWithoutStockMovementsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1507,6 +1576,7 @@ export type ProductCreateWithoutStockMovementsInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
   deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutProductInput
@@ -1526,14 +1596,13 @@ export type ProductUncheckedCreateWithoutStockMovementsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
   deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutProductInput
@@ -1567,8 +1636,6 @@ export type ProductUpdateWithoutStockMovementsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1576,6 +1643,7 @@ export type ProductUpdateWithoutStockMovementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
   deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutProductNestedInput
@@ -1595,14 +1663,13 @@ export type ProductUncheckedUpdateWithoutStockMovementsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
   deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1620,8 +1687,6 @@ export type ProductCreateWithoutPoItemsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1629,6 +1694,7 @@ export type ProductCreateWithoutPoItemsInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   deliveryItems?: Prisma.DeliveryItemCreateNestedManyWithoutProductInput
@@ -1648,14 +1714,13 @@ export type ProductUncheckedCreateWithoutPoItemsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   deliveryItems?: Prisma.DeliveryItemUncheckedCreateNestedManyWithoutProductInput
@@ -1689,8 +1754,6 @@ export type ProductUpdateWithoutPoItemsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1698,6 +1761,7 @@ export type ProductUpdateWithoutPoItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   deliveryItems?: Prisma.DeliveryItemUpdateManyWithoutProductNestedInput
@@ -1717,14 +1781,13 @@ export type ProductUncheckedUpdateWithoutPoItemsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   deliveryItems?: Prisma.DeliveryItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1742,8 +1805,6 @@ export type ProductCreateWithoutDeliveryItemsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1751,6 +1812,7 @@ export type ProductCreateWithoutDeliveryItemsInput = {
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput
   bin_location?: Prisma.BinLocationCreateNestedOneWithoutProductsInput
+  uoms?: Prisma.ProductUomCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemCreateNestedManyWithoutProductInput
@@ -1770,14 +1832,13 @@ export type ProductUncheckedCreateWithoutDeliveryItemsInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uoms?: Prisma.ProductUomUncheckedCreateNestedManyWithoutProductInput
   transactionItems?: Prisma.TransactionItemUncheckedCreateNestedManyWithoutProductInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutProductInput
   poItems?: Prisma.POItemUncheckedCreateNestedManyWithoutProductInput
@@ -1811,8 +1872,6 @@ export type ProductUpdateWithoutDeliveryItemsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1820,6 +1879,7 @@ export type ProductUpdateWithoutDeliveryItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
@@ -1839,14 +1899,13 @@ export type ProductUncheckedUpdateWithoutDeliveryItemsInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1865,8 +1924,6 @@ export type ProductCreateManyCategoryInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1885,14 +1942,13 @@ export type ProductUpdateWithoutCategoryInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bin_location?: Prisma.BinLocationUpdateOneWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
@@ -1912,14 +1968,13 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   binId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
@@ -1939,8 +1994,6 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1961,8 +2014,6 @@ export type ProductCreateManyBin_locationInput = {
   current_quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: boolean
-  pricing_uom?: $Enums.UnitOfMeasure
-  pricing_unit_qty?: runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1980,14 +2031,13 @@ export type ProductUpdateWithoutBin_locationInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput
+  uoms?: Prisma.ProductUomUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUpdateManyWithoutProductNestedInput
@@ -2008,13 +2058,12 @@ export type ProductUncheckedUpdateWithoutBin_locationInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uoms?: Prisma.ProductUomUncheckedUpdateManyWithoutProductNestedInput
   transactionItems?: Prisma.TransactionItemUncheckedUpdateManyWithoutProductNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutProductNestedInput
   poItems?: Prisma.POItemUncheckedUpdateManyWithoutProductNestedInput
@@ -2035,8 +2084,6 @@ export type ProductUncheckedUpdateManyWithoutBin_locationInput = {
   current_quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reorder_point_ROP?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   needsRecount?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  pricing_uom?: Prisma.EnumUnitOfMeasureFieldUpdateOperationsInput | $Enums.UnitOfMeasure
-  pricing_unit_qty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   cost_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retail_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   wholesale_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -2050,6 +2097,7 @@ export type ProductUncheckedUpdateManyWithoutBin_locationInput = {
  */
 
 export type ProductCountOutputType = {
+  uoms: number
   transactionItems: number
   stockMovements: number
   poItems: number
@@ -2059,6 +2107,7 @@ export type ProductCountOutputType = {
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  uoms?: boolean | ProductCountOutputTypeCountUomsArgs
   transactionItems?: boolean | ProductCountOutputTypeCountTransactionItemsArgs
   stockMovements?: boolean | ProductCountOutputTypeCountStockMovementsArgs
   poItems?: boolean | ProductCountOutputTypeCountPoItemsArgs
@@ -2075,6 +2124,13 @@ export type ProductCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
    * Select specific fields to fetch from the ProductCountOutputType
    */
   select?: Prisma.ProductCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountUomsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProductUomWhereInput
 }
 
 /**
@@ -2132,8 +2188,6 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   current_quantity?: boolean
   reorder_point_ROP?: boolean
   needsRecount?: boolean
-  pricing_uom?: boolean
-  pricing_unit_qty?: boolean
   cost_price?: boolean
   retail_price?: boolean
   wholesale_price?: boolean
@@ -2142,6 +2196,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   bin_location?: boolean | Prisma.Product$bin_locationArgs<ExtArgs>
+  uoms?: boolean | Prisma.Product$uomsArgs<ExtArgs>
   transactionItems?: boolean | Prisma.Product$transactionItemsArgs<ExtArgs>
   stockMovements?: boolean | Prisma.Product$stockMovementsArgs<ExtArgs>
   poItems?: boolean | Prisma.Product$poItemsArgs<ExtArgs>
@@ -2163,8 +2218,6 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   current_quantity?: boolean
   reorder_point_ROP?: boolean
   needsRecount?: boolean
-  pricing_uom?: boolean
-  pricing_unit_qty?: boolean
   cost_price?: boolean
   retail_price?: boolean
   wholesale_price?: boolean
@@ -2187,8 +2240,6 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   current_quantity?: boolean
   reorder_point_ROP?: boolean
   needsRecount?: boolean
-  pricing_uom?: boolean
-  pricing_unit_qty?: boolean
   cost_price?: boolean
   retail_price?: boolean
   wholesale_price?: boolean
@@ -2211,8 +2262,6 @@ export type ProductSelectScalar = {
   current_quantity?: boolean
   reorder_point_ROP?: boolean
   needsRecount?: boolean
-  pricing_uom?: boolean
-  pricing_unit_qty?: boolean
   cost_price?: boolean
   retail_price?: boolean
   wholesale_price?: boolean
@@ -2221,10 +2270,11 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sku" | "name" | "categoryId" | "size_dimensions" | "thread_type" | "material_grade" | "base_uom" | "current_quantity" | "reorder_point_ROP" | "needsRecount" | "pricing_uom" | "pricing_unit_qty" | "cost_price" | "retail_price" | "wholesale_price" | "binId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sku" | "name" | "categoryId" | "size_dimensions" | "thread_type" | "material_grade" | "base_uom" | "current_quantity" | "reorder_point_ROP" | "needsRecount" | "cost_price" | "retail_price" | "wholesale_price" | "binId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   bin_location?: boolean | Prisma.Product$bin_locationArgs<ExtArgs>
+  uoms?: boolean | Prisma.Product$uomsArgs<ExtArgs>
   transactionItems?: boolean | Prisma.Product$transactionItemsArgs<ExtArgs>
   stockMovements?: boolean | Prisma.Product$stockMovementsArgs<ExtArgs>
   poItems?: boolean | Prisma.Product$poItemsArgs<ExtArgs>
@@ -2247,6 +2297,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     category: Prisma.$CategoryPayload<ExtArgs>
     bin_location: Prisma.$BinLocationPayload<ExtArgs> | null
+    uoms: Prisma.$ProductUomPayload<ExtArgs>[]
     transactionItems: Prisma.$TransactionItemPayload<ExtArgs>[]
     stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
     poItems: Prisma.$POItemPayload<ExtArgs>[]
@@ -2266,8 +2317,6 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     current_quantity: runtime.Decimal
     reorder_point_ROP: runtime.Decimal
     needsRecount: boolean
-    pricing_uom: $Enums.UnitOfMeasure
-    pricing_unit_qty: runtime.Decimal
     cost_price: runtime.Decimal
     retail_price: runtime.Decimal
     wholesale_price: runtime.Decimal | null
@@ -2670,6 +2719,7 @@ export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   bin_location<T extends Prisma.Product$bin_locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$bin_locationArgs<ExtArgs>>): Prisma.Prisma__BinLocationClient<runtime.Types.Result.GetResult<Prisma.$BinLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  uoms<T extends Prisma.Product$uomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$uomsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductUomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transactionItems<T extends Prisma.Product$transactionItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$transactionItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockMovements<T extends Prisma.Product$stockMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   poItems<T extends Prisma.Product$poItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$poItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$POItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2716,8 +2766,6 @@ export interface ProductFieldRefs {
   readonly current_quantity: Prisma.FieldRef<"Product", 'Decimal'>
   readonly reorder_point_ROP: Prisma.FieldRef<"Product", 'Decimal'>
   readonly needsRecount: Prisma.FieldRef<"Product", 'Boolean'>
-  readonly pricing_uom: Prisma.FieldRef<"Product", 'UnitOfMeasure'>
-  readonly pricing_unit_qty: Prisma.FieldRef<"Product", 'Decimal'>
   readonly cost_price: Prisma.FieldRef<"Product", 'Decimal'>
   readonly retail_price: Prisma.FieldRef<"Product", 'Decimal'>
   readonly wholesale_price: Prisma.FieldRef<"Product", 'Decimal'>
@@ -3141,6 +3189,30 @@ export type Product$bin_locationArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.BinLocationInclude<ExtArgs> | null
   where?: Prisma.BinLocationWhereInput
+}
+
+/**
+ * Product.uoms
+ */
+export type Product$uomsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProductUom
+   */
+  select?: Prisma.ProductUomSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProductUom
+   */
+  omit?: Prisma.ProductUomOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductUomInclude<ExtArgs> | null
+  where?: Prisma.ProductUomWhereInput
+  orderBy?: Prisma.ProductUomOrderByWithRelationInput | Prisma.ProductUomOrderByWithRelationInput[]
+  cursor?: Prisma.ProductUomWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProductUomScalarFieldEnum | Prisma.ProductUomScalarFieldEnum[]
 }
 
 /**

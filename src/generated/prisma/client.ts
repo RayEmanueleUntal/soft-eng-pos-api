@@ -80,6 +80,11 @@ export type GCashPayment = Prisma.GCashPaymentModel
  */
 export type CreditPayment = Prisma.CreditPaymentModel
 /**
+ * Model CustomerPayment
+ * 
+ */
+export type CustomerPayment = Prisma.CustomerPaymentModel
+/**
  * Model Shipment
  * 
  */
@@ -114,6 +119,11 @@ export type Category = Prisma.CategoryModel
  * 
  */
 export type Product = Prisma.ProductModel
+/**
+ * Model ProductUom
+ * 
+ */
+export type ProductUom = Prisma.ProductUomModel
 /**
  * Model BinLocation
  * 

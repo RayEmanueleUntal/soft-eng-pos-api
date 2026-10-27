@@ -21,8 +21,8 @@ export class SuppliersService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Creates a new supplier record.
-   * Logs creation audit events and transforms response entity.
+   * Creates a new vendor record.
+   * Checks for duplicate supplier names before creating.
    */
   async create(
     dto: CreateSupplierDto,
@@ -32,10 +32,25 @@ export class SuppliersService {
       `Creating supplier: name="${dto.name}" by userId=${userId}`,
     );
 
+    const existing = await this.prisma.supplier.findUnique({
+      where: { name: dto.name },
+    });
+
+    if (existing) {
+      this.logger.warn(
+        `Supplier creation failed: name="${dto.name}" already exists`,
+      );
+      throw new ConflictException(
+        `Supplier with name "${dto.name}" already exists.`,
+      );
+    }
+
     const supplier = await this.prisma.supplier.create({
       data: {
         name: dto.name,
-        contact_info: dto.contact_info,
+        contact_person: dto.contact_person,
+        email: dto.email,
+        contact_number: dto.contact_number,
         location: dto.location,
         lead_time_days: dto.lead_time_days,
         is_active: dto.is_active ?? true,
@@ -48,7 +63,7 @@ export class SuppliersService {
 
   /**
    * Retrieves a paginated list of suppliers.
-   * Supports searching by name/location/contact and filtering by active status.
+   * Supports filtering by active state and searching name, contact person, email, and location.
    */
   async findAll(
     query: GetSuppliersDto,
@@ -56,7 +71,6 @@ export class SuppliersService {
     const { search, is_active, page = 1, limit = 10 } = query;
     const skip = (page - 1) * limit;
 
-    // Build dynamic query conditions
     const where: Prisma.SupplierWhereInput = {};
 
     if (is_active !== undefined) {
@@ -66,12 +80,12 @@ export class SuppliersService {
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
-        { contact_info: { contains: search, mode: 'insensitive' } },
+        { contact_person: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
         { location: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    // Concurrent execution of pagination data and count for high throughput
     const [suppliers, total] = await Promise.all([
       this.prisma.supplier.findMany({
         where,
@@ -92,8 +106,7 @@ export class SuppliersService {
   }
 
   /**
-   * Fetches a single supplier profile by ID.
-   * Throws NotFoundException if supplier record does not exist.
+   * Retrieves a single supplier entity by unique ID.
    */
   async findOne(id: number): Promise<SupplierResponseDto> {
     const supplier = await this.prisma.supplier.findUnique({
@@ -109,8 +122,8 @@ export class SuppliersService {
   }
 
   /**
-   * Updates an existing supplier profile.
-   * Allows updating details or toggling is_active state.
+   * Updates an existing supplier record.
+   * Ensures name uniqueness when the supplier name is updated.
    */
   async update(
     id: number,
@@ -119,8 +132,22 @@ export class SuppliersService {
   ): Promise<SupplierResponseDto> {
     this.logger.log(`Updating supplierId=${id} by userId=${userId}`);
 
-    // Verify record exists before executing update
     await this.findOne(id);
+
+    if (dto.name) {
+      const existingName = await this.prisma.supplier.findUnique({
+        where: { name: dto.name },
+      });
+
+      if (existingName && existingName.id !== id) {
+        this.logger.warn(
+          `Supplier update failed: name="${dto.name}" taken by supplierId=${existingName.id}`,
+        );
+        throw new ConflictException(
+          `Supplier with name "${dto.name}" already exists.`,
+        );
+      }
+    }
 
     const updated = await this.prisma.supplier.update({
       where: { id },
@@ -132,15 +159,14 @@ export class SuppliersService {
   }
 
   /**
-   * Safely deactivates or hard-deletes a supplier.
-   * Deletion is rejected if historical Purchase Orders exist to prevent relational orphans and data loss.
+   * Deletes or deactivates a supplier record.
+   * Automatically falls back to soft deactivation if historical purchase orders exist[cite: 1].
    */
   async remove(id: number, userId: number): Promise<{ message: string }> {
     this.logger.log(
       `Attempting deletion/deactivation of supplierId=${id} by userId=${userId}`,
     );
 
-    // Fetch supplier along with the count of associated purchase orders
     const supplier = await this.prisma.supplier.findUnique({
       where: { id },
       include: {
@@ -155,29 +181,27 @@ export class SuppliersService {
       throw new NotFoundException(`Supplier with ID ${id} not found.`);
     }
 
-    // Business Rule: Hard deletion is prohibited if historical purchase orders exist
+    // Historical linkage rule: Deactivate if POs exist to prevent relational breakage[cite: 1]
     if (supplier._count.purchaseOrders > 0) {
       this.logger.warn(
-        `Hard deletion blocked for supplierId=${id} due to ${supplier._count.purchaseOrders} linked purchase orders. Deactivating supplier instead.`,
+        `Hard deletion blocked for supplierId=${id} due to ${supplier._count.purchaseOrders} linked purchase orders. Deactivating supplier.`,
       );
 
-      // Automatically fall back to deactivating the supplier
       await this.prisma.supplier.update({
         where: { id },
         data: { is_active: false },
       });
 
       throw new ConflictException(
-        `Supplier ID ${id} cannot be deleted because it is linked to historical Purchase Orders. Supplier has been deactivated (is_active = false) instead to preserve audit records.`,
+        `Supplier ID ${id} cannot be deleted because it is linked to historical Purchase Orders. The supplier has been set to inactive instead.`,
       );
     }
 
-    // Safe to hard delete if 0 linked Purchase Orders exist
     await this.prisma.supplier.delete({
       where: { id },
     });
 
-    this.logger.log(`Unlinked supplier deleted permanently: supplierId=${id}`);
+    this.logger.log(`Unlinked supplier permanently removed: supplierId=${id}`);
     return { message: `Supplier with ID ${id} has been permanently deleted.` };
   }
 }

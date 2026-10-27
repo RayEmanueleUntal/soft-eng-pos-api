@@ -217,6 +217,7 @@ export type WholeSaleCustomerWhereInput = {
   outstanding_balance?: Prisma.DecimalFilter<"WholeSaleCustomer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFilter<"WholeSaleCustomer"> | string
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
+  customerPayments?: Prisma.CustomerPaymentListRelationFilter
 }
 
 export type WholeSaleCustomerOrderByWithRelationInput = {
@@ -225,6 +226,7 @@ export type WholeSaleCustomerOrderByWithRelationInput = {
   outstanding_balance?: Prisma.SortOrder
   company_name?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
+  customerPayments?: Prisma.CustomerPaymentOrderByRelationAggregateInput
 }
 
 export type WholeSaleCustomerWhereUniqueInput = Prisma.AtLeast<{
@@ -236,6 +238,7 @@ export type WholeSaleCustomerWhereUniqueInput = Prisma.AtLeast<{
   outstanding_balance?: Prisma.DecimalFilter<"WholeSaleCustomer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFilter<"WholeSaleCustomer"> | string
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
+  customerPayments?: Prisma.CustomerPaymentListRelationFilter
 }, "customerId">
 
 export type WholeSaleCustomerOrderByWithAggregationInput = {
@@ -265,6 +268,7 @@ export type WholeSaleCustomerCreateInput = {
   outstanding_balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name: string
   customer: Prisma.CustomerCreateNestedOneWithoutWholesaleInput
+  customerPayments?: Prisma.CustomerPaymentCreateNestedManyWithoutWholeSaleProfileInput
 }
 
 export type WholeSaleCustomerUncheckedCreateInput = {
@@ -272,6 +276,7 @@ export type WholeSaleCustomerUncheckedCreateInput = {
   credit_limit: runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name: string
+  customerPayments?: Prisma.CustomerPaymentUncheckedCreateNestedManyWithoutWholeSaleProfileInput
 }
 
 export type WholeSaleCustomerUpdateInput = {
@@ -279,6 +284,7 @@ export type WholeSaleCustomerUpdateInput = {
   outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
   customer?: Prisma.CustomerUpdateOneRequiredWithoutWholesaleNestedInput
+  customerPayments?: Prisma.CustomerPaymentUpdateManyWithoutWholeSaleProfileNestedInput
 }
 
 export type WholeSaleCustomerUncheckedUpdateInput = {
@@ -286,6 +292,7 @@ export type WholeSaleCustomerUncheckedUpdateInput = {
   credit_limit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPayments?: Prisma.CustomerPaymentUncheckedUpdateManyWithoutWholeSaleProfileNestedInput
 }
 
 export type WholeSaleCustomerCreateManyInput = {
@@ -306,6 +313,11 @@ export type WholeSaleCustomerUncheckedUpdateManyInput = {
   credit_limit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type WholeSaleCustomerScalarRelationFilter = {
+  is?: Prisma.WholeSaleCustomerWhereInput
+  isNot?: Prisma.WholeSaleCustomerWhereInput
 }
 
 export type WholeSaleCustomerNullableScalarRelationFilter = {
@@ -346,6 +358,20 @@ export type WholeSaleCustomerSumOrderByAggregateInput = {
   outstanding_balance?: Prisma.SortOrder
 }
 
+export type WholeSaleCustomerCreateNestedOneWithoutCustomerPaymentsInput = {
+  create?: Prisma.XOR<Prisma.WholeSaleCustomerCreateWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUncheckedCreateWithoutCustomerPaymentsInput>
+  connectOrCreate?: Prisma.WholeSaleCustomerCreateOrConnectWithoutCustomerPaymentsInput
+  connect?: Prisma.WholeSaleCustomerWhereUniqueInput
+}
+
+export type WholeSaleCustomerUpdateOneRequiredWithoutCustomerPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.WholeSaleCustomerCreateWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUncheckedCreateWithoutCustomerPaymentsInput>
+  connectOrCreate?: Prisma.WholeSaleCustomerCreateOrConnectWithoutCustomerPaymentsInput
+  upsert?: Prisma.WholeSaleCustomerUpsertWithoutCustomerPaymentsInput
+  connect?: Prisma.WholeSaleCustomerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WholeSaleCustomerUpdateToOneWithWhereWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUpdateWithoutCustomerPaymentsInput>, Prisma.WholeSaleCustomerUncheckedUpdateWithoutCustomerPaymentsInput>
+}
+
 export type WholeSaleCustomerCreateNestedOneWithoutCustomerInput = {
   create?: Prisma.XOR<Prisma.WholeSaleCustomerCreateWithoutCustomerInput, Prisma.WholeSaleCustomerUncheckedCreateWithoutCustomerInput>
   connectOrCreate?: Prisma.WholeSaleCustomerCreateOrConnectWithoutCustomerInput
@@ -378,16 +404,62 @@ export type WholeSaleCustomerUncheckedUpdateOneWithoutCustomerNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WholeSaleCustomerUpdateToOneWithWhereWithoutCustomerInput, Prisma.WholeSaleCustomerUpdateWithoutCustomerInput>, Prisma.WholeSaleCustomerUncheckedUpdateWithoutCustomerInput>
 }
 
+export type WholeSaleCustomerCreateWithoutCustomerPaymentsInput = {
+  credit_limit: runtime.Decimal | runtime.DecimalJsLike | number | string
+  outstanding_balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  company_name: string
+  customer: Prisma.CustomerCreateNestedOneWithoutWholesaleInput
+}
+
+export type WholeSaleCustomerUncheckedCreateWithoutCustomerPaymentsInput = {
+  customerId: number
+  credit_limit: runtime.Decimal | runtime.DecimalJsLike | number | string
+  outstanding_balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  company_name: string
+}
+
+export type WholeSaleCustomerCreateOrConnectWithoutCustomerPaymentsInput = {
+  where: Prisma.WholeSaleCustomerWhereUniqueInput
+  create: Prisma.XOR<Prisma.WholeSaleCustomerCreateWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUncheckedCreateWithoutCustomerPaymentsInput>
+}
+
+export type WholeSaleCustomerUpsertWithoutCustomerPaymentsInput = {
+  update: Prisma.XOR<Prisma.WholeSaleCustomerUpdateWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUncheckedUpdateWithoutCustomerPaymentsInput>
+  create: Prisma.XOR<Prisma.WholeSaleCustomerCreateWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUncheckedCreateWithoutCustomerPaymentsInput>
+  where?: Prisma.WholeSaleCustomerWhereInput
+}
+
+export type WholeSaleCustomerUpdateToOneWithWhereWithoutCustomerPaymentsInput = {
+  where?: Prisma.WholeSaleCustomerWhereInput
+  data: Prisma.XOR<Prisma.WholeSaleCustomerUpdateWithoutCustomerPaymentsInput, Prisma.WholeSaleCustomerUncheckedUpdateWithoutCustomerPaymentsInput>
+}
+
+export type WholeSaleCustomerUpdateWithoutCustomerPaymentsInput = {
+  credit_limit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  company_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customer?: Prisma.CustomerUpdateOneRequiredWithoutWholesaleNestedInput
+}
+
+export type WholeSaleCustomerUncheckedUpdateWithoutCustomerPaymentsInput = {
+  customerId?: Prisma.IntFieldUpdateOperationsInput | number
+  credit_limit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  company_name?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
 export type WholeSaleCustomerCreateWithoutCustomerInput = {
   credit_limit: runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name: string
+  customerPayments?: Prisma.CustomerPaymentCreateNestedManyWithoutWholeSaleProfileInput
 }
 
 export type WholeSaleCustomerUncheckedCreateWithoutCustomerInput = {
   credit_limit: runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name: string
+  customerPayments?: Prisma.CustomerPaymentUncheckedCreateNestedManyWithoutWholeSaleProfileInput
 }
 
 export type WholeSaleCustomerCreateOrConnectWithoutCustomerInput = {
@@ -410,14 +482,45 @@ export type WholeSaleCustomerUpdateWithoutCustomerInput = {
   credit_limit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPayments?: Prisma.CustomerPaymentUpdateManyWithoutWholeSaleProfileNestedInput
 }
 
 export type WholeSaleCustomerUncheckedUpdateWithoutCustomerInput = {
   credit_limit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   outstanding_balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   company_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPayments?: Prisma.CustomerPaymentUncheckedUpdateManyWithoutWholeSaleProfileNestedInput
 }
 
+
+/**
+ * Count Type WholeSaleCustomerCountOutputType
+ */
+
+export type WholeSaleCustomerCountOutputType = {
+  customerPayments: number
+}
+
+export type WholeSaleCustomerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customerPayments?: boolean | WholeSaleCustomerCountOutputTypeCountCustomerPaymentsArgs
+}
+
+/**
+ * WholeSaleCustomerCountOutputType without action
+ */
+export type WholeSaleCustomerCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WholeSaleCustomerCountOutputType
+   */
+  select?: Prisma.WholeSaleCustomerCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * WholeSaleCustomerCountOutputType without action
+ */
+export type WholeSaleCustomerCountOutputTypeCountCustomerPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomerPaymentWhereInput
+}
 
 
 export type WholeSaleCustomerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -426,6 +529,8 @@ export type WholeSaleCustomerSelect<ExtArgs extends runtime.Types.Extensions.Int
   outstanding_balance?: boolean
   company_name?: boolean
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  customerPayments?: boolean | Prisma.WholeSaleCustomer$customerPaymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.WholeSaleCustomerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["wholeSaleCustomer"]>
 
 export type WholeSaleCustomerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -454,6 +559,8 @@ export type WholeSaleCustomerSelectScalar = {
 export type WholeSaleCustomerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"customerId" | "credit_limit" | "outstanding_balance" | "company_name", ExtArgs["result"]["wholeSaleCustomer"]>
 export type WholeSaleCustomerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  customerPayments?: boolean | Prisma.WholeSaleCustomer$customerPaymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.WholeSaleCustomerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WholeSaleCustomerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
@@ -466,6 +573,7 @@ export type $WholeSaleCustomerPayload<ExtArgs extends runtime.Types.Extensions.I
   name: "WholeSaleCustomer"
   objects: {
     customer: Prisma.$CustomerPayload<ExtArgs>
+    customerPayments: Prisma.$CustomerPaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     customerId: number
@@ -867,6 +975,7 @@ readonly fields: WholeSaleCustomerFieldRefs;
 export interface Prisma__WholeSaleCustomerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   customer<T extends Prisma.CustomerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CustomerDefaultArgs<ExtArgs>>): Prisma.Prisma__CustomerClient<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  customerPayments<T extends Prisma.WholeSaleCustomer$customerPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WholeSaleCustomer$customerPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1298,6 +1407,30 @@ export type WholeSaleCustomerDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many WholeSaleCustomers to delete.
    */
   limit?: number
+}
+
+/**
+ * WholeSaleCustomer.customerPayments
+ */
+export type WholeSaleCustomer$customerPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerPayment
+   */
+  select?: Prisma.CustomerPaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerPayment
+   */
+  omit?: Prisma.CustomerPaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerPaymentInclude<ExtArgs> | null
+  where?: Prisma.CustomerPaymentWhereInput
+  orderBy?: Prisma.CustomerPaymentOrderByWithRelationInput | Prisma.CustomerPaymentOrderByWithRelationInput[]
+  cursor?: Prisma.CustomerPaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomerPaymentScalarFieldEnum | Prisma.CustomerPaymentScalarFieldEnum[]
 }
 
 /**

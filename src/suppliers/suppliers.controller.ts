@@ -44,20 +44,25 @@ export class SuppliersController {
 
   /**
    * Endpoint for creating a new supplier profile.
+   * Protected against duplicate form submissions via Redis idempotency.
    */
   @Post()
   @Idempotent()
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @Roles(Role.ADMIN, Role.MANAGER, Role.SECRETARY)
   @ApiOperation({
     summary: 'Create supplier profile',
-    description: 'Registers a new supplier.',
+    description:
+      'Registers a new supplier with optional contact person, email, and phone number details.',
   })
   @ApiCreatedResponse({
     description: 'Supplier successfully created',
     type: SupplierResponseDto,
   })
-  @ApiUnauthorizedResponse({ description: 'JWT authentication required' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
+  @ApiConflictResponse({
+    description: 'Supplier with the given name already exists',
+  })
+  @ApiUnauthorizedResponse({ description: 'JWT authentication required' })
   @ApiForbiddenResponse({ description: 'Insufficient permissions' })
   async create(
     @Body() dto: CreateSupplierDto,
@@ -71,7 +76,13 @@ export class SuppliersController {
    * Supports pagination, search queries, and active/inactive status filters.
    */
   @Get()
-  @Roles(Role.ADMIN, Role.MANAGER, Role.SECRETARY, Role.STOCK_MANAGEMENT)
+  @Roles(
+    Role.ADMIN,
+    Role.MANAGER,
+    Role.SECRETARY,
+    Role.STOCK_MANAGEMENT,
+    Role.SALES_CLERK,
+  )
   @ApiOperation({
     summary: 'Get list of suppliers',
     description:
@@ -113,7 +124,8 @@ export class SuppliersController {
    * Endpoint for updating supplier information or toggling active status.
    */
   @Patch(':id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @Idempotent()
+  @Roles(Role.ADMIN, Role.MANAGER, Role.SECRETARY)
   @ApiOperation({
     summary: 'Update supplier profile',
     description: 'Updates supplier information or toggles active status.',
@@ -124,6 +136,9 @@ export class SuppliersController {
   })
   @ApiNotFoundResponse({ description: 'Supplier ID not found' })
   @ApiBadRequestResponse({ description: 'Invalid input payload' })
+  @ApiConflictResponse({
+    description: 'Supplier name is already taken by another record',
+  })
   @ApiUnauthorizedResponse({ description: 'JWT authentication required' })
   @ApiForbiddenResponse({ description: 'Insufficient permissions' })
   async update(
@@ -148,6 +163,15 @@ export class SuppliersController {
   })
   @ApiOkResponse({
     description: 'Supplier deleted or deactivated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Supplier with ID 12 has been permanently deleted.',
+        },
+      },
+    },
   })
   @ApiNotFoundResponse({ description: 'Supplier ID not found' })
   @ApiConflictResponse({

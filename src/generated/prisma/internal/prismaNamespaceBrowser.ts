@@ -59,6 +59,7 @@ export const ModelName = {
   CashPayment: 'CashPayment',
   GCashPayment: 'GCashPayment',
   CreditPayment: 'CreditPayment',
+  CustomerPayment: 'CustomerPayment',
   Shipment: 'Shipment',
   Forwarder: 'Forwarder',
   StaffUser: 'StaffUser',
@@ -66,6 +67,7 @@ export const ModelName = {
   WholeSaleCustomer: 'WholeSaleCustomer',
   Category: 'Category',
   Product: 'Product',
+  ProductUom: 'ProductUom',
   BinLocation: 'BinLocation',
   StockMovement: 'StockMovement',
   PurchaseOrder: 'PurchaseOrder',
@@ -116,7 +118,10 @@ export const TransactionItemScalarFieldEnum = {
   productId: 'productId',
   quantity_sold: 'quantity_sold',
   unit_of_measure: 'unit_of_measure',
+  uom_conversion_factor: 'uom_conversion_factor',
+  base_quantity_deducted: 'base_quantity_deducted',
   unit_price: 'unit_price',
+  cost_price: 'cost_price',
   discount: 'discount',
   subtotal: 'subtotal'
 } as const
@@ -183,10 +188,27 @@ export type GCashPaymentScalarFieldEnum = (typeof GCashPaymentScalarFieldEnum)[k
 export const CreditPaymentScalarFieldEnum = {
   paymentId: 'paymentId',
   due_date: 'due_date',
-  remaining_credit_balance: 'remaining_credit_balance'
+  remaining_credit_balance: 'remaining_credit_balance',
+  status: 'status'
 } as const
 
 export type CreditPaymentScalarFieldEnum = (typeof CreditPaymentScalarFieldEnum)[keyof typeof CreditPaymentScalarFieldEnum]
+
+
+export const CustomerPaymentScalarFieldEnum = {
+  id: 'id',
+  wholesaleCustId: 'wholesaleCustId',
+  staffId: 'staffId',
+  amount_paid: 'amount_paid',
+  payment_method: 'payment_method',
+  reference_number: 'reference_number',
+  payment_date: 'payment_date',
+  notes: 'notes',
+  previous_balance: 'previous_balance',
+  new_balance: 'new_balance'
+} as const
+
+export type CustomerPaymentScalarFieldEnum = (typeof CustomerPaymentScalarFieldEnum)[keyof typeof CustomerPaymentScalarFieldEnum]
 
 
 export const ShipmentScalarFieldEnum = {
@@ -270,8 +292,6 @@ export const ProductScalarFieldEnum = {
   current_quantity: 'current_quantity',
   reorder_point_ROP: 'reorder_point_ROP',
   needsRecount: 'needsRecount',
-  pricing_uom: 'pricing_uom',
-  pricing_unit_qty: 'pricing_unit_qty',
   cost_price: 'cost_price',
   retail_price: 'retail_price',
   wholesale_price: 'wholesale_price',
@@ -281,6 +301,21 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductUomScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  uom: 'uom',
+  conversion_factor: 'conversion_factor',
+  cost_price: 'cost_price',
+  retail_price: 'retail_price',
+  wholesale_price: 'wholesale_price',
+  is_default_purchase: 'is_default_purchase',
+  is_default_sales: 'is_default_sales'
+} as const
+
+export type ProductUomScalarFieldEnum = (typeof ProductUomScalarFieldEnum)[keyof typeof ProductUomScalarFieldEnum]
 
 
 export const BinLocationScalarFieldEnum = {
@@ -326,6 +361,9 @@ export const POItemScalarFieldEnum = {
   poId: 'poId',
   productId: 'productId',
   requested_quantity: 'requested_quantity',
+  ordered_uom: 'ordered_uom',
+  uom_conversion_factor: 'uom_conversion_factor',
+  expected_base_quantity: 'expected_base_quantity',
   unit_cost: 'unit_cost'
 } as const
 
@@ -335,7 +373,9 @@ export type POItemScalarFieldEnum = (typeof POItemScalarFieldEnum)[keyof typeof 
 export const SupplierScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  contact_info: 'contact_info',
+  contact_person: 'contact_person',
+  email: 'email',
+  contact_number: 'contact_number',
   location: 'location',
   lead_time_days: 'lead_time_days',
   is_active: 'is_active',
@@ -360,7 +400,10 @@ export const DeliveryItemScalarFieldEnum = {
   id: 'id',
   deliveryId: 'deliveryId',
   productId: 'productId',
-  received_quantity: 'received_quantity'
+  received_quantity: 'received_quantity',
+  received_uom: 'received_uom',
+  uom_conversion_factor: 'uom_conversion_factor',
+  actual_base_quantity: 'actual_base_quantity'
 } as const
 
 export type DeliveryItemScalarFieldEnum = (typeof DeliveryItemScalarFieldEnum)[keyof typeof DeliveryItemScalarFieldEnum]

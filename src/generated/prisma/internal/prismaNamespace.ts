@@ -405,6 +405,7 @@ export const ModelName = {
   CashPayment: 'CashPayment',
   GCashPayment: 'GCashPayment',
   CreditPayment: 'CreditPayment',
+  CustomerPayment: 'CustomerPayment',
   Shipment: 'Shipment',
   Forwarder: 'Forwarder',
   StaffUser: 'StaffUser',
@@ -412,6 +413,7 @@ export const ModelName = {
   WholeSaleCustomer: 'WholeSaleCustomer',
   Category: 'Category',
   Product: 'Product',
+  ProductUom: 'ProductUom',
   BinLocation: 'BinLocation',
   StockMovement: 'StockMovement',
   PurchaseOrder: 'PurchaseOrder',
@@ -436,7 +438,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "transaction" | "transactionItem" | "exchange" | "return" | "payment" | "cashPayment" | "gCashPayment" | "creditPayment" | "shipment" | "forwarder" | "staffUser" | "customer" | "wholeSaleCustomer" | "category" | "product" | "binLocation" | "stockMovement" | "purchaseOrder" | "pOItem" | "supplier" | "delivery" | "deliveryItem" | "approvalRequest" | "systemSetting"
+    modelProps: "transaction" | "transactionItem" | "exchange" | "return" | "payment" | "cashPayment" | "gCashPayment" | "creditPayment" | "customerPayment" | "shipment" | "forwarder" | "staffUser" | "customer" | "wholeSaleCustomer" | "category" | "product" | "productUom" | "binLocation" | "stockMovement" | "purchaseOrder" | "pOItem" | "supplier" | "delivery" | "deliveryItem" | "approvalRequest" | "systemSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1032,6 +1034,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CustomerPayment: {
+      payload: Prisma.$CustomerPaymentPayload<ExtArgs>
+      fields: Prisma.CustomerPaymentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomerPaymentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomerPaymentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomerPaymentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomerPaymentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>
+        }
+        findMany: {
+          args: Prisma.CustomerPaymentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>[]
+        }
+        create: {
+          args: Prisma.CustomerPaymentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>
+        }
+        createMany: {
+          args: Prisma.CustomerPaymentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomerPaymentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomerPaymentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>
+        }
+        update: {
+          args: Prisma.CustomerPaymentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomerPaymentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomerPaymentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomerPaymentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomerPaymentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerPaymentPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomerPaymentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomerPayment>
+        }
+        groupBy: {
+          args: Prisma.CustomerPaymentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerPaymentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomerPaymentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerPaymentCountAggregateOutputType> | number
+        }
+      }
+    }
     Shipment: {
       payload: Prisma.$ShipmentPayload<ExtArgs>
       fields: Prisma.ShipmentFieldRefs
@@ -1547,6 +1623,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProductUom: {
+      payload: Prisma.$ProductUomPayload<ExtArgs>
+      fields: Prisma.ProductUomFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductUomFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductUomFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductUomFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductUomFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>
+        }
+        findMany: {
+          args: Prisma.ProductUomFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>[]
+        }
+        create: {
+          args: Prisma.ProductUomCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>
+        }
+        createMany: {
+          args: Prisma.ProductUomCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductUomCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductUomDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>
+        }
+        update: {
+          args: Prisma.ProductUomUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductUomDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductUomUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductUomUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductUomUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductUomPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductUomAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductUom>
+        }
+        groupBy: {
+          args: Prisma.ProductUomGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductUomGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductUomCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductUomCountAggregateOutputType> | number
         }
       }
     }
@@ -2278,7 +2428,10 @@ export const TransactionItemScalarFieldEnum = {
   productId: 'productId',
   quantity_sold: 'quantity_sold',
   unit_of_measure: 'unit_of_measure',
+  uom_conversion_factor: 'uom_conversion_factor',
+  base_quantity_deducted: 'base_quantity_deducted',
   unit_price: 'unit_price',
+  cost_price: 'cost_price',
   discount: 'discount',
   subtotal: 'subtotal'
 } as const
@@ -2345,10 +2498,27 @@ export type GCashPaymentScalarFieldEnum = (typeof GCashPaymentScalarFieldEnum)[k
 export const CreditPaymentScalarFieldEnum = {
   paymentId: 'paymentId',
   due_date: 'due_date',
-  remaining_credit_balance: 'remaining_credit_balance'
+  remaining_credit_balance: 'remaining_credit_balance',
+  status: 'status'
 } as const
 
 export type CreditPaymentScalarFieldEnum = (typeof CreditPaymentScalarFieldEnum)[keyof typeof CreditPaymentScalarFieldEnum]
+
+
+export const CustomerPaymentScalarFieldEnum = {
+  id: 'id',
+  wholesaleCustId: 'wholesaleCustId',
+  staffId: 'staffId',
+  amount_paid: 'amount_paid',
+  payment_method: 'payment_method',
+  reference_number: 'reference_number',
+  payment_date: 'payment_date',
+  notes: 'notes',
+  previous_balance: 'previous_balance',
+  new_balance: 'new_balance'
+} as const
+
+export type CustomerPaymentScalarFieldEnum = (typeof CustomerPaymentScalarFieldEnum)[keyof typeof CustomerPaymentScalarFieldEnum]
 
 
 export const ShipmentScalarFieldEnum = {
@@ -2432,8 +2602,6 @@ export const ProductScalarFieldEnum = {
   current_quantity: 'current_quantity',
   reorder_point_ROP: 'reorder_point_ROP',
   needsRecount: 'needsRecount',
-  pricing_uom: 'pricing_uom',
-  pricing_unit_qty: 'pricing_unit_qty',
   cost_price: 'cost_price',
   retail_price: 'retail_price',
   wholesale_price: 'wholesale_price',
@@ -2443,6 +2611,21 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductUomScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  uom: 'uom',
+  conversion_factor: 'conversion_factor',
+  cost_price: 'cost_price',
+  retail_price: 'retail_price',
+  wholesale_price: 'wholesale_price',
+  is_default_purchase: 'is_default_purchase',
+  is_default_sales: 'is_default_sales'
+} as const
+
+export type ProductUomScalarFieldEnum = (typeof ProductUomScalarFieldEnum)[keyof typeof ProductUomScalarFieldEnum]
 
 
 export const BinLocationScalarFieldEnum = {
@@ -2488,6 +2671,9 @@ export const POItemScalarFieldEnum = {
   poId: 'poId',
   productId: 'productId',
   requested_quantity: 'requested_quantity',
+  ordered_uom: 'ordered_uom',
+  uom_conversion_factor: 'uom_conversion_factor',
+  expected_base_quantity: 'expected_base_quantity',
   unit_cost: 'unit_cost'
 } as const
 
@@ -2497,7 +2683,9 @@ export type POItemScalarFieldEnum = (typeof POItemScalarFieldEnum)[keyof typeof 
 export const SupplierScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  contact_info: 'contact_info',
+  contact_person: 'contact_person',
+  email: 'email',
+  contact_number: 'contact_number',
   location: 'location',
   lead_time_days: 'lead_time_days',
   is_active: 'is_active',
@@ -2522,7 +2710,10 @@ export const DeliveryItemScalarFieldEnum = {
   id: 'id',
   deliveryId: 'deliveryId',
   productId: 'productId',
-  received_quantity: 'received_quantity'
+  received_quantity: 'received_quantity',
+  received_uom: 'received_uom',
+  uom_conversion_factor: 'uom_conversion_factor',
+  actual_base_quantity: 'actual_base_quantity'
 } as const
 
 export type DeliveryItemScalarFieldEnum = (typeof DeliveryItemScalarFieldEnum)[keyof typeof DeliveryItemScalarFieldEnum]
@@ -2715,6 +2906,20 @@ export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PaymentMethod[]'
  */
 export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CreditStatus'
+ */
+export type EnumCreditStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CreditStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CreditStatus[]'
+ */
+export type ListEnumCreditStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CreditStatus[]'>
     
 
 
@@ -3002,6 +3207,7 @@ export type GlobalOmitConfig = {
   cashPayment?: Prisma.CashPaymentOmit
   gCashPayment?: Prisma.GCashPaymentOmit
   creditPayment?: Prisma.CreditPaymentOmit
+  customerPayment?: Prisma.CustomerPaymentOmit
   shipment?: Prisma.ShipmentOmit
   forwarder?: Prisma.ForwarderOmit
   staffUser?: Prisma.StaffUserOmit
@@ -3009,6 +3215,7 @@ export type GlobalOmitConfig = {
   wholeSaleCustomer?: Prisma.WholeSaleCustomerOmit
   category?: Prisma.CategoryOmit
   product?: Prisma.ProductOmit
+  productUom?: Prisma.ProductUomOmit
   binLocation?: Prisma.BinLocationOmit
   stockMovement?: Prisma.StockMovementOmit
   purchaseOrder?: Prisma.PurchaseOrderOmit

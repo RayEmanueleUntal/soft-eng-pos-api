@@ -5,15 +5,15 @@ export class PaginatedSuppliersResponseDto {
   @ApiProperty({ type: [SupplierResponseDto] })
   data!: SupplierResponseDto[];
 
-  @ApiProperty({ example: 45, description: 'Total matched supplier records' })
+  @ApiProperty({ example: 50 })
   total!: number;
 
-  @ApiProperty({ example: 1, description: 'Current active page' })
+  @ApiProperty({ example: 1 })
   page!: number;
 
-  @ApiProperty({ example: 10, description: 'Limit of records per page' })
+  @ApiProperty({ example: 10 })
   limit!: number;
 
-  @ApiProperty({ example: 5, description: 'Total available pages' })
+  @ApiProperty({ example: 5 })
   totalPages!: number;
 }

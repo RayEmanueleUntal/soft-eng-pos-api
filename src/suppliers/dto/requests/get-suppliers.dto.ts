@@ -1,27 +1,20 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsInt,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class GetSuppliersDto {
   @ApiPropertyOptional({
-    description: 'Filter suppliers matching name, location, or contact info',
-    example: 'AeroFastener',
+    example: 'Hardware',
+    description:
+      'Search string matching supplier name, contact person, email, or location.',
   })
   @IsOptional()
   @IsString()
   search?: string;
 
   @ApiPropertyOptional({
-    description:
-      'Filter suppliers by active status. Defaults to returning both if omitted.',
     example: true,
+    description: 'Filter active or inactive suppliers.',
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -32,27 +25,17 @@ export class GetSuppliersDto {
   @IsBoolean()
   is_active?: boolean;
 
-  @ApiPropertyOptional({
-    description: 'Page number for pagination',
-    default: 1,
-    minimum: 1,
-  })
+  @ApiPropertyOptional({ example: 1, default: 1 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number = 1;
 
-  @ApiPropertyOptional({
-    description: 'Number of records per page',
-    default: 10,
-    minimum: 1,
-    maximum: 100,
-  })
+  @ApiPropertyOptional({ example: 10, default: 10 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
   limit?: number = 10;
 }
