@@ -1,4 +1,4 @@
-export * from './duplicate-customer.exception';
+export * from './customers/duplicate-customer.exception';
 export * from './duplicate-product.exception';
 export * from './insufficient-credit.exception';
 export * from './insufficient-stock.exception';
@@ -12,3 +12,4 @@ export * from './procurement';
 export * from './deliveries';
 export * from './forwarder';
 export * from './shipment';
+export * from './customers';
