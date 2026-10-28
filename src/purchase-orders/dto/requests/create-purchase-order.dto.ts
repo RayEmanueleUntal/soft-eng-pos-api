@@ -10,34 +10,7 @@ import {
   ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
-export class CreatePOItemDto {
-  @ApiProperty({
-    description: 'The unique ID of the product being ordered.',
-    example: 101,
-  })
-  @IsInt()
-  @IsPositive()
-  productId!: number;
-
-  @ApiProperty({
-    description: 'Quantity of the product to order (must be greater than 0).',
-    example: 50.0,
-  })
-  @IsNumber({ maxDecimalPlaces: 3 })
-  @Min(0.001, { message: 'requested_quantity must be greater than 0' })
-  requested_quantity!: number;
-
-  @ApiPropertyOptional({
-    description:
-      'Supplier quoted unit cost. If omitted, defaults to current product cost_price.',
-    example: 12.5,
-  })
-  @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0, { message: 'unit_cost cannot be negative' })
-  unit_cost?: number;
-}
+import { CreatePOItemDto } from './create-po-item.dto';
 
 export class CreatePurchaseOrderDto {
   @ApiProperty({

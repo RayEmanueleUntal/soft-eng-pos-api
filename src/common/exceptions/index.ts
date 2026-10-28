@@ -7,6 +7,7 @@ export * from './product-has-history.exception';
 export * from './transaction-type-mismatch.exception';
 export * from './uom-change-required.exception';
 export * from './uom-mismatch.exception';
+export * from './invalid-uom-conversion.exception';
 
 export * from './procurement';
 export * from './deliveries';

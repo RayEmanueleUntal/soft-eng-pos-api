@@ -14,13 +14,14 @@ import {
 } from './dto';
 import {
   InactiveSupplierException,
+  InvalidUomConversionException,
   ProductsNotFoundException,
   PurchaseOrderHasDeliveriesException,
   PurchaseOrderImmutableException,
   PurchaseOrderNotFoundException,
   SupplierNotFoundException,
 } from 'src/common/exceptions';
-import { POStatus } from 'src/generated/prisma/enums';
+import { POStatus, UnitOfMeasure } from 'src/generated/prisma/enums';
 import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
@@ -31,7 +32,7 @@ export class PurchaseOrdersService {
 
   /**
    * Creates a new Purchase Order along with its associated line items inside an atomic database transaction.
-   * Leverages in-memory consolidation to satisfy the @@unique([poId, productId]) constraint seamlessly.
+   * Handles UoM conversion snapshot calculations and unit cost fallback resolution.
    */
   async createPurchaseOrder(
     dto: CreatePurchaseOrderDto,
@@ -61,36 +62,28 @@ export class PurchaseOrdersService {
       throw new InactiveSupplierException(supplier.name, dto.supplierId);
     }
 
-    // 2. Consolidate duplicate products in the request payload to satisfy @@unique([poId, productId]) constraint
-    const consolidatedItemsMap = new Map<
-      number,
-      { productId: number; requested_quantity: number; unit_cost?: number }
-    >();
+    // 2. Extract unique product IDs
+    const productIds = Array.from(
+      new Set(dto.items.map((item) => item.productId)),
+    );
 
-    for (const item of dto.items) {
-      const existing = consolidatedItemsMap.get(item.productId);
-      if (existing) {
-        existing.requested_quantity += item.requested_quantity;
-        if (item.unit_cost !== undefined) {
-          existing.unit_cost = item.unit_cost; // Overwrite with explicit pricing if specified
-        }
-      } else {
-        consolidatedItemsMap.set(item.productId, { ...item });
-      }
-    }
-
-    const consolidatedItems = Array.from(consolidatedItemsMap.values());
-    const productIds = consolidatedItems.map((item) => item.productId);
-
-    // 3. Verify all requested products exist in database
+    // 3. Retrieve all requested products with their base UoMs and configured alternate UoMs
     const products = await this.prisma.product.findMany({
       where: { id: { in: productIds } },
       select: {
         id: true,
         name: true,
         cost_price: true,
+        base_uom: true,
         reorder_point_ROP: true,
         current_quantity: true,
+        uoms: {
+          select: {
+            uom: true,
+            conversion_factor: true,
+            cost_price: true,
+          },
+        },
       },
     });
 
@@ -106,28 +99,103 @@ export class PurchaseOrdersService {
 
     const productMap = new Map(products.map((p) => [p.id, p]));
 
-    // 4. Construct PO items payload, falling back to product.cost_price if unit_cost is unassigned
-    const poItemsCreatePayload = consolidatedItems.map((item) => {
-      const product = productMap.get(item.productId)!;
-      const finalUnitCost = item.unit_cost ?? Number(product.cost_price);
-
-      // Informational log for products ordered outside/above ROP (Non-blocking)
-      if (
-        Number(product.current_quantity) > Number(product.reorder_point_ROP)
-      ) {
-        this.logger.log(
-          `Product ID ${product.id} (${product.name}) is above ROP (Qty: ${product.current_quantity}, ROP: ${product.reorder_point_ROP}). Including in PO per user request.`,
-        );
+    // 4. Consolidate duplicate (productId, ordered_uom) pairs in payload to satisfy @@unique([poId, productId]) constraint
+    const consolidatedItemsMap = new Map<
+      string,
+      {
+        productId: number;
+        requested_quantity: number;
+        ordered_uom?: UnitOfMeasure;
+        uom_conversion_factor?: number;
+        unit_cost?: number;
       }
+    >();
 
-      return {
-        productId: item.productId,
-        requested_quantity: item.requested_quantity,
-        unit_cost: finalUnitCost,
-      };
-    });
+    for (const item of dto.items) {
+      const product = productMap.get(item.productId)!;
+      const targetUom = item.ordered_uom ?? product.base_uom;
+      const key = `${item.productId}_${targetUom}`;
 
-    // 5. Execute atomic transaction to save PurchaseOrder and POItems
+      const existing = consolidatedItemsMap.get(key);
+      if (existing) {
+        existing.requested_quantity += item.requested_quantity;
+        if (item.unit_cost !== undefined) {
+          existing.unit_cost = item.unit_cost; // Overwrite with explicit pricing if specified
+        }
+        if (item.uom_conversion_factor !== undefined) {
+          existing.uom_conversion_factor = item.uom_conversion_factor;
+        }
+      } else {
+        consolidatedItemsMap.set(key, { ...item, ordered_uom: targetUom });
+      }
+    }
+
+    // 5. Build line item payload calculating expected_base_quantity and resolving unit_cost
+    const poItemsCreatePayload = Array.from(consolidatedItemsMap.values()).map(
+      (item) => {
+        const product = productMap.get(item.productId)!;
+        const targetUom = item.ordered_uom ?? product.base_uom;
+
+        // Find configured alternate UoM if applicable
+        const matchedUomConfig = product.uoms.find((u) => u.uom === targetUom);
+
+        // Resolve Conversion Factor
+        let conversionFactor: number;
+        if (item.uom_conversion_factor !== undefined) {
+          conversionFactor = item.uom_conversion_factor;
+        } else if (targetUom === product.base_uom) {
+          conversionFactor = 1.0;
+        } else if (matchedUomConfig) {
+          conversionFactor = Number(matchedUomConfig.conversion_factor);
+        } else {
+          conversionFactor = 1.0;
+        }
+
+        if (conversionFactor <= 0) {
+          throw new InvalidUomConversionException(product.id, conversionFactor);
+        }
+
+        // Calculate snapshot expected_base_quantity = requested_quantity * uom_conversion_factor
+        const expectedBaseQuantity = new Prisma.Decimal(item.requested_quantity)
+          .times(conversionFactor)
+          .toNumber();
+
+        // Resolve Unit Cost per ordered_uom
+        let finalUnitCost: number;
+        if (item.unit_cost !== undefined) {
+          finalUnitCost = item.unit_cost;
+        } else if (targetUom === product.base_uom) {
+          finalUnitCost = Number(product.cost_price);
+        } else if (matchedUomConfig && matchedUomConfig.cost_price !== null) {
+          finalUnitCost = Number(matchedUomConfig.cost_price);
+        } else {
+          // Fallback: base cost * conversion factor
+          finalUnitCost = new Prisma.Decimal(product.cost_price)
+            .times(conversionFactor)
+            .toNumber();
+        }
+
+        // Informational log for products ordered outside/above ROP (Non-blocking)
+        if (
+          Number(product.current_quantity) > Number(product.reorder_point_ROP)
+        ) {
+          this.logger.log(
+            `Product ID ${product.id} (${product.name}) is above ROP (Qty: ${product.current_quantity}, ROP: ${product.reorder_point_ROP}). Including in PO per user request.`,
+          );
+        }
+
+        return {
+          productId: item.productId,
+          requested_quantity: item.requested_quantity,
+          ordered_uom: targetUom,
+          uom_conversion_factor: conversionFactor,
+          expected_base_quantity: expectedBaseQuantity,
+          unit_cost: finalUnitCost,
+        };
+      },
+    );
+
+    // 6. Execute atomic transaction to save PurchaseOrder and POItems
     try {
       const createdPO = await this.prisma.$transaction(async (tx) => {
         return tx.purchaseOrder.create({
