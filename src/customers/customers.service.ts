@@ -6,13 +6,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCustomerDto, GetCustomerDto, UpdateCustomerDto } from './dto';
-import { DuplicateCustomerException } from 'src/common/exceptions';
-import { CustomerType } from 'src/generated/prisma/enums';
+import {
+  CreateCustomerDto,
+  CreateCustomerPaymentDto,
+  CustomerPaymentResponseDto,
+  GetCustomerDto,
+  UpdateCustomerDto,
+} from './dto';
+import { CustomerType, PaymentMethod } from 'src/generated/prisma/client';
 import { CustomerResponseDto } from './dto/response/customer-response.dto';
 import { Prisma } from 'src/generated/prisma/client';
 import { AssignedRole as Role } from 'src/generated/prisma/enums';
 import { PaginatedCustomerResponseDto } from './dto/response/paginated-customer-response.dto';
+import {
+  DuplicateCustomerException,
+  InvalidPaymentAmountException,
+  WholesaleProfileNotFoundException,
+} from 'src/common/exceptions';
 
 @Injectable()
 export class CustomersService {
@@ -362,5 +372,90 @@ export class CustomersService {
     );
 
     return updatedWholesale;
+  }
+
+  /**
+   * Collects a credit settlement payment for a wholesale customer.
+   * Decrements `outstanding_balance` and records audit snapshots inside a transaction.
+   */
+  async collectWholesalePayment(
+    customerId: number,
+    staffId: number,
+    dto: CreateCustomerPaymentDto,
+  ): Promise<CustomerPaymentResponseDto> {
+    const paymentAmount = new Prisma.Decimal(dto.amount_paid);
+
+    if (paymentAmount.lte(0)) {
+      throw new InvalidPaymentAmountException(
+        'Payment amount must be greater than zero.',
+      );
+    }
+
+    if (dto.payment_method === PaymentMethod.CREDIT) {
+      throw new InvalidPaymentAmountException(
+        'Cannot use CREDIT as a payment method to settle outstanding credit balances.',
+      );
+    }
+
+    this.logger.log(
+      `Staff #${staffId} initiating credit settlement payment of ${paymentAmount.toFixed(2)} for Wholesale Customer #${customerId}`,
+    );
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Lock and fetch wholesale account
+      const wholesaleAccount = await tx.wholeSaleCustomer.findUnique({
+        where: { customerId },
+      });
+
+      if (!wholesaleAccount) {
+        this.logger.warn(
+          `Payment failed: Customer #${customerId} has no active wholesale profile.`,
+        );
+        throw new WholesaleProfileNotFoundException(customerId);
+      }
+
+      const previousBalance = wholesaleAccount.outstanding_balance;
+
+      // 2. Validate non-overpayment constraint
+      if (paymentAmount.gt(previousBalance)) {
+        this.logger.warn(
+          `Payment rejected for Customer #${customerId}: Payment (${paymentAmount.toFixed(2)}) exceeds outstanding balance (${previousBalance.toFixed(2)})`,
+        );
+        throw new InvalidPaymentAmountException(
+          `Payment amount (${paymentAmount.toFixed(2)}) cannot exceed outstanding balance (${previousBalance.toFixed(2)}).`,
+        );
+      }
+
+      // 3. Compute new balance
+      const newBalance = previousBalance.minus(paymentAmount);
+
+      // 4. Update Wholesale Customer balance
+      await tx.wholeSaleCustomer.update({
+        where: { customerId },
+        data: {
+          outstanding_balance: newBalance,
+        },
+      });
+
+      // 5. Create CustomerPayment audit entry
+      const customerPayment = await tx.customerPayment.create({
+        data: {
+          wholesaleCustId: customerId,
+          staffId,
+          amount_paid: paymentAmount,
+          payment_method: dto.payment_method,
+          reference_number: dto.reference_number,
+          notes: dto.notes,
+          previous_balance: previousBalance,
+          new_balance: newBalance,
+        },
+      });
+
+      this.logger.log(
+        `Successfully processed settlement payment #${customerPayment.id} for Wholesale Customer #${customerId}. Prev balance: ${previousBalance.toFixed(2)}, New balance: ${newBalance.toFixed(2)}`,
+      );
+
+      return CustomerPaymentResponseDto.fromEntity(customerPayment);
+    });
   }
 }
