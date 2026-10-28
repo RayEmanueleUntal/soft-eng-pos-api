@@ -42,7 +42,7 @@ export class PurchaseOrdersController {
   constructor(private readonly purchaseOrdersService: PurchaseOrdersService) {}
 
   /**
-   * HTTP POST Endpoint for generating a new Purchase Order with line items.
+   * HTTP POST Endpoint for generating a new Purchase Order with UoM-aware line items.
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -51,7 +51,7 @@ export class PurchaseOrdersController {
   @ApiOperation({
     summary: 'Generate a new Purchase Order',
     description:
-      'Creates a new Purchase Order record with line items for an active supplier. Products do not need to be below Reorder Point (ROP) to be included.',
+      'Creates a new Purchase Order record with line items for an active supplier. Automatically resolves Unit of Measure (UoM) conversion factors, snapshots expected base quantities, and applies quoted or defaulted unit costs.',
   })
   @ApiCreatedResponse({
     description: 'Purchase Order created successfully.',
@@ -59,7 +59,7 @@ export class PurchaseOrdersController {
   })
   @ApiBadRequestResponse({
     description:
-      'Validation failed or business domain rule violated (e.g., inactive supplier, missing product IDs, or zero/negative quantity).',
+      'Validation failed or business domain rule violated (e.g., inactive supplier, missing product IDs, zero/negative conversion factor, or invalid quantities).',
     schema: {
       examples: {
         InactiveSupplier: {
@@ -78,6 +78,15 @@ export class PurchaseOrdersController {
             error: 'Bad Request',
             message: 'The following product IDs do not exist: 999, 1000',
             missingProductIds: [999, 1000],
+          },
+        },
+        InvalidUomConversion: {
+          summary: 'Invalid UoM Conversion Factor',
+          value: {
+            statusCode: 400,
+            error: 'Bad Request',
+            message:
+              'Invalid UoM conversion factor (0) for product ID 101. Multiplier must be greater than 0.',
           },
         },
       },
