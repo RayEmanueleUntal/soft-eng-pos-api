@@ -5,3 +5,4 @@ export * from './delete-product-response.dto';
 export * from './paginated-products-response.dto';
 export * from './pagination-meta.dto';
 export * from './product-item-response.dto';
+export * from './product-uom-response.dto';

@@ -39,7 +39,7 @@ export class ProductsService {
     this.logger.debug('Fetching products list', { filters: productsDto });
     const searchKeywords = search ? search.trim().split(/\s+/) : [];
 
-    const where: any = {};
+    const where: Prisma.ProductWhereInput = {};
 
     if (searchKeywords.length > 0) {
       // Every keyword typed must match AT LEAST ONE of the searchable fields
@@ -139,12 +139,11 @@ export class ProductsService {
       base_uom,
       current_quantity,
       reorder_point_ROP,
-      pricing_uom,
-      pricing_unit_qty,
       cost_price,
       retail_price,
       wholesale_price,
       binId,
+      uoms,
       allowDuplicate,
     } = createProductDto;
 
@@ -271,33 +270,50 @@ export class ProductsService {
     }
 
     // 7. Build safe Decimal payloads
-    const productData: Prisma.ProductCreateInput = {
-      name,
-      sku: finalSku,
-      size_dimensions: size_dimensions || null,
-      thread_type: thread_type || null,
-      material_grade: material_grade || null,
-      base_uom,
-      current_quantity: new Prisma.Decimal(current_quantity ?? 0),
-      reorder_point_ROP: new Prisma.Decimal(reorder_point_ROP ?? 0),
-      pricing_uom,
-      pricing_unit_qty: new Prisma.Decimal(pricing_unit_qty ?? 1),
-      cost_price: new Prisma.Decimal(cost_price ?? 0),
-      retail_price: new Prisma.Decimal(retail_price),
-      wholesale_price:
-        wholesale_price !== undefined
-          ? new Prisma.Decimal(wholesale_price)
-          : null,
-      category: { connect: { id: categoryId } },
-      ...(binId ? { bin_location: { connect: { id: binId } } } : {}),
-    };
 
-    // 6. Save product entity
+    const uomCreateData = uoms?.map((u) => ({
+      uom: u.uom,
+      conversion_factor: new Prisma.Decimal(u.conversion_factor),
+      cost_price:
+        u.cost_price !== undefined ? new Prisma.Decimal(u.cost_price) : null,
+      retail_price:
+        u.retail_price !== undefined
+          ? new Prisma.Decimal(u.retail_price)
+          : null,
+      wholesale_price:
+        u.wholesale_price !== undefined
+          ? new Prisma.Decimal(u.wholesale_price)
+          : null,
+      is_default_purchase: u.is_default_purchase ?? false,
+      is_default_sales: u.is_default_sales ?? false,
+    }));
+
     const newProduct = await this.prisma.product.create({
-      data: productData,
+      data: {
+        name,
+        sku: finalSku,
+        size_dimensions: size_dimensions || null,
+        thread_type: thread_type || null,
+        material_grade: material_grade || null,
+        base_uom,
+        current_quantity: new Prisma.Decimal(current_quantity ?? 0),
+        reorder_point_ROP: new Prisma.Decimal(reorder_point_ROP ?? 0),
+        cost_price: new Prisma.Decimal(cost_price ?? 0),
+        retail_price: new Prisma.Decimal(retail_price),
+        wholesale_price:
+          wholesale_price !== undefined
+            ? new Prisma.Decimal(wholesale_price)
+            : null,
+        category: { connect: { id: categoryId } },
+        ...(binId ? { bin_location: { connect: { id: binId } } } : {}),
+        ...(uomCreateData && uomCreateData.length > 0
+          ? { uoms: { create: uomCreateData } }
+          : {}),
+      },
       include: {
         category: true,
         bin_location: true,
+        uoms: true,
       },
     });
 
@@ -323,7 +339,7 @@ export class ProductsService {
     // 1. Verify existence of target Product
     const existingProduct = await this.prisma.product.findUnique({
       where: { id: productId },
-      include: { category: true, bin_location: true },
+      include: { category: true, bin_location: true, uoms: true },
     });
 
     if (!existingProduct) {
@@ -342,16 +358,34 @@ export class ProductsService {
       material_grade,
       base_uom,
       reorder_point_ROP,
-      pricing_uom,
-      pricing_unit_qty,
       cost_price,
       retail_price,
       wholesale_price,
       binId,
       needsRecount,
       allowDuplicate,
-      confirmUomChange,
+      uoms,
     } = updateDto;
+
+    // Check Base UoM immutability rule: Block base_uom change if stock movements exist
+    if (base_uom && base_uom !== existingProduct.base_uom) {
+      const stockMovementCount = await this.prisma.stockMovement.count({
+        where: { productId },
+      });
+
+      if (stockMovementCount > 0) {
+        this.logger.warn(
+          `Update blocked: Product #${productId} has ${stockMovementCount} stock movement records. base_uom cannot be changed.`,
+        );
+        throw new ProductHasHistoryException(productId, {
+          stockMovements: stockMovementCount,
+        });
+      }
+
+      this.logger.log(
+        `Base UoM change allowed for Product #${productId}: (${existingProduct.base_uom} -> ${base_uom}) as no stock movement history exists.`,
+      );
+    }
 
     // 2. Validate Category relation (if changing category)
     let targetCategory = existingProduct.category;
@@ -391,39 +425,7 @@ export class ProductsService {
       }
     }
 
-    // 4. Handle UOM Changes & Stock Recount Guard
-    let recountFlag = needsRecount ?? existingProduct.needsRecount;
-
-    if (base_uom && base_uom !== existingProduct.base_uom) {
-      if (!confirmUomChange) {
-        this.logger.warn(
-          `Update blocked: Attempted base_uom change on Product #${productId} without confirmation flag.`,
-        );
-        throw new UomChangeRequiredException(
-          existingProduct.base_uom,
-          base_uom,
-        );
-      }
-
-      recountFlag = true;
-      this.logger.warn(
-        `User #${userId} changed base_uom for Product #${productId} (${existingProduct.base_uom} -> ${base_uom}). Flagged needsRecount=true.`,
-      );
-    }
-
-    // UOM Mismatch Guard: Warn if pricing_uom is provided without a multiplier
-    const targetBaseUom = base_uom ?? existingProduct.base_uom;
-    const targetPricingUom = pricing_uom ?? existingProduct.pricing_uom;
-    const targetPricingQty =
-      pricing_unit_qty ?? existingProduct.pricing_unit_qty.toNumber();
-
-    if (targetBaseUom === targetPricingUom && targetPricingQty !== 1) {
-      this.logger.warn(
-        `UOM Warning: Base and Pricing UOM match (${targetBaseUom}) but pricing_unit_qty is ${targetPricingQty}. Defaulting logic to 1.`,
-      );
-    }
-
-    // 5. SKU Resolution & Duplicate Check
+    // 4. SKU Resolution & Duplicate Check
     let finalSku: string | null | undefined = sku;
 
     // If client sends empty string, trigger auto-generation using target attributes
@@ -462,7 +464,7 @@ export class ProductsService {
       }
     }
 
-    // 6. Soft Duplicate Fastener Attribute Check
+    // 5. Soft Duplicate Fastener Attribute Check
     const targetSize =
       size_dimensions !== undefined
         ? size_dimensions
@@ -504,46 +506,73 @@ export class ProductsService {
     }
 
     // 7. Execute Prisma Update
-    const updatedProduct = await this.prisma.product.update({
-      where: { id: productId },
-      data: {
-        ...(name !== undefined && { name }),
-        ...(finalSku !== undefined && { sku: finalSku }),
-        ...(size_dimensions !== undefined && { size_dimensions }),
-        ...(thread_type !== undefined && { thread_type }),
-        ...(material_grade !== undefined && { material_grade }),
-        ...(base_uom !== undefined && { base_uom }),
-        ...(reorder_point_ROP !== undefined && {
-          reorder_point_ROP: new Prisma.Decimal(reorder_point_ROP),
-        }),
-        ...(pricing_uom !== undefined && { pricing_uom }),
-        ...(pricing_unit_qty !== undefined && {
-          pricing_unit_qty: new Prisma.Decimal(pricing_unit_qty),
-        }),
-        ...(cost_price !== undefined && {
-          cost_price: new Prisma.Decimal(cost_price),
-        }),
-        ...(retail_price !== undefined && {
-          retail_price: new Prisma.Decimal(retail_price),
-        }),
-        ...(wholesale_price !== undefined && {
-          wholesale_price:
-            wholesale_price !== null
-              ? new Prisma.Decimal(wholesale_price)
-              : null,
-        }),
-        needsRecount: recountFlag,
-        ...(categoryId && { category: { connect: { id: categoryId } } }),
-        ...(binId !== undefined && {
-          bin_location: binId
-            ? { connect: { id: binId } }
-            : { disconnect: true },
-        }),
-      },
-      include: {
-        category: true,
-        bin_location: true,
-      },
+    const updatedProduct = await this.prisma.$transaction(async (tx) => {
+      if (uoms !== undefined) {
+        await tx.productUom.deleteMany({ where: { productId } });
+
+        if (uoms.length > 0) {
+          await tx.productUom.createMany({
+            data: uoms.map((u) => ({
+              productId,
+              uom: u.uom,
+              conversion_factor: new Prisma.Decimal(u.conversion_factor),
+              cost_price:
+                u.cost_price !== undefined
+                  ? new Prisma.Decimal(u.cost_price)
+                  : null,
+              retail_price:
+                u.retail_price !== undefined
+                  ? new Prisma.Decimal(u.retail_price)
+                  : null,
+              wholesale_price:
+                u.wholesale_price !== undefined
+                  ? new Prisma.Decimal(u.wholesale_price)
+                  : null,
+              is_default_purchase: u.is_default_purchase ?? false,
+              is_default_sales: u.is_default_sales ?? false,
+            })),
+          });
+        }
+      }
+
+      return tx.product.update({
+        where: { id: productId },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(finalSku !== undefined && { sku: finalSku }),
+          ...(size_dimensions !== undefined && { size_dimensions }),
+          ...(thread_type !== undefined && { thread_type }),
+          ...(material_grade !== undefined && { material_grade }),
+          ...(base_uom !== undefined && { base_uom }),
+          ...(reorder_point_ROP !== undefined && {
+            reorder_point_ROP: new Prisma.Decimal(reorder_point_ROP),
+          }),
+          ...(cost_price !== undefined && {
+            cost_price: new Prisma.Decimal(cost_price),
+          }),
+          ...(retail_price !== undefined && {
+            retail_price: new Prisma.Decimal(retail_price),
+          }),
+          ...(wholesale_price !== undefined && {
+            wholesale_price:
+              wholesale_price !== null
+                ? new Prisma.Decimal(wholesale_price)
+                : null,
+          }),
+          ...(needsRecount !== undefined && { needsRecount }),
+          ...(categoryId && { category: { connect: { id: categoryId } } }),
+          ...(binId !== undefined && {
+            bin_location: binId
+              ? { connect: { id: binId } }
+              : { disconnect: true },
+          }),
+        },
+        include: {
+          category: true,
+          bin_location: true,
+          uoms: true,
+        },
+      });
     });
 
     this.logger.log(
