@@ -1,7 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductItemResponseDto } from './product-item-response.dto';
 import { PaginationMetaDto } from './pagination-meta.dto';
-import { Product } from 'src/generated/prisma/client';
+import {
+  BinLocation,
+  Category,
+  Product,
+  ProductUom,
+} from 'src/generated/prisma/client';
+
+type ProductWithRelations = Product & {
+  category?: Category | null;
+  bin_location?: BinLocation | null;
+  uoms?: ProductUom[];
+};
 
 export class PaginatedProductsResponseDto {
   @ApiProperty({ type: [ProductItemResponseDto] })
@@ -11,7 +22,7 @@ export class PaginatedProductsResponseDto {
   meta!: PaginationMetaDto;
 
   static fromEntities(
-    products: Product[],
+    products: ProductWithRelations[],
     total: number,
     page: number,
     limit: number,

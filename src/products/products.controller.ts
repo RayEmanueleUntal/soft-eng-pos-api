@@ -22,6 +22,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
   CreateProductDto,
@@ -55,6 +56,39 @@ export class ProductsController {
     @Query() productsDto: GetProductsDto,
   ): Promise<PaginatedProductsResponseDto> {
     return this.productsService.getProducts(productsDto);
+  }
+
+  /*
+    Get single product details by ID
+  */
+  @Get(':id')
+  @Roles(
+    Role.ADMIN,
+    Role.MANAGER,
+    Role.SECRETARY,
+    Role.STOCK_MANAGEMENT,
+    Role.CASHIER,
+    Role.SALES_CLERK,
+  )
+  @ApiOperation({
+    summary: 'Get a product by ID',
+    description:
+      'Fetches complete product details including category, bin location, and configured alternate units of measure (ProductUom) with calculated unit prices.',
+  })
+  @ApiOkResponse({
+    description: 'Product details successfully retrieved.',
+    type: ProductResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Product with the specified ID was not found.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Authentication token missing or invalid.',
+  })
+  async getProductById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ProductResponseDto> {
+    return this.productsService.getProductById(id);
   }
 
   /**

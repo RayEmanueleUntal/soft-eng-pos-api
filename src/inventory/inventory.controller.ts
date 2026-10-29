@@ -18,9 +18,7 @@ import {
   AssignBinDto,
   AssignBinResponseDto,
   GetStockMovementsDto,
-  InventoryDto,
   LowStockAlertsResponseDto,
-  PaginatedInventoryResponseDto,
   PaginatedStockMovementsResponseDto,
   StockInDto,
   StockMovementResponseDto,
@@ -30,11 +28,14 @@ import { Idempotent } from 'src/common/decorators';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+@ApiTags('Inventory')
 @Controller('inventory')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class InventoryController {
@@ -45,12 +46,29 @@ export class InventoryController {
   */
   @Post('adjust')
   @Idempotent()
-  @ApiOperation({ summary: 'Manually adjust stock quantity for a product' })
+  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiOperation({
+    summary: 'Manually adjust stock quantity for a product',
+    description:
+      'Performs a physical stock recount or inventory override. Input count is automatically converted from current_uom into canonical base units.',
+  })
   @ApiOkResponse({
     description: 'Stock adjustment record created successfully.',
     type: StockMovementResponseDto,
   })
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiNotFoundResponse({
+    description: 'Product specified in request body was not found.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Provided UOM is invalid for this product or invalid body parameters.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authentication JWT token.',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not possess sufficient role privileges.',
+  })
   adjustInventory(
     @CurrentUser() user: { id: number },
     @Body() adjustDto: AdjustInventoryDto,
@@ -63,12 +81,29 @@ export class InventoryController {
   */
   @Post('stock-in')
   @Idempotent()
-  @ApiOperation({ summary: 'Increase stock quantity for a product' })
+  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiOperation({
+    summary: 'Increase stock quantity for a product',
+    description:
+      'Increases inventory stock level for a product. Automatically handles alternate package UoM conversions to base units before updating current_quantity.',
+  })
   @ApiOkResponse({
-    description: 'Stock in record created successfully.',
+    description: 'Stock-in record created successfully.',
     type: StockMovementResponseDto,
   })
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiNotFoundResponse({
+    description: 'Product specified in request body was not found.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Provided UOM is invalid for this product or invalid body parameters.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authentication JWT token.',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not possess sufficient role privileges.',
+  })
   stockIn(
     @CurrentUser() user: { id: number },
     @Body() stockInDto: StockInDto,
@@ -81,16 +116,32 @@ export class InventoryController {
   */
   @Post('stock-out')
   @Idempotent()
-  @ApiOperation({ summary: 'Decrease stock quantity for a product' })
+  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiOperation({
+    summary: 'Decrease stock quantity for a product',
+    description:
+      'Deducts inventory stock level for a product. Verifies available base stock unless allowOverride flag is enabled.',
+  })
   @ApiOkResponse({
-    description: 'Stock out record created successfully.',
+    description: 'Stock-out record created successfully.',
     type: StockMovementResponseDto,
   })
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiNotFoundResponse({
+    description: 'Product specified in request body was not found.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Insufficient stock available or invalid UOM provided.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authentication JWT token.',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not possess sufficient role privileges.',
+  })
   stockOut(
     @CurrentUser() user: { id: number },
     @Body() stockOutDto: StockOutDto,
-  ) {
+  ): Promise<StockMovementResponseDto> {
     return this.inventoryService.stockOut(user.id, stockOutDto);
   }
 
@@ -99,12 +150,25 @@ export class InventoryController {
   */
   @Patch(':id/bin')
   @Idempotent()
-  @ApiOperation({ summary: 'Assign bin location to product' })
+  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiOperation({
+    summary: 'Assign bin location to product',
+    description:
+      'Updates the bin location assignment (aisle and shelf location) for a specific product.',
+  })
   @ApiOkResponse({
     description: 'Product assigned bin updated successfully.',
     type: AssignBinResponseDto,
   })
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOCK_MANAGEMENT)
+  @ApiNotFoundResponse({
+    description: 'Product ID or Bin Location ID was not found.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authentication JWT token.',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not possess sufficient role privileges.',
+  })
   assignBin(
     @CurrentUser() user: { id: number },
     @Param('id', ParseIntPipe) productId: number,
@@ -117,14 +181,23 @@ export class InventoryController {
    Retrieve products whose current quantity falls below ROP
   */
   @Get('rop')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.SECRETARY, Role.STOCK_MANAGEMENT)
   @ApiOperation({
     summary: 'Get all products reaching or falling below Reorder Point (ROP)',
+    description:
+      'Retrieves low stock alert items where current base quantity is less than or equal to reorder_point_ROP.',
   })
   @ApiOkResponse({
     description: 'List of low stock products successfully retrieved.',
     type: LowStockAlertsResponseDto,
   })
-  getProductsBelowROP() {
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authentication JWT token.',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not possess sufficient role privileges.',
+  })
+  getProductsBelowROP(): Promise<LowStockAlertsResponseDto> {
     return this.inventoryService.getProductsBelowROP();
   }
 
@@ -139,38 +212,21 @@ export class InventoryController {
       'Retrieves audit records of inventory movements (IN, OUT, SALE, RETURN, ADJUSTMENT) filtered by product, staff, type, override flag, and date range.',
   })
   @ApiOkResponse({
-    description: 'Successfully fetched stock movement history',
+    description: 'Successfully fetched stock movement history.',
     type: PaginatedStockMovementsResponseDto,
   })
   @ApiBadRequestResponse({
-    description: 'Invalid query parameters or date bounds provided',
+    description: 'Invalid query parameters or date bounds provided.',
   })
   @ApiUnauthorizedResponse({
-    description: 'Missing or invalid authentication JWT token',
+    description: 'Missing or invalid authentication JWT token.',
   })
   @ApiForbiddenResponse({
-    description: 'User does not possess sufficient role privileges',
+    description: 'User does not possess sufficient role privileges.',
   })
   async getStockMovements(
     @Query() queryDto: GetStockMovementsDto,
   ): Promise<PaginatedStockMovementsResponseDto> {
     return this.inventoryService.getStockMovements(queryDto);
-  }
-
-  /*
-  Get inventory with query filters
-  */
-  @Get()
-  @ApiOperation({
-    summary: 'Get all products from inventory based on the query parameters.',
-  })
-  @ApiOkResponse({
-    description: 'Paginated list of inventory items successfully retrieved.',
-    type: PaginatedInventoryResponseDto,
-  })
-  getInventory(
-    @Query() invDto: InventoryDto,
-  ): Promise<PaginatedInventoryResponseDto> {
-    return this.inventoryService.getInventory(invDto);
   }
 }

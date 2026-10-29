@@ -10,9 +10,7 @@ import {
   AssignBinDto,
   AssignBinResponseDto,
   GetStockMovementsDto,
-  InventoryDto,
   LowStockAlertsResponseDto,
-  PaginatedInventoryResponseDto,
   PaginatedStockMovementsResponseDto,
   StockOutDto,
 } from './dto';
@@ -21,9 +19,12 @@ import { MovementType, UnitOfMeasure } from 'src/generated/prisma/enums';
 import { UOMMismatchException } from 'src/common/exceptions';
 import { StockInDto } from './dto/requests/stock-in.dto';
 import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace';
-import { Product } from 'src/generated/prisma/client';
+import { Product, ProductUom } from 'src/generated/prisma/client';
 import { StockMovementResponseDto } from './dto/responses/stock-movement-response.dto';
 import { InsufficientStockException } from 'src/common/exceptions';
+
+// Extended Product type including configured uoms relation
+type ProductWithUoms = Product & { uoms: ProductUom[] };
 
 @Injectable()
 export class InventoryService {
@@ -31,99 +32,21 @@ export class InventoryService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  /*
-    Get inventory with query filters
-  */
-  async getInventory(
-    invDto: InventoryDto,
-  ): Promise<PaginatedInventoryResponseDto> {
-    const {
-      search,
-      categoryId,
-      size,
-      thread,
-      material,
-      page = 1,
-      limit = 20,
-    } = invDto;
-
-    this.logger.debug('Fetching inventory list', { filters: invDto });
-
-    // const where = {
-    //   ...(search && {
-    //     name: {
-    //       contains: search,
-    //       mode: 'insensitive' as const,
-    //     },
-    //   }),
-    //   ...(categoryId && { categoryId }),
-    //   ...(size && { size_dimensions: size }),
-    //   ...(thread && { thread_type: thread }),
-    //   ...(material && { material_grade: material }),
-    // };
-
-    // A. If the user types a general search strin glike "Hex Bolt Grade 8"
-    const searchKeywords = search ? search.trim().split(/\s+/) : [];
-
-    const where: any = {};
-
-    if (searchKeywords.length > 0) {
-      // Every keyword typed must match AT LEAST ONE of the searchable fields
-      where.AND = searchKeywords.map((keyword) => ({
-        OR: [
-          { name: { contains: keyword, mode: 'insensitive' } },
-          { sku: { contains: keyword, mode: 'insensitive' } },
-          { size_dimensions: { contains: keyword, mode: 'insensitive' } },
-          { thread_type: { contains: keyword, mode: 'insensitive' } },
-          { material_grade: { contains: keyword, mode: 'insensitive' } },
-        ],
-      }));
-    }
-
-    // B. Keep explicit filters if they are provided via dropdowns
-    if (categoryId) where.categoryId = categoryId;
-    if (size) {
-      where.size_dimensions = { contains: size, mode: 'insensitive' };
-    }
-    if (thread) {
-      where.thread_type = { contains: thread, mode: 'insensitive' };
-    }
-    if (material) {
-      where.material_grade = { contains: material, mode: 'insensitive' };
-    }
-
-    const skip = (page - 1) * limit;
-
-    const [products, total] = await this.prisma.$transaction([
-      this.prisma.product.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: { bin_location: true },
-      }),
-      this.prisma.product.count({ where }),
-    ]);
-
-    return PaginatedInventoryResponseDto.fromEntities(
-      products,
-      total,
-      page,
-      limit,
-    );
-  }
-
-  /*
-  Helper method: Validates existence and UOM inside a transaction context
-  */
+  /**
+   * Helper method: Validates existence and UOM inside a transaction context.
+   * Includes configured uoms to verify providedUom against product.base_uom or configured product.uoms.
+   */
   private async validateAndGetProduct(
     tx: TransactionClient,
     productId: number,
     providedUom: UnitOfMeasure,
     userId: number,
     operationName: string,
-  ): Promise<Product> {
-    const product = await tx.product.findUnique({ where: { id: productId } });
+  ): Promise<{ product: ProductWithUoms; conversionFactor: Prisma.Decimal }> {
+    const product = await tx.product.findUnique({
+      where: { id: productId },
+      include: { uoms: true },
+    });
 
     // Check if product exists
     if (!product) {
@@ -135,18 +58,30 @@ export class InventoryService {
       throw new NotFoundException('Product not found');
     }
 
-    // Validate UOM
-    if (product.base_uom !== providedUom) {
-      this.logger.warn(`${operationName} failed: UOM mismatch`, {
-        userId,
-        productId: product.id,
-        expectedUom: product.base_uom,
-        providedUom,
-      });
-      throw new UOMMismatchException(product.name, product.base_uom);
+    // Determine conversion factor and validate provided UOM
+    if (product.base_uom === providedUom) {
+      return { product, conversionFactor: new Prisma.Decimal(1) };
     }
 
-    return product;
+    const matchingUom = product.uoms.find((u) => u.uom === providedUom);
+    if (matchingUom) {
+      return {
+        product,
+        conversionFactor: new Prisma.Decimal(matchingUom.conversion_factor),
+      };
+    }
+
+    const validUoms = [product.base_uom, ...product.uoms.map((u) => u.uom)];
+
+    this.logger.warn(`${operationName} failed: UOM mismatch`, {
+      userId,
+      productId: product.id,
+      expectedBaseUom: product.base_uom,
+      providedUom,
+      validUoms,
+    });
+
+    throw new UOMMismatchException(product.name, providedUom, validUoms);
   }
 
   /*
@@ -162,7 +97,7 @@ export class InventoryService {
     });
 
     const movement = await this.prisma.$transaction(async (tx) => {
-      const product = await this.validateAndGetProduct(
+      const { product, conversionFactor } = await this.validateAndGetProduct(
         tx,
         adjustDto.productId,
         adjustDto.current_uom,
@@ -171,8 +106,11 @@ export class InventoryService {
       );
 
       const previousQty = new Prisma.Decimal(product.current_quantity);
-      const newQty = new Prisma.Decimal(adjustDto.new_count);
-      const qtyChanged = newQty.minus(previousQty);
+      // Convert new count into base UOM units
+      const newBaseQty = new Prisma.Decimal(adjustDto.new_count).times(
+        conversionFactor,
+      );
+      const qtyChanged = newBaseQty.minus(previousQty);
 
       const createdMovement = await tx.stockMovement.create({
         data: {
@@ -180,10 +118,10 @@ export class InventoryService {
           staffId: userId,
           date: adjustDto.date ?? new Date(),
           type: MovementType.ADJUSTMENT,
-          current_uom: product.base_uom,
+          current_uom: adjustDto.current_uom,
           quantity_changed: qtyChanged,
           previous_quantity: previousQty,
-          new_quantity: newQty,
+          new_quantity: newBaseQty,
           reason: adjustDto.reason,
         },
       });
@@ -191,7 +129,7 @@ export class InventoryService {
       await tx.product.update({
         where: { id: product.id },
         data: {
-          current_quantity: newQty,
+          current_quantity: newBaseQty,
           needsRecount: false,
         },
       });
@@ -201,7 +139,7 @@ export class InventoryService {
         productId: product.id,
         userId,
         previousQty: previousQty.toString(),
-        newQty: newQty.toString(),
+        newQty: newBaseQty.toString(),
         qtyChanged: qtyChanged.toString(),
       });
 
@@ -238,7 +176,7 @@ export class InventoryService {
     } = params;
 
     // 1. Validate UOM and fetch product
-    const product = await this.validateAndGetProduct(
+    const { product, conversionFactor } = await this.validateAndGetProduct(
       tx,
       productId,
       provided_uom,
@@ -247,8 +185,11 @@ export class InventoryService {
     );
 
     const prevQty = new Prisma.Decimal(product.current_quantity);
-    const addedQty = new Prisma.Decimal(quantityToAdd);
-    const newQty = prevQty.plus(addedQty);
+    // Convert added quantity to base UOM
+    const addedBaseQty = new Prisma.Decimal(quantityToAdd).times(
+      conversionFactor,
+    );
+    const newQty = prevQty.plus(addedBaseQty);
 
     // 2. Update stock level
     await tx.product.update({
@@ -256,15 +197,15 @@ export class InventoryService {
       data: { current_quantity: newQty },
     });
 
-    // 3. Log Movement
+    // 3. Log Movement with provided UOM and canonical base quantity change
     const movement = await tx.stockMovement.create({
       data: {
         productId: product.id,
         staffId: userId,
         date: date ?? new Date(),
         type: MovementType.IN,
-        current_uom: product.pricing_uom ?? UnitOfMeasure.PCS,
-        quantity_changed: addedQty,
+        current_uom: provided_uom,
+        quantity_changed: addedBaseQty,
         previous_quantity: prevQty,
         new_quantity: newQty,
         reason,
@@ -274,7 +215,7 @@ export class InventoryService {
     this.logger.log(`Stock restocked successfully`, {
       movementId: movement.id,
       productId: product.id,
-      addedQty: addedQty.toString(),
+      addedBaseQty: addedBaseQty.toString(),
       newQty: newQty.toString(),
       operation: operation_name,
     });
@@ -284,7 +225,7 @@ export class InventoryService {
 
   /*
   Stock-In
-*/
+  */
   async stockIn(
     userId: number,
     stockInDto: StockInDto,
@@ -310,7 +251,7 @@ export class InventoryService {
   }
 
   /*
-  Helper function that reduces the stock
+  Helper function that reduces product stock
   */
   async reduceProductStock(
     tx: Prisma.TransactionClient,
@@ -334,7 +275,7 @@ export class InventoryService {
       operation_name,
     } = params;
 
-    const product = await this.validateAndGetProduct(
+    const { product, conversionFactor } = await this.validateAndGetProduct(
       tx,
       productId,
       provided_uom,
@@ -343,8 +284,11 @@ export class InventoryService {
     );
 
     const prevQty = new Prisma.Decimal(product.current_quantity);
-    const takenQty = new Prisma.Decimal(quantityToDeduct);
-    const newQty = prevQty.minus(takenQty);
+    // Convert deducted quantity to canonical base UOM
+    const baseQtyDeducted = new Prisma.Decimal(quantityToDeduct).times(
+      conversionFactor,
+    );
+    const newQty = prevQty.minus(baseQtyDeducted);
 
     if (newQty.isNegative()) {
       if (!allowOverride) {
@@ -356,15 +300,15 @@ export class InventoryService {
         this.logger.warn(`Checkout failed: Insufficient stock`, {
           productId: product.id,
           productName: product.name,
-          requested: takenQty.toNumber(),
-          available: prevQty.toNumber(),
+          requestedBase: baseQtyDeducted.toNumber(),
+          availableBase: prevQty.toNumber(),
         });
 
         // Throw exception for insufficient stock
         throw new InsufficientStockException(
           product.id,
           product.name,
-          takenQty.toNumber(),
+          baseQtyDeducted.toNumber(),
           prevQty.toNumber(),
         );
       }
@@ -394,8 +338,8 @@ export class InventoryService {
         staffId: userId,
         date: new Date(),
         type: MovementType.OUT,
-        current_uom: product.pricing_uom ?? UnitOfMeasure.PCS,
-        quantity_changed: takenQty.times(-1),
+        current_uom: provided_uom,
+        quantity_changed: baseQtyDeducted.times(-1),
         previous_quantity: prevQty,
         new_quantity: newQty,
         reason:
@@ -496,7 +440,7 @@ export class InventoryService {
   }
 
   /*
-  Retrieve products whose current quanitity falls below ROP
+  Retrieve products whose current quantity falls below ROP
   */
   async getProductsBelowROP() {
     this.logger.debug('Fetching products below reorder point');

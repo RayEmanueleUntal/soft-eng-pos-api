@@ -74,7 +74,7 @@ export class ProductsService {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: { bin_location: true },
+        include: { bin_location: true, category: true, uoms: true },
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -85,6 +85,33 @@ export class ProductsService {
       page,
       limit,
     );
+  }
+
+  /**
+   * Get single Product by ID with all relations
+   */
+  async getProductById(productId: number): Promise<ProductResponseDto> {
+    this.logger.debug(`Fetching details for Product #${productId}`);
+
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        category: true,
+        bin_location: true,
+        uoms: true,
+      },
+    });
+
+    if (!product) {
+      this.logger.warn(
+        `Product fetch failed: Product #${productId} not found.`,
+      );
+      throw new NotFoundException(
+        `Product with ID #${productId} does not exist.`,
+      );
+    }
+
+    return ProductResponseDto.fromEntity(product);
   }
 
   // Helper function for generating SKU

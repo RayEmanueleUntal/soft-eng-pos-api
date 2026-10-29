@@ -1,14 +1,16 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
+import { UnitOfMeasure } from 'src/generated/prisma/enums';
 
-export class UOMMismatchException extends HttpException {
-  constructor(productName: string, productUom: string) {
+export class UOMMismatchException extends BadRequestException {
+  constructor(
+    productName: string,
+    providedUom: UnitOfMeasure,
+    validUoms: UnitOfMeasure[],
+  ) {
     super(
-      {
-        statusCode: HttpStatus.CONFLICT,
-        error: 'Conflict',
-        message: `Unit of Measure Mismatch. '${productName}' must be counted by '${productUom}'`,
-      },
-      HttpStatus.CONFLICT,
+      `Invalid UOM '${providedUom}' for product '${productName}'. Valid UOMs are: ${validUoms.join(
+        ', ',
+      )}.`,
     );
   }
 }
