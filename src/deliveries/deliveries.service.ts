@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { InventoryService } from 'src/inventory/inventory.service';
 import {
   CreateDeliveryDto,
   DeliveryResponseDto,
@@ -11,18 +12,25 @@ import {
   POItemNotFoundException,
   PurchaseOrderNotFoundException,
   ProductsNotFoundException,
+  InvalidDeliveryQuantityException,
 } from 'src/common/exceptions';
-import { MovementType, POStatus } from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
+import { POStatus } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class DeliveriesService {
   private readonly logger = new Logger(DeliveriesService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly inventoryService: InventoryService,
+  ) {}
 
   /**
    * Verifies and logs physical delivery receiving against a Purchase Order.
-   * Performs inventory stock-in, logs StockMovement records, and updates PO status atomically.
+   * Calculates Weighted Average Costing (WAC) per item, updates Product cost_price,
+   * invokes InventoryService.restockProductStock() for inventory & movement auditing,
+   * and updates PO status atomically.
    */
   async processDelivery(
     staffId: number,
@@ -64,42 +72,96 @@ export class DeliveriesService {
       throw new InvalidPOStatusException(po.id, po.po_status);
     }
 
-    // Map existing received quantities per product across previous deliveries
-    const totalReceivedMap = new Map<number, number>();
+    // Map existing received base quantities per product across previous deliveries
+    const totalReceivedBaseQtyMap = new Map<number, number>();
     for (const pastDelivery of po.deliveries) {
       for (const item of pastDelivery.deliveryItems) {
-        const current = totalReceivedMap.get(item.productId) || 0;
-        totalReceivedMap.set(
+        const current = totalReceivedBaseQtyMap.get(item.productId) || 0;
+        totalReceivedBaseQtyMap.set(
           item.productId,
-          current + Number(item.received_quantity),
+          current + Number(item.actual_base_quantity),
         );
       }
     }
 
-    // Validate submitted items against PO items
-    const poItemsMap = new Map<number, number>();
+    // Index PO Items by productId for fast lookup and cost calculation
+    const poItemsMap = new Map<number, (typeof po.poItems)[0]>();
     po.poItems.forEach((item) => {
-      poItemsMap.set(item.productId, Number(item.requested_quantity));
+      poItemsMap.set(item.productId, item);
     });
 
-    // Consolidate payload duplicate product entries
-    const newItemsMap = new Map<number, number>();
+    // Validate submitted items against PO items & consolidate input details
+    type ProcessedDeliveryInput = {
+      productId: number;
+      receivedQuantity: number;
+      receivedUom: any;
+      conversionFactor: number;
+      actualBaseQuantity: number;
+      poItem: (typeof po.poItems)[0];
+    };
+
+    const processedItems: ProcessedDeliveryInput[] = [];
+
     for (const item of dto.items) {
-      if (!poItemsMap.has(item.productId)) {
+      const poItem = poItemsMap.get(item.productId);
+      if (!poItem) {
         this.logger.warn(
           `Delivery item error: Product #${item.productId} not in PO #${po.id}`,
         );
         throw new POItemNotFoundException(po.id, item.productId);
       }
-      const existing = newItemsMap.get(item.productId) || 0;
-      newItemsMap.set(item.productId, existing + item.received_quantity);
+
+      const receivedQty = Number(item.received_quantity);
+      if (receivedQty <= 0) {
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          'Received quantity must be greater than zero.',
+        );
+      }
+
+      const conversionFactor = item.uom_conversion_factor
+        ? Number(item.uom_conversion_factor)
+        : Number(poItem.uom_conversion_factor);
+
+      if (conversionFactor <= 0) {
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          'Conversion factor must be greater than zero.',
+        );
+      }
+
+      // Calculate or use explicitly provided actual base quantity override
+      const actualBaseQuantity = item.actual_base_quantity
+        ? Number(item.actual_base_quantity)
+        : receivedQty * conversionFactor;
+
+      if (actualBaseQuantity <= 0) {
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          'Actual base quantity must be greater than zero.',
+        );
+      }
+
+      processedItems.push({
+        productId: item.productId,
+        receivedQuantity: receivedQty,
+        receivedUom: item.received_uom || poItem.ordered_uom,
+        conversionFactor,
+        actualBaseQuantity,
+        poItem,
+      });
     }
 
     // 2. Batch verify existence of all submitted products in the database
-    const submittedProductIds = Array.from(newItemsMap.keys());
+    const submittedProductIds = processedItems.map((i) => i.productId);
     const existingProducts = await this.prisma.product.findMany({
       where: { id: { in: submittedProductIds } },
-      select: { id: true, current_quantity: true, base_uom: true },
+      select: {
+        id: true,
+        current_quantity: true,
+        cost_price: true,
+        base_uom: true,
+      },
     });
 
     if (existingProducts.length !== submittedProductIds.length) {
@@ -118,18 +180,19 @@ export class DeliveriesService {
 
     // 3. Execute Transaction
     const result = await this.prisma.$transaction(async (tx) => {
-      // Create Delivery record
+      // Create Delivery record and DeliveryItems with snapshot metrics
       const delivery = await tx.delivery.create({
         data: {
           poId: po.id,
           staffId,
           deliveryItems: {
-            create: Array.from(newItemsMap.entries()).map(
-              ([productId, received_quantity]) => ({
-                productId,
-                received_quantity,
-              }),
-            ),
+            create: processedItems.map((item) => ({
+              productId: item.productId,
+              received_quantity: item.receivedQuantity,
+              received_uom: item.receivedUom,
+              uom_conversion_factor: item.conversionFactor,
+              actual_base_quantity: item.actualBaseQuantity,
+            })),
           },
         },
         include: {
@@ -142,42 +205,77 @@ export class DeliveriesService {
         },
       });
 
-      // Stock-in each received product and generate StockMovement
-      for (const [productId, qtyReceived] of newItemsMap.entries()) {
-        const product = productMap.get(productId)!;
+      // Recalculate WAC, update product cost_price, and restock inventory via InventoryService
+      for (const item of processedItems) {
+        const product = productMap.get(item.productId)!;
 
-        const prevQty = Number(product.current_quantity);
-        const newQty = prevQty + qtyReceived;
+        const currentQty = Number(product.current_quantity);
+        const currentCost = Number(product.cost_price);
+        const receivedBaseQty = item.actualBaseQuantity;
 
-        // Update product inventory
+        // Calculate unit cost per base UOM from PO Item pricing
+        const poUnitCost = Number(item.poItem.unit_cost);
+        const poConversionFactor = Number(item.poItem.uom_conversion_factor);
+        const intakeBaseCost =
+          poConversionFactor > 0 ? poUnitCost / poConversionFactor : poUnitCost;
+
+        // Weighted Average Costing (WAC) formula:
+        // New Cost = ((Current Qty * Current Cost) + (Received Base Qty * Intake Base Cost)) / (Current Qty + Received Base Qty)
+        const totalNewQty = currentQty + receivedBaseQty;
+        let newWeightedCost = intakeBaseCost;
+
+        if (currentQty > 0 && totalNewQty > 0) {
+          newWeightedCost =
+            (currentQty * currentCost + receivedBaseQty * intakeBaseCost) /
+            totalNewQty;
+        }
+
+        const roundedNewCost = new Prisma.Decimal(
+          Math.max(0, newWeightedCost).toFixed(2),
+        );
+
+        // Step A: Update Product cost_price before restocking stock
         await tx.product.update({
-          where: { id: productId },
-          data: { current_quantity: newQty },
+          where: { id: item.productId },
+          data: { cost_price: roundedNewCost },
         });
 
-        // Create audit StockMovement record
-        await tx.stockMovement.create({
-          data: {
-            productId,
-            staffId,
-            type: MovementType.IN,
-            current_uom: product.base_uom,
-            quantity_changed: qtyReceived,
-            previous_quantity: prevQty,
-            new_quantity: newQty,
-            reason: `PO #${po.id} Delivery Receiving (Delivery #${delivery.id})`,
-          },
+        this.logger.log(
+          `Updated Product #${product.id} WAC: ${currentCost} -> ${roundedNewCost.toString()} (Intake Base Cost: ${intakeBaseCost})`,
+        );
+
+        // Step B: Delegate stock restock and movement recording to InventoryService
+        await this.inventoryService.restockProductStock(tx, {
+          productId: item.productId,
+          quantityToAdd: item.actualBaseQuantity,
+          provided_uom: product.base_uom, // Passing computed canonical base quantity directly
+          userId: staffId,
+          reason: `PO #${po.id} Delivery Receiving (Delivery #${delivery.id})`,
+          operation_name: 'DELIVERY_RECEIVING',
         });
       }
 
-      // Check if PO is fully fulfilled or partially fulfilled
+      // Track multi-item intake in case duplicate entries exist in delivery payload
+      const newlyAddedBaseQtyMap = new Map<number, number>();
+      for (const item of processedItems) {
+        const current = newlyAddedBaseQtyMap.get(item.productId) || 0;
+        newlyAddedBaseQtyMap.set(
+          item.productId,
+          current + item.actualBaseQuantity,
+        );
+      }
+
+      // Determine PO status based on expected base quantities
       let isFullyFulfilled = true;
       for (const poItem of po.poItems) {
-        const pastQty = totalReceivedMap.get(poItem.productId) || 0;
-        const newlyAdded = newItemsMap.get(poItem.productId) || 0;
-        const totalReceived = pastQty + newlyAdded;
+        const pastBaseQty = totalReceivedBaseQtyMap.get(poItem.productId) || 0;
+        const newlyAddedBaseQty =
+          newlyAddedBaseQtyMap.get(poItem.productId) || 0;
+        const totalBaseReceived = pastBaseQty + newlyAddedBaseQty;
 
-        if (totalReceived < Number(poItem.requested_quantity)) {
+        const expectedBaseQty = Number(poItem.expected_base_quantity);
+
+        if (totalBaseReceived < expectedBaseQty) {
           isFullyFulfilled = false;
           break;
         }
@@ -205,8 +303,8 @@ export class DeliveriesService {
     );
 
     const message = result.isPartial
-      ? 'Quantities received do not match PO. PO marked as Partially Fulfilled.'
-      : 'Success: Delivery verified and inventory stock levels updated.';
+      ? 'Quantities received do not match PO expected base quantities. PO marked as Partially Fulfilled.'
+      : 'Success: Delivery verified, WAC calculated, and inventory stock levels updated.';
 
     return {
       delivery: DeliveryResponseDto.fromEntity(result.delivery),

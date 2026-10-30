@@ -17,6 +17,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -40,7 +41,7 @@ export class DeliveriesController {
 
   /**
    * HTTP POST Endpoint for receiving and verifying a physical delivery against a Purchase Order.
-   * Performs stock-in, updates inventory, logs StockMovement audit records, and transitions PO status.
+   * Performs stock-in, updates inventory, logs StockMovement audit records, calculates WAC, and transitions PO status.
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -49,15 +50,15 @@ export class DeliveriesController {
   @ApiOperation({
     summary: 'Process physical delivery receiving against a Purchase Order',
     description:
-      'Receives stock items from a supplier delivery, verifies quantities against requested PO line items, atomically updates inventory stock levels, logs stock-in StockMovement records, and updates PO status (PARTIALLY_FULFILLED or FULFILLED).',
+      'Receives stock items from a supplier delivery (supports multi-UOM overrides), computes Weighted Average Costing (WAC), verifies quantities against requested PO line items, atomically updates inventory stock levels, logs stock-in StockMovement records, and updates PO status (PARTIALLY_FULFILLED or FULFILLED).',
   })
   @ApiCreatedResponse({
     description:
-      'Delivery recorded and inventory stock levels updated successfully.',
+      'Delivery recorded, WAC calculated, and inventory stock levels updated successfully.',
     schema: {
       example: {
         message:
-          'Success: Delivery verified and inventory stock levels updated.',
+          'Success: Delivery verified, WAC calculated, and inventory stock levels updated.',
         isPartial: false,
         delivery: {
           id: 1,
@@ -72,6 +73,9 @@ export class DeliveriesController {
               productName: 'Hex Bolt M8-1.25 x 30mm',
               productSku: 'BLT-M8-30-SS',
               received_quantity: 50,
+              received_uom: 'PCS',
+              uom_conversion_factor: 1.0,
+              actual_base_quantity: 50,
             },
           ],
         },
@@ -80,9 +84,19 @@ export class DeliveriesController {
   })
   @ApiBadRequestResponse({
     description:
-      'Validation failed or business rule violation (e.g., PO not in active status, submitted product not in PO, or missing products).',
+      'Validation failed or business rule violation (e.g., PO not in active status, submitted product not in PO, missing products, or invalid quantity/conversion factor).',
     schema: {
       examples: {
+        InvalidDeliveryQuantity: {
+          summary: 'Non-positive quantity or conversion factor',
+          value: {
+            statusCode: 400,
+            error: 'Bad Request',
+            message:
+              'Invalid delivery quantity for Product #101: Received quantity must be greater than zero.',
+            productId: 101,
+          },
+        },
         InvalidPOStatus: {
           summary: 'PO not in PENDING/PARTIALLY_FULFILLED state',
           value: {
@@ -172,6 +186,12 @@ export class DeliveriesController {
     summary: 'Get delivery details by ID',
     description:
       'Retrieves single physical delivery record including staff actor details and received items.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Unique Delivery Record ID',
+    example: 1,
   })
   @ApiOkResponse({
     description: 'Delivery record details retrieved successfully.',
