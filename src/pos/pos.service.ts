@@ -1,3 +1,4 @@
+// src/pos/pos.service.ts
 import {
   BadRequestException,
   ForbiddenException,
@@ -14,13 +15,17 @@ import {
   GCashDetailsDto,
 } from './dto';
 import {
+  CreditStatus,
   CustomerType,
   PaymentMethod,
   TransactionType,
   UnitOfMeasure,
 } from 'src/generated/prisma/enums';
-import { InsufficientCreditException } from 'src/common/exceptions';
-import { TransactionTypeMismatchException } from 'src/common/exceptions';
+import {
+  InsufficientCreditException,
+  OverdueCreditException,
+  TransactionTypeMismatchException,
+} from 'src/common/exceptions';
 import { Prisma } from 'src/generated/prisma/client';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { TransactionsService } from 'src/transactions/transactions.service';
@@ -29,6 +34,7 @@ import { CustomersService } from 'src/customers/customers.service';
 @Injectable()
 export class PosService {
   private readonly logger = new Logger(PosService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
@@ -36,9 +42,10 @@ export class PosService {
     private readonly customersService: CustomersService,
   ) {}
 
-  /*
-  Checkout items
-  */
+  /**
+   * Process POS Sales Checkout
+   * Handles stock deduction, WAC cost snapshotting, UOM conversions, and wholesale credit rules.
+   */
   async checkout(
     userId: number,
     checkoutDto: CheckoutDto,
@@ -49,7 +56,9 @@ export class PosService {
     this.logger.log('Checking Out', { checkout: checkoutDto });
 
     return await this.prisma.$transaction(async (tx) => {
-      // 1. Fetch Customer & Wholesale account
+      // ------------------------------------------------------------------------
+      // 1. Fetch Customer & Wholesale Profile
+      // ------------------------------------------------------------------------
       const customer = customerId
         ? await tx.customer.findUnique({
             where: { id: customerId },
@@ -57,13 +66,13 @@ export class PosService {
           })
         : null;
 
-      // 2. Validate Wholesale / Retail item constraints
+      // ------------------------------------------------------------------------
+      // 2. Validate Wholesale / Retail Item & Customer Constraints
+      // ------------------------------------------------------------------------
       const hasWholesaleItems = items.some(
         (item) => item.transaction_type === TransactionType.WHOLESALE,
       );
 
-      // If transaction type is wholesale, but there is not a single wholesale item,
-      // or if there is a wholesale item in a retail transaction, raise exception
       if (transaction_type === TransactionType.RETAIL && hasWholesaleItems) {
         this.logger.warn(
           `Checkout failed. Cannot process a Retail transaction containing wholesale items.`,
@@ -85,7 +94,6 @@ export class PosService {
         );
       }
 
-      // Ensure that only a wholesale customer can perform wholesale transactions
       if (
         transaction_type === TransactionType.WHOLESALE &&
         (!customerId || customer?.type !== CustomerType.WHOLESALE)
@@ -98,8 +106,9 @@ export class PosService {
         );
       }
 
-      // 3. Credit Payment Validation
-      // Only wholesale customers can use credit
+      // ------------------------------------------------------------------------
+      // 3. Wholesale Credit Line & Overdue Checks
+      // ------------------------------------------------------------------------
       const creditPaymentDto = payments.find(
         (payment) => payment.payment_method === PaymentMethod.CREDIT,
       );
@@ -116,35 +125,90 @@ export class PosService {
         );
       }
 
-      // If the wholesale customer uses their credits, ensure that they have enough balance
-      if (creditPaymentDto) {
-        const creditLimit = customer!.wholesale!.credit_limit.toNumber();
+      if (creditPaymentDto && customer?.wholesale) {
+        const creditLimit = customer.wholesale.credit_limit.toNumber();
         const currentBalance =
-          customer!.wholesale!.outstanding_balance?.toNumber() ?? 0;
-        const availableCredit = creditLimit - currentBalance;
+          customer.wholesale.outstanding_balance?.toNumber() ?? 0;
+        const requestedCredit = Number(creditPaymentDto.amount_paid);
 
-        if (creditPaymentDto.amount_paid > availableCredit) {
+        // A. Credit Limit Enforcement: (balance + new_credit <= limit)
+        if (currentBalance + requestedCredit > creditLimit) {
+          const availableCredit = creditLimit - currentBalance;
+          this.logger.warn(
+            `Checkout failed: Credit limit exceeded for Customer #${customerId}. Limit: ${creditLimit}, Current Balance: ${currentBalance}, Requested: ${requestedCredit}`,
+          );
           throw new InsufficientCreditException(
             customerId!,
-            creditPaymentDto.amount_paid,
+            requestedCredit,
             availableCredit,
+          );
+        }
+
+        // B. Check for Overdue Credit Payments
+        const now = new Date();
+        const overdueRecords = await tx.creditPayment.findMany({
+          where: {
+            payment: {
+              transaction: {
+                customerId: customerId!,
+              },
+            },
+            OR: [
+              { status: CreditStatus.OVERDUE },
+              {
+                status: {
+                  in: [CreditStatus.UNPAID, CreditStatus.PARTIALLY_PAID],
+                },
+                due_date: { lt: now },
+              },
+            ],
+          },
+          select: {
+            remaining_credit_balance: true,
+          },
+        });
+
+        if (overdueRecords.length > 0) {
+          const totalOverdueAmount = overdueRecords.reduce(
+            (sum, item) => sum + Number(item.remaining_credit_balance),
+            0,
+          );
+
+          // Allow proceed ONLY IF the cashier explicitly supplied override flag
+          if (!checkoutDto.override) {
+            this.logger.warn(
+              `Checkout blocked: Customer #${customerId} has ${overdueRecords.length} overdue invoice(s) totalling ₱${totalOverdueAmount.toFixed(2)}. Override not set.`,
+            );
+            throw new OverdueCreditException(
+              customerId!,
+              overdueRecords.length,
+              totalOverdueAmount,
+            );
+          }
+
+          this.logger.warn(
+            `CREDIT OVERRIDE APPLIED: Customer #${customerId} allowed credit checkout despite ${overdueRecords.length} overdue invoice(s). Authorized by User #${userId}`,
           );
         }
       }
 
-      // 4. Fetch Products and Calculate Line Totals
-      // Fetch products from the database to get their actual base prices and types
+      // ------------------------------------------------------------------------
+      // 4. Fetch Products & Configured Product UOMs for Conversion Factors
+      // ------------------------------------------------------------------------
       const productIds = items.map((item) => item.productId);
       const products = await tx.product.findMany({
         where: { id: { in: productIds } },
+        include: { uoms: true },
       });
 
-      // Create a lookup map
       const productMap = new Map(products.map((p) => [p.id, p]));
 
       let subtotal = new Prisma.Decimal(0);
       let discountTotal = new Prisma.Decimal(0);
 
+      // ------------------------------------------------------------------------
+      // 5. Calculate Line Totals, UOM Conversions & Snapshot WAC Cost Price
+      // ------------------------------------------------------------------------
       const transactionItemsData = items.map((itemDto) => {
         const product = productMap.get(itemDto.productId);
         if (!product) {
@@ -153,60 +217,77 @@ export class PosService {
           );
         }
 
-        // Determine unit price based on whether the item is retail or wholesale
+        const requestedUom = itemDto.current_uom ?? product.base_uom;
+
+        // Resolve conversion factor: 1.000 if Base UOM, else lookup from ProductUom table
+        let conversionFactor = new Prisma.Decimal(1.0);
+        if (requestedUom !== product.base_uom) {
+          const configuredUom = product.uoms.find(
+            (u) => u.uom === requestedUom,
+          );
+          if (configuredUom) {
+            conversionFactor = new Prisma.Decimal(
+              configuredUom.conversion_factor,
+            );
+          }
+        }
+
+        // Calculate converted base quantity deducted: quantity_sold * conversion_factor
+        const quantitySold = new Prisma.Decimal(itemDto.quantity_sold);
+        const baseQuantityDeducted = quantitySold.times(conversionFactor);
+
+        // Determine selling unit price based on retail vs wholesale item selection
         const unitPrice = new Prisma.Decimal(
           itemDto.transaction_type === TransactionType.WHOLESALE
-            ? Number(product?.wholesale_price)
-            : Number(product?.retail_price),
+            ? Number(product.wholesale_price ?? product.retail_price)
+            : Number(product.retail_price),
         );
 
-        const quantity = new Prisma.Decimal(itemDto.quantity_sold);
-        const discount = new Prisma.Decimal(itemDto.line_discount ?? 0);
+        // Snapshot Weighted Average Cost (WAC) per Base UOM from Product model
+        const costPriceSnapshot = new Prisma.Decimal(product.cost_price);
 
-        // Calculate line item subtotal: (quantity x unit_price) - discount
-        const lineSubtotal = quantity.times(unitPrice);
+        const discount = new Prisma.Decimal(itemDto.line_discount ?? 0);
+        const lineSubtotal = quantitySold.times(unitPrice);
+
         subtotal = subtotal.plus(lineSubtotal);
         discountTotal = discountTotal.plus(discount);
 
         return {
           productId: itemDto.productId,
-          quantity_sold: quantity,
-          unit_of_measure: product?.pricing_uom ?? UnitOfMeasure.PCS, // fallback unit
+          quantity_sold: quantitySold,
+          unit_of_measure: requestedUom,
+          uom_conversion_factor: conversionFactor,
+          base_quantity_deducted: baseQuantityDeducted,
           unit_price: unitPrice,
+          cost_price: costPriceSnapshot, // Snapshot WAC at moment of sale
           discount: discount,
-          subtotal: lineSubtotal.minus(discount), // Net line item total
+          subtotal: lineSubtotal.minus(discount),
         };
       });
 
-      // TODO: NEED CONFIRMATION. MIGHT ADD TAX LOGIC.
-      // Philippine BIR context: Determine if retail prices are VAT-inclusive (default)
-      // and wholesale prices are VAT-exclusive, or if the business is non-VAT.
-
-      // 5. Calculate Final Transaction Totals
-      const taxTotal = new Prisma.Decimal(0); // tax placeholder
-
-      // Calculate grand total
+      // ------------------------------------------------------------------------
+      // 6. Calculate Final Transaction Totals & Payment Validation
+      // ------------------------------------------------------------------------
+      const taxTotal = new Prisma.Decimal(0); // Tax placeholder
       const grandTotal = subtotal.minus(discountTotal).plus(taxTotal);
 
-      // Calculate total paid
       const totalPaid = payments.reduce(
         (acc, p) => acc.plus(new Prisma.Decimal(p.amount_paid)),
         new Prisma.Decimal(0),
       );
 
-      // Total validation check
       if (totalPaid.lessThan(grandTotal)) {
         throw new BadRequestException(
           `Insufficient payment. Total: ${grandTotal.toFixed(2)}, Paid: ${totalPaid.toFixed(2)}`,
         );
       }
 
-      // 6. Generate Serial Invoice Number
+      // ------------------------------------------------------------------------
+      // 7. Generate Invoice Number & Deduct Inventory Stock
+      // ------------------------------------------------------------------------
       const invoice_number =
         await this.transactionsService.getNextInvoiceNumber(tx);
 
-      // 7. Deduct Inventory Stock
-      // Verify and adjust products stock in real-time
       for (const item of items) {
         await this.inventoryService.reduceProductStock(tx, {
           productId: item.productId,
@@ -219,7 +300,9 @@ export class PosService {
         });
       }
 
-      // 8. Construct Nested Polymorphic Payment Mutations
+      // ------------------------------------------------------------------------
+      // 8. Construct Polymorphic Payment Mutations
+      // ------------------------------------------------------------------------
       const paymentsCreateData = payments.map((p) => {
         const basePaymentData: Prisma.PaymentCreateWithoutTransactionInput = {
           amount_paid: p.amount_paid,
@@ -257,7 +340,9 @@ export class PosService {
         return basePaymentData;
       });
 
+      // ------------------------------------------------------------------------
       // 9. Update Wholesale Account Outstanding Balance
+      // ------------------------------------------------------------------------
       if (creditPaymentDto && customer?.wholesale) {
         await this.customersService.adjustWholesaleBalance(
           tx,
@@ -266,38 +351,9 @@ export class PosService {
         );
       }
 
-      // 10. Persist Transaction, Items, and Payments
-      // POS prepares the data, TransactionService writes it.
-
-      // const newTransaction = await tx.transaction.create({
-      //   data: {
-      //     invoice_number,
-      //     transaction_type,
-      //     customerId: customerId ?? null,
-      //     staffId: userId,
-      //     subtotal: subtotal,
-      //     tax_total: taxTotal,
-      //     discount_total: discountTotal,
-      //     grand_total: grandTotal,
-      //     transactionItems: {
-      //       create: transactionItemsData,
-      //     },
-      //     payments: {
-      //       create: paymentsCreateData,
-      //     },
-      //   },
-      //   include: {
-      //     transactionItems: true,
-      //     payments: {
-      //       include: {
-      //         cashPayment: true,
-      //         gCashPayment: true,
-      //         creditPayment: true,
-      //       },
-      //     },
-      //   },
-      // });
-
+      // ------------------------------------------------------------------------
+      // 10. Persist Transaction
+      // ------------------------------------------------------------------------
       const newTransaction = await this.transactionsService.createTransaction(
         tx,
         {

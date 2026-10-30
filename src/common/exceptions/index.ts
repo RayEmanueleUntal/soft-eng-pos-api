@@ -8,6 +8,7 @@ export * from './transaction-type-mismatch.exception';
 export * from './uom-change-required.exception';
 export * from './uom-mismatch.exception';
 export * from './invalid-uom-conversion.exception';
+export * from './overdue-credit.exception';
 
 export * from './procurement';
 export * from './deliveries';
