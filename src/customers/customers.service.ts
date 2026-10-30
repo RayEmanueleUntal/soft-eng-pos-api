@@ -9,14 +9,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateCustomerDto,
   CreateCustomerPaymentDto,
+  CustomerOverdueStatusResponseDto,
   CustomerPaymentResponseDto,
   GetCustomerDto,
+  GetCustomerPaymentsDto,
+  PaginatedCustomerPaymentsResponseDto,
   UpdateCustomerDto,
 } from './dto';
 import { CustomerType, PaymentMethod } from 'src/generated/prisma/client';
 import { CustomerResponseDto } from './dto/response/customer-response.dto';
 import { Prisma } from 'src/generated/prisma/client';
-import { AssignedRole as Role } from 'src/generated/prisma/enums';
+import { CreditStatus, AssignedRole as Role } from 'src/generated/prisma/enums';
 import { PaginatedCustomerResponseDto } from './dto/response/paginated-customer-response.dto';
 import {
   DuplicateCustomerException,
@@ -208,6 +211,31 @@ export class CustomersService {
       limit,
       totalPages: Math.ceil(total / limit) || 1,
     };
+  }
+
+  /**
+   * Retrieve a single Customer profile by ID including optional wholesale profile
+   *
+   * @param customerId Primary key ID of the customer
+   */
+  async getCustomerById(customerId: number): Promise<CustomerResponseDto> {
+    this.logger.log(`Fetching Customer details for ID #${customerId}`);
+
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId },
+      include: {
+        wholesale: true,
+      },
+    });
+
+    if (!customer) {
+      this.logger.warn(
+        `Customer retrieval failed: Customer #${customerId} not found`,
+      );
+      throw new NotFoundException(`Customer with ID #${customerId} not found.`);
+    }
+
+    return CustomerResponseDto.fromEntity(customer);
   }
 
   /**
@@ -457,5 +485,98 @@ export class CustomersService {
 
       return CustomerPaymentResponseDto.fromEntity(customerPayment);
     });
+  }
+
+  /**
+   * Retrieves paginated credit settlement payment ledger for a specific wholesale customer.
+   */
+  async getWholesaleCustomerPayments(
+    customerId: number,
+    queryDto: GetCustomerPaymentsDto,
+  ): Promise<PaginatedCustomerPaymentsResponseDto> {
+    const { page = 1, limit = 10 } = queryDto;
+
+    // Verify wholesale account exists
+    const wholesaleExists = await this.prisma.wholeSaleCustomer.findUnique({
+      where: { customerId },
+    });
+
+    if (!wholesaleExists) {
+      throw new WholesaleProfileNotFoundException(customerId);
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [total, payments] = await this.prisma.$transaction([
+      this.prisma.customerPayment.count({
+        where: { wholesaleCustId: customerId },
+      }),
+      this.prisma.customerPayment.findMany({
+        where: { wholesaleCustId: customerId },
+        skip,
+        take: limit,
+        orderBy: { payment_date: 'desc' },
+      }),
+    ]);
+
+    return {
+      data: payments.map(CustomerPaymentResponseDto.fromEntity),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
+
+  /**
+   * Evaluates if a wholesale customer has overdue credit payments.
+   * Can be consumed by POS Service or called directly via API.
+   */
+  async checkCustomerOverdueStatus(
+    customerId: number,
+  ): Promise<CustomerOverdueStatusResponseDto> {
+    const wholesaleAccount = await this.prisma.wholeSaleCustomer.findUnique({
+      where: { customerId },
+    });
+
+    if (!wholesaleAccount) {
+      throw new WholesaleProfileNotFoundException(customerId);
+    }
+
+    const now = new Date();
+
+    // Query credit payments associated with customer transactions that are overdue or past due date
+    const overdueRecords = await this.prisma.creditPayment.findMany({
+      where: {
+        payment: {
+          transaction: {
+            customerId: customerId,
+          },
+        },
+        OR: [
+          { status: CreditStatus.OVERDUE },
+          {
+            status: { in: [CreditStatus.UNPAID, CreditStatus.PARTIALLY_PAID] },
+            due_date: { lt: now },
+          },
+        ],
+      },
+      select: {
+        remaining_credit_balance: true,
+      },
+    });
+
+    const overdueCount = overdueRecords.length;
+    const totalOverdueAmount = overdueRecords.reduce(
+      (sum, item) => sum + Number(item.remaining_credit_balance),
+      0,
+    );
+
+    return {
+      customerId,
+      hasOverdue: overdueCount > 0,
+      overdueCount,
+      totalOverdueAmount,
+    };
   }
 }

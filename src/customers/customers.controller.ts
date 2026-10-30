@@ -21,6 +21,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CustomerResponseDto } from './dto/response/customer-response.dto';
@@ -28,8 +29,11 @@ import { CurrentUser, Roles } from 'src/auth/decorators';
 import {
   CreateCustomerDto,
   CreateCustomerPaymentDto,
+  CustomerOverdueStatusResponseDto,
   CustomerPaymentResponseDto,
   GetCustomerDto,
+  GetCustomerPaymentsDto,
+  PaginatedCustomerPaymentsResponseDto,
   UpdateCustomerDto,
 } from './dto';
 import { PaginatedCustomerResponseDto } from './dto/response/paginated-customer-response.dto';
@@ -92,6 +96,92 @@ export class CustomersController {
     @Query() queryDto: GetCustomerDto,
   ): Promise<PaginatedCustomerResponseDto> {
     return this.customerService.getCustomers(user.id, queryDto);
+  }
+
+  /**
+   * Get paginated settlement payment history for a wholesale customer.
+   */
+  @Get('wholesale/:customerId/payments')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.SECRETARY, Role.CASHIER)
+  @ApiOperation({
+    summary: 'Get wholesale customer payment history',
+    description:
+      'Retrieves paginated ledger of credit settlement payments for a wholesale customer.',
+  })
+  @ApiParam({ name: 'customerId', type: Number, example: 42 })
+  @ApiOkResponse({ type: PaginatedCustomerPaymentsResponseDto })
+  @ApiNotFoundResponse({ description: 'Wholesale customer not found.' })
+  async getWholesaleCustomerPayments(
+    @Param('customerId', ParseIntPipe) customerId: number,
+    @Query() queryDto: GetCustomerPaymentsDto,
+  ): Promise<PaginatedCustomerPaymentsResponseDto> {
+    return this.customerService.getWholesaleCustomerPayments(
+      customerId,
+      queryDto,
+    );
+  }
+
+  /**
+   * Check if a wholesale customer has overdue payments.
+   */
+  @Get('wholesale/:customerId/overdue-status')
+  @Roles(
+    Role.ADMIN,
+    Role.MANAGER,
+    Role.SECRETARY,
+    Role.CASHIER,
+    Role.SALES_CLERK,
+  )
+  @ApiOperation({
+    summary: 'Check customer overdue credit status',
+    description:
+      'Returns overdue status, count of overdue invoices, and total balance past due.',
+  })
+  @ApiParam({ name: 'customerId', type: Number, example: 42 })
+  @ApiOkResponse({ type: CustomerOverdueStatusResponseDto })
+  @ApiNotFoundResponse({ description: 'Wholesale customer not found.' })
+  async checkCustomerOverdueStatus(
+    @Param('customerId', ParseIntPipe) customerId: number,
+  ): Promise<CustomerOverdueStatusResponseDto> {
+    return this.customerService.checkCustomerOverdueStatus(customerId);
+  }
+
+  /**
+   * Retrieve a single customer profile by ID
+   */
+  @Get(':id')
+  @Roles(
+    Role.ADMIN,
+    Role.MANAGER,
+    Role.SECRETARY,
+    Role.CASHIER,
+    Role.SALES_CLERK,
+  )
+  @ApiOperation({
+    summary: 'Get customer profile by ID',
+    description:
+      'Fetches complete profile details for a customer, including associated wholesale profile if applicable.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Unique primary key ID of the customer',
+    example: 1,
+  })
+  @ApiOkResponse({
+    description: 'Customer profile details retrieved successfully.',
+    type: CustomerResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Customer with given ID was not found.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Authentication credential token missing or invalid.',
+  })
+  async getCustomerById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CustomerResponseDto> {
+    return this.customerService.getCustomerById(id);
   }
 
   /**
