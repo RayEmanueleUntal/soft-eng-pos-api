@@ -10,10 +10,12 @@ import { Prisma } from 'src/generated/prisma/client';
 @Injectable()
 export class TransactionsService {
   private readonly logger = new Logger(TransactionsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Fetch paginated list of transactions filtered by status, types, dates, or search criteria.
+   * Includes product UOM configurations for transaction item details.
    */
   async getTransactions(
     queryDto: GetTransactionsQueryDto,
@@ -34,7 +36,7 @@ export class TransactionsService {
     } = queryDto;
 
     this.logger.log(
-      `Fetching transactions - Page: \({page}, Limit:\){limit}, Search: "${search ?? ''}"`,
+      `Fetching transactions - Page: ${page}, Limit: ${limit}, Search: "${search ?? ''}"`,
     );
 
     const skip = (page - 1) * limit;
@@ -99,7 +101,11 @@ export class TransactionsService {
             customer: true,
             transactionItems: {
               include: {
-                product: true,
+                product: {
+                  include: {
+                    uoms: true, // Included configured multi-UOM definitions
+                  },
+                },
               },
             },
             payments: {
@@ -137,7 +143,7 @@ export class TransactionsService {
       ]);
 
       this.logger.log(
-        `Successfully retrieved \({transactions.length} transactions out of\){total} total records.`,
+        `Successfully retrieved ${transactions.length} transactions out of ${total} total records.`,
       );
 
       return PaginatedTransactionsResponseDto.fromEntities(
@@ -155,9 +161,10 @@ export class TransactionsService {
     }
   }
 
-  /*
-  Get receipt by transaction ID
-  */
+  /**
+   * Get receipt details by transaction ID.
+   * Includes product multi-UOM definitions for verification and transformation.
+   */
   async getReceipt(
     transactionId: number,
     includeShipments: boolean = false,
@@ -171,7 +178,11 @@ export class TransactionsService {
         customer: true,
         transactionItems: {
           include: {
-            product: true,
+            product: {
+              include: {
+                uoms: true, // Fetch configured product alternate UOMs
+              },
+            },
           },
         },
         payments: {
@@ -215,7 +226,9 @@ export class TransactionsService {
     return GetReceiptResponseDto.fromEntity(transaction);
   }
 
-  // Helper function: generating invoice number
+  /**
+   * Helper function: Generating atomic invoice number using DB sequence.
+   */
   async getNextInvoiceNumber(tx: Prisma.TransactionClient): Promise<string> {
     const year = new Date().getFullYear();
 
@@ -231,7 +244,7 @@ export class TransactionsService {
   }
 
   /**
-   * Accepts a transaction client and creates the transaction.
+   * Accepts a transaction client and creates the transaction record.
    */
   async createTransaction(
     tx: Prisma.TransactionClient,
@@ -240,7 +253,15 @@ export class TransactionsService {
     return await tx.transaction.create({
       data,
       include: {
-        transactionItems: true,
+        transactionItems: {
+          include: {
+            product: {
+              include: {
+                uoms: true,
+              },
+            },
+          },
+        },
         payments: {
           include: {
             cashPayment: true,

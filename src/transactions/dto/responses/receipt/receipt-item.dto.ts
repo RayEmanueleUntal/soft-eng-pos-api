@@ -1,55 +1,91 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TransactionType, UnitOfMeasure } from 'src/generated/prisma/enums';
+import { Prisma } from 'src/generated/prisma/client';
 
 export class ReceiptItemDto {
-  @ApiProperty({
-    example: 1,
-    description: 'Product ID',
-  })
+  @ApiProperty({ description: 'ID of the purchased product', example: 101 })
   productId!: number;
 
   @ApiProperty({
-    example: 'San Miguel Beer 330ml Can',
-    description: 'Product name',
+    description: 'Name of the product at time of transaction',
+    example: 'Hex Bolt M8-1.25 x 30mm',
   })
   product_name!: string;
 
-  @ApiProperty({ example: 6, description: 'Quantity sold' })
+  @ApiProperty({
+    description: 'Quantity sold in the selected unit of measure',
+    example: 2.0,
+  })
   quantity!: number;
 
   @ApiProperty({
-    example: 65.0,
-    description: 'Base price applied per unit before line discount',
+    description: 'Selling unit of measure used during transaction',
+    enum: UnitOfMeasure,
+    example: UnitOfMeasure.BOX,
+  })
+  pricing_uom!: UnitOfMeasure;
+
+  @ApiProperty({
+    description: 'Unit conversion multiplier relative to base unit',
+    example: 100.0,
+  })
+  uom_conversion_factor!: number;
+
+  @ApiProperty({
+    description: 'Calculated canonical base quantity deducted from inventory',
+    example: 200.0,
+  })
+  base_quantity_deducted!: number;
+
+  @ApiProperty({
+    description: 'Unit price per selected unit of measure at sale',
+    example: 150.0,
   })
   applied_price!: number;
 
   @ApiProperty({
-    example: 390.0,
-    description: 'Gross item subtotal (quantity * applied_price)',
+    description: 'Line item discount applied',
+    example: 10.0,
+  })
+  discounted_price!: number;
+
+  @ApiProperty({
+    description: 'Calculated subtotal for line item',
+    example: 290.0,
   })
   subtotal!: number;
 
-  @ApiProperty({ example: 360.0, description: 'Net item total after discount' })
-  discounted_price!: number;
-
-  @ApiProperty({ example: 360.0, description: 'Final net line price paid' })
-  net_price!: number;
-
-  @ApiProperty({
-    enum: UnitOfMeasure,
-    example: UnitOfMeasure.PCS,
-    description: 'Pricing Unit of Measure of the Transaction Item',
-  })
-  pricing_uom!: UnitOfMeasure;
-
-  @ApiProperty({ enum: TransactionType, example: TransactionType.RETAIL })
-  type!: TransactionType;
-
   @ApiPropertyOptional({
-    example: 2,
-    description:
-      'Calculated quantity of items already returned across return logs',
-    default: 0,
+    description: 'Quantity returned previously for this line item',
+    example: 0,
   })
   already_returned_qty?: number;
+
+  static fromEntity(
+    item: {
+      productId: number;
+      product?: { name: string };
+      quantity_sold: Prisma.Decimal | number;
+      unit_of_measure: UnitOfMeasure;
+      uom_conversion_factor: Prisma.Decimal | number;
+      base_quantity_deducted: Prisma.Decimal | number;
+      unit_price: Prisma.Decimal | number;
+      discount: Prisma.Decimal | number;
+      subtotal: Prisma.Decimal | number;
+    },
+    alreadyReturnedQty = 0,
+  ): ReceiptItemDto {
+    const dto = new ReceiptItemDto();
+    dto.productId = item.productId;
+    dto.product_name = item.product?.name ?? 'Unknown Product';
+    dto.quantity = Number(item.quantity_sold);
+    dto.pricing_uom = item.unit_of_measure;
+    dto.uom_conversion_factor = Number(item.uom_conversion_factor);
+    dto.base_quantity_deducted = Number(item.base_quantity_deducted);
+    dto.applied_price = Number(item.unit_price);
+    dto.discounted_price = Number(item.discount);
+    dto.subtotal = Number(item.subtotal);
+    dto.already_returned_qty = alreadyReturnedQty;
+    return dto;
+  }
 }
