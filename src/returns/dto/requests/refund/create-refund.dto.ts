@@ -24,7 +24,10 @@ export class CreateRefundDto {
   @IsNotEmpty()
   productId!: number;
 
-  @ApiProperty({ example: 2.5, description: 'Quantity returned (in Base UOM)' })
+  @ApiProperty({
+    example: 2.5,
+    description: 'Quantity returned (in Base UOM)',
+  })
   @IsNumber()
   @IsPositive()
   quantity!: number;

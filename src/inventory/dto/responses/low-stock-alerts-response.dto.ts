@@ -1,14 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { InventoryItemResponseDto } from './inventory-item-response.dto';
-import { Product } from 'src/generated/prisma/client';
+import {
+  Product,
+  Category,
+  BinLocation,
+  ProductUom,
+} from 'src/generated/prisma/client';
+import { ProductItemResponseDto } from 'src/products/dto';
+
+// Extended type matching product relations fetched from database
+type ProductWithRelations = Product & {
+  category?: Category | null;
+  bin_location?: BinLocation | null;
+  uoms?: ProductUom[];
+};
 
 export class LowStockAlertsResponseDto {
   @ApiProperty({
-    type: [InventoryItemResponseDto],
+    type: [ProductItemResponseDto],
     description:
       'List of products whose stock is at or below reorder point threshold',
   })
-  items!: InventoryItemResponseDto[];
+  items!: ProductItemResponseDto[];
 
   @ApiProperty({
     example: 5,
@@ -16,9 +28,14 @@ export class LowStockAlertsResponseDto {
   })
   totalAlerts!: number;
 
-  static fromEntities(products: Product[]): LowStockAlertsResponseDto {
+  /**
+   * Static Factory Method to transform Prisma Product models into Low Stock Alert Response DTO
+   */
+  static fromEntities(
+    products: ProductWithRelations[],
+  ): LowStockAlertsResponseDto {
     return {
-      items: products.map(InventoryItemResponseDto.fromEntity),
+      items: products.map(ProductItemResponseDto.fromEntity),
       totalAlerts: products.length,
     };
   }

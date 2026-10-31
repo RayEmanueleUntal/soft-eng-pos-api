@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SystemSettingsService } from 'src/system-settings/system-settings.service';
 import { CreateRefundDto, CreateExchangeDto, ReturnResponseDto } from './dto';
 import { RequestType } from 'src/generated/prisma/enums';
+import { RefundPaymentBreakdown } from './interfaces';
 
 @Injectable()
 export class ReturnsService {
@@ -61,6 +62,73 @@ export class ReturnsService {
     return isWithinWindow;
   }
 
+  private async calculateRefundBreakdown(
+    transactionId: number,
+    productId: number,
+    refundQuantity: number,
+  ): Promise<RefundPaymentBreakdown> {
+    const txItem = await this.prisma.transactionItem.findFirst({
+      where: { transactionId, productId },
+      include: {
+        transaction: {
+          include: {
+            payments: {
+              include: {
+                creditPayment: true,
+                cashPayment: true,
+                gCashPayment: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!txItem) {
+      throw new NotFoundException(
+        `Item (Product #${productId}) not found in Transaction #${transactionId}`,
+      );
+    }
+
+    const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+    const effectiveBaseUnitPrice =
+      txItem.subtotal.toNumber() / baseQuantityDeducted;
+    const totalRefundAmount = effectiveBaseUnitPrice * refundQuantity;
+
+    // Check for open credit payment balance
+    const creditPayment = txItem.transaction.payments.find(
+      (p) => p.creditPayment,
+    )?.creditPayment;
+    const remainingCreditBalance = creditPayment
+      ? creditPayment.remaining_credit_balance.toNumber()
+      : 0;
+
+    // Allocate refund: debt reduction first, remaining balance as cash payout
+    const creditDebtReduction = Math.min(
+      remainingCreditBalance,
+      totalRefundAmount,
+    );
+    const cashPayoutAmount = Math.max(
+      0,
+      totalRefundAmount - creditDebtReduction,
+    );
+
+    const originalPayments = txItem.transaction.payments.map((p) => ({
+      method: p.payment_method,
+      amountPaid: p.amount_paid.toNumber(),
+      remainingCreditBalance: p.creditPayment
+        ? p.creditPayment.remaining_credit_balance.toNumber()
+        : undefined,
+    }));
+
+    return {
+      totalRefundAmount,
+      creditDebtReduction,
+      cashPayoutAmount,
+      originalPayments,
+    };
+  }
+
   async requestRefund(
     dto: CreateRefundDto,
     staffId: number,
@@ -69,10 +137,15 @@ export class ReturnsService {
       `Staff #${staffId} initiating Refund request for Tx #${dto.transactionId}`,
     );
 
-    // 1. Date Verification
     await this.validateReturnWindow(dto.transactionId);
 
-    // 2. Create Approval Request (Passing staffId as the 2nd argument to match your ApprovalService)
+    // Calculate multi-payment allocation breakdown for manager review
+    const paymentBreakdown = await this.calculateRefundBreakdown(
+      dto.transactionId,
+      dto.productId,
+      dto.quantity,
+    );
+
     const approvalRequest = await this.approvalService.createRequest(
       {
         type: RequestType.REFUND_TRANSACTION,
@@ -82,6 +155,7 @@ export class ReturnsService {
           quantity: dto.quantity,
           condition: dto.condition,
           reason: dto.reason,
+          paymentBreakdown, // Attached explicitly to payload
         },
       },
       staffId,
