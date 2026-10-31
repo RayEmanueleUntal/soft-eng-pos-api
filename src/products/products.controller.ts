@@ -113,6 +113,10 @@ export class ProductsController {
     description:
       'SKU collision or matching fastener specification collision (bypassable via allowDuplicate=true).',
   })
+  @ApiConflictResponse({
+    description:
+      'Product has existing transaction history (sales, purchase orders, movements) and cannot be hard deleted.',
+  })
   @ApiBadRequestResponse({
     description:
       'Attempted to modify base_uom without confirmUomChange=true, or invalid body payload.',

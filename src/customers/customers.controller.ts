@@ -207,6 +207,10 @@ export class CustomersController {
   @ApiConflictResponse({
     description: 'Updated contact number collides with an existing customer.',
   })
+  @ApiBadRequestResponse({
+    description:
+      'Cannot convert Wholesale customer to RETAIL while an outstanding balance exists',
+  })
   async updateCustomer(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: { id: number; assigned_role: Role },

@@ -17,6 +17,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -70,7 +71,7 @@ export class TransactionsController {
   }
 
   /**
-   * Get printable receipt details by transaction ID
+   * Get printable receipt details by transaction ID with optional inclusion of shipments, returns, and exchanges.
    */
   @Get('receipt/:id')
   @Roles(
@@ -84,13 +85,34 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Get printable receipt details by transaction ID',
     description:
-      'Retrieves complete receipt details including cashier information, customer details, line item pricing/UOM breakdowns, and payment execution summaries.',
+      'Retrieves complete receipt details including cashier information, customer details, line item pricing/UOM breakdowns, payment summaries, and optional relation records (shipments, returns, exchanges).',
   })
   @ApiParam({
     name: 'id',
     type: Number,
     description: 'Unique numerical ID of the transaction',
     example: 101,
+  })
+  @ApiQuery({
+    name: 'includeShipments',
+    type: Boolean,
+    required: false,
+    description: 'Include associated shipment tracking information',
+    example: false,
+  })
+  @ApiQuery({
+    name: 'includeReturns',
+    type: Boolean,
+    required: false,
+    description: 'Include item return and refund history for this transaction',
+    example: false,
+  })
+  @ApiQuery({
+    name: 'includeExchanges',
+    type: Boolean,
+    required: false,
+    description: 'Include item exchange records for this transaction',
+    example: false,
   })
   @ApiOkResponse({
     type: GetReceiptResponseDto,
@@ -100,7 +122,7 @@ export class TransactionsController {
     description: 'Transaction ID not found.',
   })
   @ApiBadRequestResponse({
-    description: 'Invalid transaction ID format supplied.',
+    description: 'Invalid transaction ID or query parameter format supplied.',
   })
   @ApiUnauthorizedResponse({
     description: 'Missing or invalid JWT authentication token.',
@@ -110,7 +132,20 @@ export class TransactionsController {
   })
   async getReceipt(
     @Param('id', ParseIntPipe) id: number,
+    @Query('includeShipments') includeShipments?: boolean,
+    @Query('includeReturns') includeReturns?: boolean,
+    @Query('includeExchanges') includeExchanges?: boolean,
   ): Promise<GetReceiptResponseDto> {
-    return await this.transactionsService.getReceipt(id);
+    // Parse query param values (converting potential query string values safely to booleans)
+    const shouldIncludeShipments = String(includeShipments) === 'true';
+    const shouldIncludeReturns = String(includeReturns) === 'true';
+    const shouldIncludeExchanges = String(includeExchanges) === 'true';
+
+    return await this.transactionsService.getReceipt(
+      id,
+      shouldIncludeShipments,
+      shouldIncludeReturns,
+      shouldIncludeExchanges,
+    );
   }
 }

@@ -66,13 +66,13 @@ export class UpdateCustomerDto {
   @Type(() => Number)
   credit_limit?: number;
 
-  @ApiPropertyOptional({
-    example: 1250.0,
-    description: 'Adjust current outstanding balance',
-  })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Type(() => Number)
-  outstanding_balance?: number;
+  // @ApiPropertyOptional({
+  //   example: 1250.0,
+  //   description: 'Adjust current outstanding balance',
+  // })
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(0)
+  // @Type(() => Number)
+  // outstanding_balance?: number;
 }

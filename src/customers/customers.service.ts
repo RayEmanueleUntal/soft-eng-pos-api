@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -268,7 +269,7 @@ export class CustomersService {
       type,
       company_name,
       credit_limit,
-      outstanding_balance,
+      // outstanding_balance,
     } = updateDto;
 
     // 2. Target type evaluation
@@ -277,8 +278,7 @@ export class CustomersService {
     const isModifyingWholesaleFields =
       isTargetWholesale ||
       company_name !== undefined ||
-      credit_limit !== undefined ||
-      outstanding_balance !== undefined;
+      credit_limit !== undefined;
 
     // Guard wholesale updates by role
     if (isModifyingWholesaleFields) {
@@ -311,7 +311,7 @@ export class CustomersService {
       }
     }
 
-    // 4. Construct Wholesale relation updates (`upsert`, `update`, or `delete`)
+    // 4. Construct Wholesale relation updates & Guard against Unpaid Debt Loss
     let wholesaleRelationUpdate:
       Prisma.WholeSaleCustomerUpdateOneWithoutCustomerNestedInput | undefined;
 
@@ -321,24 +321,53 @@ export class CustomersService {
           create: {
             company_name: company_name ?? 'N/A',
             credit_limit: new Prisma.Decimal(credit_limit ?? 0),
-            outstanding_balance: new Prisma.Decimal(outstanding_balance ?? 0),
+            // outstanding_balance: new Prisma.Decimal(outstanding_balance ?? 0),
+            outstanding_balance: new Prisma.Decimal(0),
           },
           update: {
             ...(company_name !== undefined && { company_name }),
             ...(credit_limit !== undefined && {
               credit_limit: new Prisma.Decimal(credit_limit),
             }),
-            ...(outstanding_balance !== undefined && {
-              outstanding_balance: new Prisma.Decimal(outstanding_balance),
-            }),
+            // ...(outstanding_balance !== undefined && {
+            //   outstanding_balance: new Prisma.Decimal(outstanding_balance),
+            // }),
           },
         },
       };
     } else if (type === CustomerType.RETAIL && existingCustomer.wholesale) {
-      // If downgraded from WHOLESALE to RETAIL, remove the wholesale profile
-      wholesaleRelationUpdate = {
-        delete: true,
-      };
+      // --- SAFEGUARD ADDED HERE ---
+      const currentBalance = new Prisma.Decimal(
+        existingCustomer.wholesale.outstanding_balance,
+      );
+
+      // Block downgrade if debt exists
+      if (currentBalance.gt(0)) {
+        this.logger.warn(
+          `Downgrade blocked: Wholesale Customer #${customerId} has outstanding balance of ₱${currentBalance.toFixed(2)}`,
+        );
+        throw new BadRequestException(
+          `Cannot convert Wholesale customer to RETAIL while an outstanding balance of ₱${currentBalance.toFixed(2)} exists. Settle all outstanding credit debts first.`,
+        );
+      }
+
+      // Check if settlement payment audit records exist
+      const paymentHistoryCount = await this.prisma.customerPayment.count({
+        where: { wholesaleCustId: customerId },
+      });
+
+      if (paymentHistoryCount > 0) {
+        // Option A: Do NOT delete the record to preserve audit history. Keep wholesale record, just toggle customer type.
+        this.logger.log(
+          `Customer #${customerId} downgraded to RETAIL. Retaining Wholesale profile to preserve ${paymentHistoryCount} historical payment ledger record(s).`,
+        );
+        wholesaleRelationUpdate = undefined; // Retain profile in DB so ledger history isn't lost
+      } else {
+        // Option B: Safe to delete only if 0 balance AND 0 payment history records exist
+        wholesaleRelationUpdate = {
+          delete: true,
+        };
+      }
     }
 
     // 5. Apply database update
@@ -404,7 +433,7 @@ export class CustomersService {
 
   /**
    * Collects a credit settlement payment for a wholesale customer.
-   * Decrements `outstanding_balance` and records audit snapshots inside a transaction.
+   * Decrements `outstanding_balance` AND settles open `CreditPayment` invoices using FIFO.
    */
   async collectWholesalePayment(
     customerId: number,
@@ -426,11 +455,11 @@ export class CustomersService {
     }
 
     this.logger.log(
-      `Staff #${staffId} initiating credit settlement payment of ${paymentAmount.toFixed(2)} for Wholesale Customer #${customerId}`,
+      `Staff #${staffId} initiating credit settlement payment of ₱${paymentAmount.toFixed(2)} for Wholesale Customer #${customerId}`,
     );
 
     return await this.prisma.$transaction(async (tx) => {
-      // 1. Lock and fetch wholesale account
+      // 1. Fetch wholesale account
       const wholesaleAccount = await tx.wholeSaleCustomer.findUnique({
         where: { customerId },
       });
@@ -447,17 +476,17 @@ export class CustomersService {
       // 2. Validate non-overpayment constraint
       if (paymentAmount.gt(previousBalance)) {
         this.logger.warn(
-          `Payment rejected for Customer #${customerId}: Payment (${paymentAmount.toFixed(2)}) exceeds outstanding balance (${previousBalance.toFixed(2)})`,
+          `Payment rejected for Customer #${customerId}: Payment (₱${paymentAmount.toFixed(2)}) exceeds outstanding balance (₱${previousBalance.toFixed(2)})`,
         );
         throw new InvalidPaymentAmountException(
-          `Payment amount (${paymentAmount.toFixed(2)}) cannot exceed outstanding balance (${previousBalance.toFixed(2)}).`,
+          `Payment amount (₱${paymentAmount.toFixed(2)}) cannot exceed outstanding balance (₱${previousBalance.toFixed(2)}).`,
         );
       }
 
-      // 3. Compute new balance
+      // 3. Compute new account balance
       const newBalance = previousBalance.minus(paymentAmount);
 
-      // 4. Update Wholesale Customer balance
+      // 4. Update Wholesale Customer macro balance
       await tx.wholeSaleCustomer.update({
         where: { customerId },
         data: {
@@ -465,7 +494,61 @@ export class CustomersService {
         },
       });
 
-      // 5. Create CustomerPayment audit entry
+      // 5. FIFO Settlement against individual CreditPayment records
+      let remainingToAllocate = new Prisma.Decimal(paymentAmount);
+
+      const openCreditPayments = await tx.creditPayment.findMany({
+        where: {
+          payment: {
+            transaction: {
+              customerId,
+            },
+          },
+          status: {
+            in: [
+              CreditStatus.UNPAID,
+              CreditStatus.PARTIALLY_PAID,
+              CreditStatus.OVERDUE,
+            ],
+          },
+        },
+        orderBy: { due_date: 'asc' }, // FIFO: settle oldest invoices first
+      });
+
+      for (const creditRec of openCreditPayments) {
+        if (remainingToAllocate.lte(0)) break;
+
+        const recordBalance = new Prisma.Decimal(
+          creditRec.remaining_credit_balance,
+        );
+
+        if (remainingToAllocate.gte(recordBalance)) {
+          // Fully pay off this credit record
+          remainingToAllocate = remainingToAllocate.minus(recordBalance);
+
+          await tx.creditPayment.update({
+            where: { paymentId: creditRec.paymentId },
+            data: {
+              remaining_credit_balance: new Prisma.Decimal(0),
+              status: CreditStatus.PAID,
+            },
+          });
+        } else {
+          // Partially pay off this credit record
+          const newRecordBalance = recordBalance.minus(remainingToAllocate);
+          remainingToAllocate = new Prisma.Decimal(0);
+
+          await tx.creditPayment.update({
+            where: { paymentId: creditRec.paymentId },
+            data: {
+              remaining_credit_balance: newRecordBalance,
+              status: CreditStatus.PARTIALLY_PAID,
+            },
+          });
+        }
+      }
+
+      // 6. Create CustomerPayment audit entry
       const customerPayment = await tx.customerPayment.create({
         data: {
           wholesaleCustId: customerId,
@@ -480,7 +563,7 @@ export class CustomersService {
       });
 
       this.logger.log(
-        `Successfully processed settlement payment #${customerPayment.id} for Wholesale Customer #${customerId}. Prev balance: ${previousBalance.toFixed(2)}, New balance: ${newBalance.toFixed(2)}`,
+        `Successfully processed settlement payment #${customerPayment.id} for Wholesale Customer #${customerId}. Prev balance: ₱${previousBalance.toFixed(2)}, New balance: ₱${newBalance.toFixed(2)}`,
       );
 
       return CustomerPaymentResponseDto.fromEntity(customerPayment);

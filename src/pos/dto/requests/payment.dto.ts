@@ -1,4 +1,5 @@
 import {
+  ApiExtraModels,
   ApiProperty,
   ApiPropertyOptional,
   getSchemaPath,
@@ -18,6 +19,7 @@ import {
   GCashDetailsDto,
 } from './payment-details.dto';
 
+@ApiExtraModels(CashDetailsDto, GCashDetailsDto, CreditDetailsDto)
 export class PaymentDto {
   @ApiProperty({
     enum: PaymentMethod,

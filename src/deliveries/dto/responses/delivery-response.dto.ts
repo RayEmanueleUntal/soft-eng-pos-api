@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { UnitOfMeasure } from 'src/generated/prisma/client';
 
 export class DeliveryItemResponseDto {
   @ApiProperty({ example: 1 })
@@ -13,8 +14,31 @@ export class DeliveryItemResponseDto {
   @ApiPropertyOptional({ example: 'BLT-M8-30-SS' })
   productSku?: string;
 
-  @ApiProperty({ example: 50.0 })
+  @ApiProperty({
+    example: 2.0,
+    description: 'Physical quantity received in received_uom',
+  })
   received_quantity!: number;
+
+  @ApiProperty({
+    enum: UnitOfMeasure,
+    example: UnitOfMeasure.SACK,
+    description: 'Packaging unit of measure received during delivery',
+  })
+  received_uom!: UnitOfMeasure;
+
+  @ApiProperty({
+    example: 1000.0,
+    description: 'Multiplier used to convert received_uom to base_uom',
+  })
+  uom_conversion_factor!: number;
+
+  @ApiProperty({
+    example: 2000.0,
+    description:
+      'Actual physical base units added to inventory (received_quantity * uom_conversion_factor)',
+  })
+  actual_base_quantity!: number;
 
   static fromEntity(entity: any): DeliveryItemResponseDto {
     return {
@@ -23,6 +47,9 @@ export class DeliveryItemResponseDto {
       productName: entity.product?.name,
       productSku: entity.product?.sku ?? undefined,
       received_quantity: Number(entity.received_quantity),
+      received_uom: entity.received_uom ?? UnitOfMeasure.PCS,
+      uom_conversion_factor: Number(entity.uom_conversion_factor ?? 1.0),
+      actual_base_quantity: Number(entity.actual_base_quantity),
     };
   }
 }
