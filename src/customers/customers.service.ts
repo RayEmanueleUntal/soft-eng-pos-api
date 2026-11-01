@@ -662,4 +662,42 @@ export class CustomersService {
       totalOverdueAmount,
     };
   }
+
+  /**
+   * Scans all UNPAID or PARTIALLY_PAID credit payments past their due date
+   * and updates their status to OVERDUE.
+   *
+   * @returns Prisma BatchPayload containing the number of updated records
+   */
+  async updateOverduePaymentsStatus(): Promise<Prisma.BatchPayload> {
+    const now = new Date();
+
+    this.logger.log(
+      `Scanning credit payments due prior to ${now.toISOString()}...`,
+    );
+
+    const result = await this.prisma.creditPayment.updateMany({
+      where: {
+        due_date: {
+          lt: now,
+        },
+        status: {
+          in: [CreditStatus.UNPAID, CreditStatus.PARTIALLY_PAID],
+        },
+      },
+      data: {
+        status: CreditStatus.OVERDUE,
+      },
+    });
+
+    if (result.count > 0) {
+      this.logger.warn(
+        `Automated status update: ${result.count} credit payment record(s) transitioned to OVERDUE.`,
+      );
+    } else {
+      this.logger.log('No past-due credit payments found during status check.');
+    }
+
+    return result;
+  }
 }
