@@ -24,6 +24,8 @@ import { DeliveriesModule } from './deliveries/deliveries.module';
 import { ForwarderModule } from './forwarder/forwarder.module';
 import { ShipmentsModule } from './shipments/shipments.module';
 import KeyvRedis from '@keyv/redis';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -50,6 +52,7 @@ import KeyvRedis from '@keyv/redis';
         };
       },
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
     StaffUserModule,
@@ -68,6 +71,7 @@ import KeyvRedis from '@keyv/redis';
     DeliveriesModule,
     ForwarderModule,
     ShipmentsModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
