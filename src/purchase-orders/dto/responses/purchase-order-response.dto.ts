@@ -1,47 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { POStatus, UnitOfMeasure } from 'src/generated/prisma/client';
-
-export class POItemResponseDto {
-  @ApiProperty({ example: 1 })
-  id!: number;
-
-  @ApiProperty({ example: 101 })
-  productId!: number;
-
-  @ApiProperty({ example: 'Hex Bolt M8-1.25 x 30mm' })
-  productName!: string;
-
-  @ApiProperty({ example: 'BLT-M8-30-SS', nullable: true })
-  sku!: string | null;
-
-  @ApiProperty({ example: 50.0 })
-  requested_quantity!: number;
-
-  @ApiProperty({ example: 12.5 })
-  unit_cost!: number;
-
-  @ApiProperty({ example: 625.0 })
-  total_cost!: number;
-
-  @ApiProperty({ enum: UnitOfMeasure, example: 'PCS' })
-  base_uom!: UnitOfMeasure;
-
-  static fromEntity(entity: any): POItemResponseDto {
-    const requestedQty = Number(entity.requested_quantity);
-    const unitCost = Number(entity.unit_cost);
-
-    return {
-      id: entity.id,
-      productId: entity.productId,
-      productName: entity.product?.name ?? '',
-      sku: entity.product?.sku ?? null,
-      requested_quantity: requestedQty,
-      unit_cost: unitCost,
-      total_cost: Number((requestedQty * unitCost).toFixed(2)),
-      base_uom: entity.product?.base_uom ?? UnitOfMeasure.PCS,
-    };
-  }
-}
+import { POStatus } from 'src/generated/prisma/enums';
+import { POItemResponseDto } from './po-item-response.dto';
 
 export class PurchaseOrderResponseDto {
   @ApiProperty({ example: 12 })
