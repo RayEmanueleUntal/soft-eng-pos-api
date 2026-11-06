@@ -3,8 +3,6 @@ import { ApiForbiddenResponse, ApiOperation } from '@nestjs/swagger';
 import { AssignedRole } from 'src/generated/prisma/enums';
 
 export const ROLES_KEY = 'roles';
-// export const Roles = (...roles: AssignedRole[]) =>
-//   SetMetadata(ROLES_KEY, roles);
 
 export function Roles(...roles: AssignedRole[]) {
   const roleNames = roles.map((role) => `\`${role}\``).join(', ');
