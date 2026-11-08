@@ -9,6 +9,20 @@
 * 🟢 You can import this file directly.
 */
 
+export const ExpenseCategory = {
+  RENT: 'RENT',
+  UTILITIES: 'UTILITIES',
+  SALARIES_WAGES: 'SALARIES_WAGES',
+  TAXES_LICENCES: 'TAXES_LICENCES',
+  MAINTENANCE: 'MAINTENANCE',
+  LOGISTICS: 'LOGISTICS',
+  SUPPLIES: 'SUPPLIES',
+  MISCELLANEOUS: 'MISCELLANEOUS'
+} as const
+
+export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory]
+
+
 export const RequestType = {
   OVERRIDE_DISCOUNT: 'OVERRIDE_DISCOUNT',
   STOCK_OUT_OVERRIDE: 'STOCK_OUT_OVERRIDE',
@@ -48,7 +62,8 @@ export const UnitOfMeasure = {
   METER: 'METER',
   HUNDRED: 'HUNDRED',
   GROSS: 'GROSS',
-  SACK: 'SACK'
+  SACK: 'SACK',
+  SACKs: 'SACKs'
 } as const
 
 export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]
@@ -96,7 +111,9 @@ export type AssignedRole = (typeof AssignedRole)[keyof typeof AssignedRole]
 export const PaymentMethod = {
   CASH: 'CASH',
   GCASH: 'GCASH',
-  CREDIT: 'CREDIT'
+  CREDIT: 'CREDIT',
+  CHECK: 'CHECK',
+  BANK_TRANSFER: 'BANK_TRANSFER'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

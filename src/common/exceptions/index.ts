@@ -15,3 +15,4 @@ export * from './deliveries';
 export * from './forwarder';
 export * from './shipment';
 export * from './customers';
+export * from './expenses';

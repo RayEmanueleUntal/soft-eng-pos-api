@@ -75,6 +75,16 @@ export type CashPayment = Prisma.CashPaymentModel
  */
 export type GCashPayment = Prisma.GCashPaymentModel
 /**
+ * Model CheckPayment
+ * 
+ */
+export type CheckPayment = Prisma.CheckPaymentModel
+/**
+ * Model BankTransferPayment
+ * 
+ */
+export type BankTransferPayment = Prisma.BankTransferPaymentModel
+/**
  * Model CreditPayment
  * 
  */
@@ -169,3 +179,8 @@ export type ApprovalRequest = Prisma.ApprovalRequestModel
  * 
  */
 export type SystemSetting = Prisma.SystemSettingModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel

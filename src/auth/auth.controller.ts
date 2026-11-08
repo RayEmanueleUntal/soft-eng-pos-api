@@ -50,7 +50,6 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @Post('logout')
   @ApiOperation({ summary: 'Logout Staff User' })
   logout(@CurrentUser('id') userId: number, @Req() req: any) {

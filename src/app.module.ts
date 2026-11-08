@@ -26,6 +26,7 @@ import { ShipmentsModule } from './shipments/shipments.module';
 import KeyvRedis from '@keyv/redis';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
+import { ExpensesModule } from './expenses/expenses.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { TasksModule } from './tasks/tasks.module';
     ForwarderModule,
     ShipmentsModule,
     TasksModule,
+    ExpensesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

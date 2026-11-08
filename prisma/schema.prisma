@@ -123,6 +123,8 @@ model Payment {
 
   cashPayment    CashPayment?
   gCashPayment   GCashPayment?
+  bankTransferPayment BankTransferPayment?
+  checkPayment   CheckPayment?
   creditPayment  CreditPayment?
 
   transaction    Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
@@ -148,6 +150,28 @@ model GCashPayment {
   payment             Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
   @@map("gcash_payment")
+}
+
+model CheckPayment {
+  paymentId     Int       @id
+  bank_name     String    // e.g. "BDO", "Metrobank", "BPI"
+  check_number  String    // e.g. "0001294812"
+  check_date    DateTime? // Date written on the check (for Post-Dated Checks / PDC)
+  is_cleared    Boolean   @default(false) // Set to true once cleared in bank
+
+  payment       Payment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("check_payment")
+}
+
+model BankTransferPayment {
+  paymentId        Int     @id
+  bank_name        String  // e.g. "BDO", "Landbank", "BPI"
+  reference_number String  // InstaPay / PESONet ref number
+
+  payment          Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("bank_transfer_payment")
 }
 
 model CreditPayment {
@@ -249,6 +273,7 @@ model StaffUser {
 
   transactions   Transaction[]
   customerPayments  CustomerPayment[]
+  expenses          Expense[]
   initiatedMovements StockMovement[] @relation("InitiatedMovements")
   approvedMovements  StockMovement[] @relation("ApprovedMovements")
   approvalRequests ApprovalRequest[] @relation("RequestedBy")
@@ -551,8 +576,42 @@ model SystemSetting {
 }
 
 // ==========================================
+// EXPENSES & OPEX
+// ==========================================
+
+model Expense {
+  id             Int            @id @default(autoincrement())
+  category       ExpenseCategory
+  amount         Decimal        @db.Decimal(10, 2)
+  date           DateTime       @default(now())
+  payment_method PaymentMethod  @default(CASH)
+  notes          String?        // Detailed description (e.g., "Meralco bill for Oct")
+  
+  staffId        Int            // Who logged the expense?
+  staff          StaffUser      @relation(fields: [staffId], references: [id])
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([date])
+  @@index([category])
+  @@map("expense")
+}
+
+// ==========================================
 // ENUMS
 // ==========================================
+
+enum ExpenseCategory {
+  RENT
+  UTILITIES       // Electricity, Water, Internet
+  SALARIES_WAGES  // Staff payroll payouts outside base system
+  TAXES_LICENCES  // LGU permits, BIR taxes
+  MAINTENANCE     // Equipment/store repairs
+  LOGISTICS       // Fuel, toll fees, shipping expenses not tied to POs
+  SUPPLIES        // Office/store consumption supplies
+  MISCELLANEOUS   // Other general expenses
+}
 
 enum RequestType {
   OVERRIDE_DISCOUNT
@@ -619,6 +678,8 @@ enum PaymentMethod {
   CASH
   GCASH
   CREDIT
+  CHECK
+  BANK_TRANSFER
 }
 
 enum TrackingStatus {
