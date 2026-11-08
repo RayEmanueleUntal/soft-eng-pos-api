@@ -226,6 +226,8 @@ export type PaymentWhereInput = {
   payment_method?: Prisma.EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
   cashPayment?: Prisma.XOR<Prisma.CashPaymentNullableScalarRelationFilter, Prisma.CashPaymentWhereInput> | null
   gCashPayment?: Prisma.XOR<Prisma.GCashPaymentNullableScalarRelationFilter, Prisma.GCashPaymentWhereInput> | null
+  bankTransferPayment?: Prisma.XOR<Prisma.BankTransferPaymentNullableScalarRelationFilter, Prisma.BankTransferPaymentWhereInput> | null
+  checkPayment?: Prisma.XOR<Prisma.CheckPaymentNullableScalarRelationFilter, Prisma.CheckPaymentWhereInput> | null
   creditPayment?: Prisma.XOR<Prisma.CreditPaymentNullableScalarRelationFilter, Prisma.CreditPaymentWhereInput> | null
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
 }
@@ -238,6 +240,8 @@ export type PaymentOrderByWithRelationInput = {
   payment_method?: Prisma.SortOrder
   cashPayment?: Prisma.CashPaymentOrderByWithRelationInput
   gCashPayment?: Prisma.GCashPaymentOrderByWithRelationInput
+  bankTransferPayment?: Prisma.BankTransferPaymentOrderByWithRelationInput
+  checkPayment?: Prisma.CheckPaymentOrderByWithRelationInput
   creditPayment?: Prisma.CreditPaymentOrderByWithRelationInput
   transaction?: Prisma.TransactionOrderByWithRelationInput
 }
@@ -253,6 +257,8 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   payment_method?: Prisma.EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
   cashPayment?: Prisma.XOR<Prisma.CashPaymentNullableScalarRelationFilter, Prisma.CashPaymentWhereInput> | null
   gCashPayment?: Prisma.XOR<Prisma.GCashPaymentNullableScalarRelationFilter, Prisma.GCashPaymentWhereInput> | null
+  bankTransferPayment?: Prisma.XOR<Prisma.BankTransferPaymentNullableScalarRelationFilter, Prisma.BankTransferPaymentWhereInput> | null
+  checkPayment?: Prisma.XOR<Prisma.CheckPaymentNullableScalarRelationFilter, Prisma.CheckPaymentWhereInput> | null
   creditPayment?: Prisma.XOR<Prisma.CreditPaymentNullableScalarRelationFilter, Prisma.CreditPaymentWhereInput> | null
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
 }, "id">
@@ -287,6 +293,8 @@ export type PaymentCreateInput = {
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentCreateNestedOneWithoutPaymentInput
   gCashPayment?: Prisma.GCashPaymentCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentCreateNestedOneWithoutPaymentInput
   transaction: Prisma.TransactionCreateNestedOneWithoutPaymentsInput
 }
@@ -299,6 +307,8 @@ export type PaymentUncheckedCreateInput = {
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedCreateNestedOneWithoutPaymentInput
   gCashPayment?: Prisma.GCashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentUncheckedCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentUncheckedCreateNestedOneWithoutPaymentInput
 }
 
@@ -308,6 +318,8 @@ export type PaymentUpdateInput = {
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUpdateOneWithoutPaymentNestedInput
   gCashPayment?: Prisma.GCashPaymentUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUpdateOneWithoutPaymentNestedInput
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutPaymentsNestedInput
 }
@@ -320,6 +332,8 @@ export type PaymentUncheckedUpdateInput = {
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   gCashPayment?: Prisma.GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
@@ -470,6 +484,34 @@ export type PaymentUpdateOneRequiredWithoutGCashPaymentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutGCashPaymentInput, Prisma.PaymentUpdateWithoutGCashPaymentInput>, Prisma.PaymentUncheckedUpdateWithoutGCashPaymentInput>
 }
 
+export type PaymentCreateNestedOneWithoutCheckPaymentInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutCheckPaymentInput, Prisma.PaymentUncheckedCreateWithoutCheckPaymentInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCheckPaymentInput
+  connect?: Prisma.PaymentWhereUniqueInput
+}
+
+export type PaymentUpdateOneRequiredWithoutCheckPaymentNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutCheckPaymentInput, Prisma.PaymentUncheckedCreateWithoutCheckPaymentInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCheckPaymentInput
+  upsert?: Prisma.PaymentUpsertWithoutCheckPaymentInput
+  connect?: Prisma.PaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutCheckPaymentInput, Prisma.PaymentUpdateWithoutCheckPaymentInput>, Prisma.PaymentUncheckedUpdateWithoutCheckPaymentInput>
+}
+
+export type PaymentCreateNestedOneWithoutBankTransferPaymentInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutBankTransferPaymentInput, Prisma.PaymentUncheckedCreateWithoutBankTransferPaymentInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutBankTransferPaymentInput
+  connect?: Prisma.PaymentWhereUniqueInput
+}
+
+export type PaymentUpdateOneRequiredWithoutBankTransferPaymentNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutBankTransferPaymentInput, Prisma.PaymentUncheckedCreateWithoutBankTransferPaymentInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutBankTransferPaymentInput
+  upsert?: Prisma.PaymentUpsertWithoutBankTransferPaymentInput
+  connect?: Prisma.PaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutBankTransferPaymentInput, Prisma.PaymentUpdateWithoutBankTransferPaymentInput>, Prisma.PaymentUncheckedUpdateWithoutBankTransferPaymentInput>
+}
+
 export type PaymentCreateNestedOneWithoutCreditPaymentInput = {
   create?: Prisma.XOR<Prisma.PaymentCreateWithoutCreditPaymentInput, Prisma.PaymentUncheckedCreateWithoutCreditPaymentInput>
   connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCreditPaymentInput
@@ -490,6 +532,8 @@ export type PaymentCreateWithoutTransactionInput = {
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentCreateNestedOneWithoutPaymentInput
   gCashPayment?: Prisma.GCashPaymentCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentCreateNestedOneWithoutPaymentInput
 }
 
@@ -500,6 +544,8 @@ export type PaymentUncheckedCreateWithoutTransactionInput = {
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedCreateNestedOneWithoutPaymentInput
   gCashPayment?: Prisma.GCashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentUncheckedCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentUncheckedCreateNestedOneWithoutPaymentInput
 }
 
@@ -545,6 +591,8 @@ export type PaymentCreateWithoutCashPaymentInput = {
   amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method: $Enums.PaymentMethod
   gCashPayment?: Prisma.GCashPaymentCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentCreateNestedOneWithoutPaymentInput
   transaction: Prisma.TransactionCreateNestedOneWithoutPaymentsInput
 }
@@ -556,6 +604,8 @@ export type PaymentUncheckedCreateWithoutCashPaymentInput = {
   amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method: $Enums.PaymentMethod
   gCashPayment?: Prisma.GCashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentUncheckedCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentUncheckedCreateNestedOneWithoutPaymentInput
 }
 
@@ -580,6 +630,8 @@ export type PaymentUpdateWithoutCashPaymentInput = {
   amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   gCashPayment?: Prisma.GCashPaymentUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUpdateOneWithoutPaymentNestedInput
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutPaymentsNestedInput
 }
@@ -591,6 +643,8 @@ export type PaymentUncheckedUpdateWithoutCashPaymentInput = {
   amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   gCashPayment?: Prisma.GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
@@ -599,6 +653,8 @@ export type PaymentCreateWithoutGCashPaymentInput = {
   amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentCreateNestedOneWithoutPaymentInput
   transaction: Prisma.TransactionCreateNestedOneWithoutPaymentsInput
 }
@@ -610,6 +666,8 @@ export type PaymentUncheckedCreateWithoutGCashPaymentInput = {
   amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentUncheckedCreateNestedOneWithoutPaymentInput
   creditPayment?: Prisma.CreditPaymentUncheckedCreateNestedOneWithoutPaymentInput
 }
 
@@ -634,6 +692,8 @@ export type PaymentUpdateWithoutGCashPaymentInput = {
   amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUpdateOneWithoutPaymentNestedInput
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutPaymentsNestedInput
 }
@@ -645,6 +705,132 @@ export type PaymentUncheckedUpdateWithoutGCashPaymentInput = {
   amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  creditPayment?: Prisma.CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+}
+
+export type PaymentCreateWithoutCheckPaymentInput = {
+  date?: Date | string
+  amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method: $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentCreateNestedOneWithoutPaymentInput
+  gCashPayment?: Prisma.GCashPaymentCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentCreateNestedOneWithoutPaymentInput
+  creditPayment?: Prisma.CreditPaymentCreateNestedOneWithoutPaymentInput
+  transaction: Prisma.TransactionCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutCheckPaymentInput = {
+  id?: number
+  transactionId: number
+  date?: Date | string
+  amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method: $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  gCashPayment?: Prisma.GCashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  creditPayment?: Prisma.CreditPaymentUncheckedCreateNestedOneWithoutPaymentInput
+}
+
+export type PaymentCreateOrConnectWithoutCheckPaymentInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutCheckPaymentInput, Prisma.PaymentUncheckedCreateWithoutCheckPaymentInput>
+}
+
+export type PaymentUpsertWithoutCheckPaymentInput = {
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutCheckPaymentInput, Prisma.PaymentUncheckedUpdateWithoutCheckPaymentInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutCheckPaymentInput, Prisma.PaymentUncheckedCreateWithoutCheckPaymentInput>
+  where?: Prisma.PaymentWhereInput
+}
+
+export type PaymentUpdateToOneWithWhereWithoutCheckPaymentInput = {
+  where?: Prisma.PaymentWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutCheckPaymentInput, Prisma.PaymentUncheckedUpdateWithoutCheckPaymentInput>
+}
+
+export type PaymentUpdateWithoutCheckPaymentInput = {
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentUpdateOneWithoutPaymentNestedInput
+  gCashPayment?: Prisma.GCashPaymentUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUpdateOneWithoutPaymentNestedInput
+  creditPayment?: Prisma.CreditPaymentUpdateOneWithoutPaymentNestedInput
+  transaction?: Prisma.TransactionUpdateOneRequiredWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutCheckPaymentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionId?: Prisma.IntFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  gCashPayment?: Prisma.GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  creditPayment?: Prisma.CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+}
+
+export type PaymentCreateWithoutBankTransferPaymentInput = {
+  date?: Date | string
+  amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method: $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentCreateNestedOneWithoutPaymentInput
+  gCashPayment?: Prisma.GCashPaymentCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentCreateNestedOneWithoutPaymentInput
+  creditPayment?: Prisma.CreditPaymentCreateNestedOneWithoutPaymentInput
+  transaction: Prisma.TransactionCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutBankTransferPaymentInput = {
+  id?: number
+  transactionId: number
+  date?: Date | string
+  amount_paid: runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method: $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  gCashPayment?: Prisma.GCashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  creditPayment?: Prisma.CreditPaymentUncheckedCreateNestedOneWithoutPaymentInput
+}
+
+export type PaymentCreateOrConnectWithoutBankTransferPaymentInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutBankTransferPaymentInput, Prisma.PaymentUncheckedCreateWithoutBankTransferPaymentInput>
+}
+
+export type PaymentUpsertWithoutBankTransferPaymentInput = {
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutBankTransferPaymentInput, Prisma.PaymentUncheckedUpdateWithoutBankTransferPaymentInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutBankTransferPaymentInput, Prisma.PaymentUncheckedCreateWithoutBankTransferPaymentInput>
+  where?: Prisma.PaymentWhereInput
+}
+
+export type PaymentUpdateToOneWithWhereWithoutBankTransferPaymentInput = {
+  where?: Prisma.PaymentWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutBankTransferPaymentInput, Prisma.PaymentUncheckedUpdateWithoutBankTransferPaymentInput>
+}
+
+export type PaymentUpdateWithoutBankTransferPaymentInput = {
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentUpdateOneWithoutPaymentNestedInput
+  gCashPayment?: Prisma.GCashPaymentUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUpdateOneWithoutPaymentNestedInput
+  creditPayment?: Prisma.CreditPaymentUpdateOneWithoutPaymentNestedInput
+  transaction?: Prisma.TransactionUpdateOneRequiredWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutBankTransferPaymentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionId?: Prisma.IntFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  cashPayment?: Prisma.CashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  gCashPayment?: Prisma.GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
@@ -654,6 +840,8 @@ export type PaymentCreateWithoutCreditPaymentInput = {
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentCreateNestedOneWithoutPaymentInput
   gCashPayment?: Prisma.GCashPaymentCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentCreateNestedOneWithoutPaymentInput
   transaction: Prisma.TransactionCreateNestedOneWithoutPaymentsInput
 }
 
@@ -665,6 +853,8 @@ export type PaymentUncheckedCreateWithoutCreditPaymentInput = {
   payment_method: $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedCreateNestedOneWithoutPaymentInput
   gCashPayment?: Prisma.GCashPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedCreateNestedOneWithoutPaymentInput
+  checkPayment?: Prisma.CheckPaymentUncheckedCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutCreditPaymentInput = {
@@ -689,6 +879,8 @@ export type PaymentUpdateWithoutCreditPaymentInput = {
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUpdateOneWithoutPaymentNestedInput
   gCashPayment?: Prisma.GCashPaymentUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUpdateOneWithoutPaymentNestedInput
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutPaymentsNestedInput
 }
 
@@ -700,6 +892,8 @@ export type PaymentUncheckedUpdateWithoutCreditPaymentInput = {
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   gCashPayment?: Prisma.GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentCreateManyTransactionInput = {
@@ -715,6 +909,8 @@ export type PaymentUpdateWithoutTransactionInput = {
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUpdateOneWithoutPaymentNestedInput
   gCashPayment?: Prisma.GCashPaymentUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUpdateOneWithoutPaymentNestedInput
 }
 
@@ -725,6 +921,8 @@ export type PaymentUncheckedUpdateWithoutTransactionInput = {
   payment_method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   cashPayment?: Prisma.CashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   gCashPayment?: Prisma.GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  bankTransferPayment?: Prisma.BankTransferPaymentUncheckedUpdateOneWithoutPaymentNestedInput
+  checkPayment?: Prisma.CheckPaymentUncheckedUpdateOneWithoutPaymentNestedInput
   creditPayment?: Prisma.CreditPaymentUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
@@ -745,6 +943,8 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   payment_method?: boolean
   cashPayment?: boolean | Prisma.Payment$cashPaymentArgs<ExtArgs>
   gCashPayment?: boolean | Prisma.Payment$gCashPaymentArgs<ExtArgs>
+  bankTransferPayment?: boolean | Prisma.Payment$bankTransferPaymentArgs<ExtArgs>
+  checkPayment?: boolean | Prisma.Payment$checkPaymentArgs<ExtArgs>
   creditPayment?: boolean | Prisma.Payment$creditPaymentArgs<ExtArgs>
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
@@ -779,6 +979,8 @@ export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cashPayment?: boolean | Prisma.Payment$cashPaymentArgs<ExtArgs>
   gCashPayment?: boolean | Prisma.Payment$gCashPaymentArgs<ExtArgs>
+  bankTransferPayment?: boolean | Prisma.Payment$bankTransferPaymentArgs<ExtArgs>
+  checkPayment?: boolean | Prisma.Payment$checkPaymentArgs<ExtArgs>
   creditPayment?: boolean | Prisma.Payment$creditPaymentArgs<ExtArgs>
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
 }
@@ -794,6 +996,8 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     cashPayment: Prisma.$CashPaymentPayload<ExtArgs> | null
     gCashPayment: Prisma.$GCashPaymentPayload<ExtArgs> | null
+    bankTransferPayment: Prisma.$BankTransferPaymentPayload<ExtArgs> | null
+    checkPayment: Prisma.$CheckPaymentPayload<ExtArgs> | null
     creditPayment: Prisma.$CreditPaymentPayload<ExtArgs> | null
     transaction: Prisma.$TransactionPayload<ExtArgs>
   }
@@ -1199,6 +1403,8 @@ export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   cashPayment<T extends Prisma.Payment$cashPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$cashPaymentArgs<ExtArgs>>): Prisma.Prisma__CashPaymentClient<runtime.Types.Result.GetResult<Prisma.$CashPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   gCashPayment<T extends Prisma.Payment$gCashPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$gCashPaymentArgs<ExtArgs>>): Prisma.Prisma__GCashPaymentClient<runtime.Types.Result.GetResult<Prisma.$GCashPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  bankTransferPayment<T extends Prisma.Payment$bankTransferPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$bankTransferPaymentArgs<ExtArgs>>): Prisma.Prisma__BankTransferPaymentClient<runtime.Types.Result.GetResult<Prisma.$BankTransferPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  checkPayment<T extends Prisma.Payment$checkPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$checkPaymentArgs<ExtArgs>>): Prisma.Prisma__CheckPaymentClient<runtime.Types.Result.GetResult<Prisma.$CheckPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   creditPayment<T extends Prisma.Payment$creditPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$creditPaymentArgs<ExtArgs>>): Prisma.Prisma__CreditPaymentClient<runtime.Types.Result.GetResult<Prisma.$CreditPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transaction<T extends Prisma.TransactionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TransactionDefaultArgs<ExtArgs>>): Prisma.Prisma__TransactionClient<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1671,6 +1877,44 @@ export type Payment$gCashPaymentArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.GCashPaymentInclude<ExtArgs> | null
   where?: Prisma.GCashPaymentWhereInput
+}
+
+/**
+ * Payment.bankTransferPayment
+ */
+export type Payment$bankTransferPaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BankTransferPayment
+   */
+  select?: Prisma.BankTransferPaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BankTransferPayment
+   */
+  omit?: Prisma.BankTransferPaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BankTransferPaymentInclude<ExtArgs> | null
+  where?: Prisma.BankTransferPaymentWhereInput
+}
+
+/**
+ * Payment.checkPayment
+ */
+export type Payment$checkPaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CheckPayment
+   */
+  select?: Prisma.CheckPaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CheckPayment
+   */
+  omit?: Prisma.CheckPaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CheckPaymentInclude<ExtArgs> | null
+  where?: Prisma.CheckPaymentWhereInput
 }
 
 /**

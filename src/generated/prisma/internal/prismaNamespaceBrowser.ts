@@ -58,6 +58,8 @@ export const ModelName = {
   Payment: 'Payment',
   CashPayment: 'CashPayment',
   GCashPayment: 'GCashPayment',
+  CheckPayment: 'CheckPayment',
+  BankTransferPayment: 'BankTransferPayment',
   CreditPayment: 'CreditPayment',
   CustomerPayment: 'CustomerPayment',
   Shipment: 'Shipment',
@@ -76,7 +78,8 @@ export const ModelName = {
   Delivery: 'Delivery',
   DeliveryItem: 'DeliveryItem',
   ApprovalRequest: 'ApprovalRequest',
-  SystemSetting: 'SystemSetting'
+  SystemSetting: 'SystemSetting',
+  Expense: 'Expense'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -183,6 +186,26 @@ export const GCashPaymentScalarFieldEnum = {
 } as const
 
 export type GCashPaymentScalarFieldEnum = (typeof GCashPaymentScalarFieldEnum)[keyof typeof GCashPaymentScalarFieldEnum]
+
+
+export const CheckPaymentScalarFieldEnum = {
+  paymentId: 'paymentId',
+  bank_name: 'bank_name',
+  check_number: 'check_number',
+  check_date: 'check_date',
+  is_cleared: 'is_cleared'
+} as const
+
+export type CheckPaymentScalarFieldEnum = (typeof CheckPaymentScalarFieldEnum)[keyof typeof CheckPaymentScalarFieldEnum]
+
+
+export const BankTransferPaymentScalarFieldEnum = {
+  paymentId: 'paymentId',
+  bank_name: 'bank_name',
+  reference_number: 'reference_number'
+} as const
+
+export type BankTransferPaymentScalarFieldEnum = (typeof BankTransferPaymentScalarFieldEnum)[keyof typeof BankTransferPaymentScalarFieldEnum]
 
 
 export const CreditPaymentScalarFieldEnum = {
@@ -432,6 +455,21 @@ export const SystemSettingScalarFieldEnum = {
 } as const
 
 export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  amount: 'amount',
+  date: 'date',
+  payment_method: 'payment_method',
+  notes: 'notes',
+  staffId: 'staffId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
 
 
 export const SortOrder = {
