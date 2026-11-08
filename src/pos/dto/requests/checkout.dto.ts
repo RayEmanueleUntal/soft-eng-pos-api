@@ -44,9 +44,6 @@ export class CheckoutDto {
   })
   @IsArray()
   @ArrayMinSize(1, { message: 'Checkout must contain at least one item.' })
-  @ArrayUnique((item: ItemDto) => item.productId, {
-    message: 'Each item ID in the array must be unique.',
-  })
   @ValidateNested({ each: true })
   @Type(() => ItemDto)
   items!: ItemDto[];

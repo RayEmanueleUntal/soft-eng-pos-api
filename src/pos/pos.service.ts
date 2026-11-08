@@ -219,12 +219,12 @@ export class PosService {
 
         const requestedUom = itemDto.current_uom ?? product.base_uom;
 
-        // Resolve conversion factor: 1.000 if Base UOM, else lookup from ProductUom table
+        // 1. Resolve conversion factor: 1.000 if Base UOM, else lookup from ProductUom table
         let conversionFactor = new Prisma.Decimal(1.0);
+        let configuredUom: any = null;
+
         if (requestedUom !== product.base_uom) {
-          const configuredUom = product.uoms.find(
-            (u) => u.uom === requestedUom,
-          );
+          configuredUom = product.uoms.find((u) => u.uom === requestedUom);
           if (configuredUom) {
             conversionFactor = new Prisma.Decimal(
               configuredUom.conversion_factor,
@@ -232,16 +232,40 @@ export class PosService {
           }
         }
 
-        // Calculate converted base quantity deducted: quantity_sold * conversion_factor
+        // 2. Base unit prices
+        const baseRetailPrice = new Prisma.Decimal(product.retail_price);
+        const baseWholesalePrice = product.wholesale_price
+          ? new Prisma.Decimal(product.wholesale_price)
+          : baseRetailPrice;
+
+        // 3. Resolve actual selling unit price for 1 unit of requestedUom
+        let unitPrice: Prisma.Decimal;
+
+        if (itemDto.transaction_type === TransactionType.WHOLESALE) {
+          if (configuredUom?.wholesale_price) {
+            // Priority A: Explicit UOM wholesale price override
+            unitPrice = new Prisma.Decimal(configuredUom.wholesale_price);
+          } else if (configuredUom?.retail_price) {
+            // Priority B: Explicit UOM retail price fallback
+            unitPrice = new Prisma.Decimal(configuredUom.retail_price);
+          } else {
+            // Priority C: Base wholesale price * conversion factor
+            unitPrice = baseWholesalePrice.times(conversionFactor);
+          }
+        } else {
+          // RETAIL
+          if (configuredUom?.retail_price) {
+            // Priority A: Explicit UOM retail price override
+            unitPrice = new Prisma.Decimal(configuredUom.retail_price);
+          } else {
+            // Priority B: Base retail price * conversion factor
+            unitPrice = baseRetailPrice.times(conversionFactor);
+          }
+        }
+
+        // 4. Quantities and Totals
         const quantitySold = new Prisma.Decimal(itemDto.quantity_sold);
         const baseQuantityDeducted = quantitySold.times(conversionFactor);
-
-        // Determine selling unit price based on retail vs wholesale item selection
-        const unitPrice = new Prisma.Decimal(
-          itemDto.transaction_type === TransactionType.WHOLESALE
-            ? Number(product.wholesale_price ?? product.retail_price)
-            : Number(product.retail_price),
-        );
 
         // Snapshot Weighted Average Cost (WAC) per Base UOM from Product model
         const costPriceSnapshot = new Prisma.Decimal(product.cost_price);
@@ -264,7 +288,6 @@ export class PosService {
           subtotal: lineSubtotal.minus(discount),
         };
       });
-
       // ------------------------------------------------------------------------
       // 6. Calculate Final Transaction Totals & Payment Validation
       // ------------------------------------------------------------------------
