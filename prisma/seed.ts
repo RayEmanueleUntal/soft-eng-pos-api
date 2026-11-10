@@ -18,6 +18,7 @@ import { seedTransactions } from './seeds/dependent/transactions.seed';
 import { seedReturnsAndExchanges } from './seeds/dependent/returns-exchanges.seed';
 import { seedShipments } from './seeds/dependent/shipments.seed';
 import { seedStockMovements } from './seeds/dependent/stock-movements.seed';
+import { seedExpenses } from './seeds/dependent/expenses.seed';
 
 async function main() {
   console.log('🌱 Starting database seeding...');
@@ -42,6 +43,7 @@ async function main() {
   await seedReturnsAndExchanges();
   await seedShipments();
   await seedStockMovements();
+  await seedExpenses();
 
   console.log('✅ Seeding finished successfully.');
 }
