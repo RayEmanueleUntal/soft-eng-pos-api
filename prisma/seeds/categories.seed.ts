@@ -8,6 +8,10 @@ export async function seedCategories() {
     'Screws',
     'Drill Bits',
     'Hand Tools',
+    'Anchors',
+    'Electrical & Cable Management',
+    'Chains, Ropes & Rigging',
+    'Scaffolding & Clamps',
   ];
 
   for (const name of categories) {

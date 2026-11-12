@@ -63,7 +63,7 @@ export const UnitOfMeasure = {
   HUNDRED: 'HUNDRED',
   GROSS: 'GROSS',
   SACK: 'SACK',
-  SACKs: 'SACKs'
+  SMALL_BOX: 'SMALL_BOX'
 } as const
 
 export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]
