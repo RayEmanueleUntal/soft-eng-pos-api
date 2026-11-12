@@ -644,7 +644,7 @@ enum UnitOfMeasure {
   HUNDRED
   GROSS 
   SACK
-  SACKs // TEMP. MUST CLEAN THIS UP LATER
+  SMALL_BOX
 }
 
 enum TransactionType {

@@ -9,6 +9,7 @@ import { seedSuppliers } from './seeds/suppliers.seed';
 import { seedForwarders } from './seeds/forwarders.seed';
 import { seedCustomers } from './seeds/customers.seed';
 import { seedProducts } from './seeds/products.seed';
+import { seedProductsFromCsv } from './seeds/products-csv.seed';
 import { seedSystemSettings } from './seeds/system-settings.seed';
 
 // Dependent seeds...
@@ -21,7 +22,12 @@ import { seedStockMovements } from './seeds/dependent/stock-movements.seed';
 import { seedExpenses } from './seeds/dependent/expenses.seed';
 
 async function main() {
-  console.log('🌱 Starting database seeding...');
+  const useCsv =
+    process.env.USE_CSV === 'true' || process.argv.includes('--csv');
+
+  console.log(
+    `🌱 Starting database seeding (${useCsv ? 'CSV PRODUCT MODE' : 'MOCK DATA MODE'})...`,
+  );
 
   // 1. Base entities
   await seedAdmin();
@@ -33,16 +39,26 @@ async function main() {
   await seedCustomers();
   await seedSystemSettings();
 
-  // 2. Products
-  await seedProducts();
+  // 2. Products (Switch based on mode)
+  if (useCsv) {
+    await seedProductsFromCsv();
+  } else {
+    await seedProducts();
+  }
 
   // 3. Dependent entities
-  await seedPurchaseOrders();
-  await seedDeliveries();
-  await seedTransactions();
-  await seedReturnsAndExchanges();
-  await seedShipments();
-  await seedStockMovements();
+  // Note: Mock dependent seeds look up fake SKUs (e.g., BLT-M8-30-SS).
+  // Run them only in mock mode, or adapt them if your CSV contains those SKUs.
+  if (!useCsv) {
+    await seedPurchaseOrders();
+    await seedDeliveries();
+    await seedTransactions();
+    await seedReturnsAndExchanges();
+    await seedShipments();
+    await seedStockMovements();
+  }
+
+  // Expenses only depend on StaffUsers, so it works in both modes
   await seedExpenses();
 
   console.log('✅ Seeding finished successfully.');
