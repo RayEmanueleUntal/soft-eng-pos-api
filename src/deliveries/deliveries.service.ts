@@ -303,7 +303,7 @@ export class DeliveriesService {
     );
 
     const message = result.isPartial
-      ? 'Quantities received do not match PO expected base quantities. PO marked as Partially Fulfilled.'
+      ? 'Quantities received do not match PO expected base quantities.'
       : 'Success: Delivery verified, WAC calculated, and inventory stock levels updated.';
 
     return {

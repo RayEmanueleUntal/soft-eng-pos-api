@@ -67,6 +67,7 @@ export class ReturnsService {
     productId: number,
     refundQuantity: number,
   ): Promise<RefundPaymentBreakdown> {
+    // Retrieve the transaction
     const txItem = await this.prisma.transactionItem.findFirst({
       where: { transactionId, productId },
       include: {
@@ -90,9 +91,9 @@ export class ReturnsService {
       );
     }
 
-    const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+    const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber(); // amount of items in base unit deducted from the inventory
     const effectiveBaseUnitPrice =
-      txItem.subtotal.toNumber() / baseQuantityDeducted;
+      txItem.subtotal.toNumber() / baseQuantityDeducted; // price for each item in base unit upon its purchase
     const totalRefundAmount = effectiveBaseUnitPrice * refundQuantity;
 
     // Check for open credit payment balance
