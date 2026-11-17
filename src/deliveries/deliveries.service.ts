@@ -15,7 +15,7 @@ import {
   InvalidDeliveryQuantityException,
 } from 'src/common/exceptions';
 import { Prisma } from 'src/generated/prisma/client';
-import { POStatus } from 'src/generated/prisma/enums';
+import { POStatus, UnitOfMeasure } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class DeliveriesService {
@@ -72,88 +72,11 @@ export class DeliveriesService {
       throw new InvalidPOStatusException(po.id, po.po_status);
     }
 
-    // Map existing received base quantities per product across previous deliveries
-    const totalReceivedBaseQtyMap = new Map<number, number>();
-    for (const pastDelivery of po.deliveries) {
-      for (const item of pastDelivery.deliveryItems) {
-        const current = totalReceivedBaseQtyMap.get(item.productId) || 0;
-        totalReceivedBaseQtyMap.set(
-          item.productId,
-          current + Number(item.actual_base_quantity),
-        );
-      }
-    }
-
-    // Index PO Items by productId for fast lookup and cost calculation
-    const poItemsMap = new Map<number, (typeof po.poItems)[0]>();
-    po.poItems.forEach((item) => {
-      poItemsMap.set(item.productId, item);
-    });
-
-    // Validate submitted items against PO items & consolidate input details
-    type ProcessedDeliveryInput = {
-      productId: number;
-      receivedQuantity: number;
-      receivedUom: any;
-      conversionFactor: number;
-      actualBaseQuantity: number;
-      poItem: (typeof po.poItems)[0];
-    };
-
-    const processedItems: ProcessedDeliveryInput[] = [];
-
-    for (const item of dto.items) {
-      const poItem = poItemsMap.get(item.productId);
-      if (!poItem) {
-        this.logger.warn(
-          `Delivery item error: Product #${item.productId} not in PO #${po.id}`,
-        );
-        throw new POItemNotFoundException(po.id, item.productId);
-      }
-
-      const receivedQty = Number(item.received_quantity);
-      if (receivedQty <= 0) {
-        throw new InvalidDeliveryQuantityException(
-          item.productId,
-          'Received quantity must be greater than zero.',
-        );
-      }
-
-      const conversionFactor = item.uom_conversion_factor
-        ? Number(item.uom_conversion_factor)
-        : Number(poItem.uom_conversion_factor);
-
-      if (conversionFactor <= 0) {
-        throw new InvalidDeliveryQuantityException(
-          item.productId,
-          'Conversion factor must be greater than zero.',
-        );
-      }
-
-      // Calculate or use explicitly provided actual base quantity override
-      const actualBaseQuantity = item.actual_base_quantity
-        ? Number(item.actual_base_quantity)
-        : receivedQty * conversionFactor;
-
-      if (actualBaseQuantity <= 0) {
-        throw new InvalidDeliveryQuantityException(
-          item.productId,
-          'Actual base quantity must be greater than zero.',
-        );
-      }
-
-      processedItems.push({
-        productId: item.productId,
-        receivedQuantity: receivedQty,
-        receivedUom: item.received_uom || poItem.ordered_uom,
-        conversionFactor,
-        actualBaseQuantity,
-        poItem,
-      });
-    }
-
-    // 2. Batch verify existence of all submitted products in the database
-    const submittedProductIds = processedItems.map((i) => i.productId);
+    // 2. Batch verify existence of all submitted products BEFORE item validation
+    // so we have access to each product's canonical base_uom
+    const submittedProductIds = Array.from(
+      new Set(dto.items.map((i) => i.productId)),
+    );
     const existingProducts = await this.prisma.product.findMany({
       where: { id: { in: submittedProductIds } },
       select: {
@@ -178,7 +101,123 @@ export class DeliveriesService {
 
     const productMap = new Map(existingProducts.map((p) => [p.id, p]));
 
-    // 3. Execute Transaction
+    // Map existing received base quantities per product across previous deliveries
+    const totalReceivedBaseQtyMap = new Map<number, number>();
+    for (const pastDelivery of po.deliveries) {
+      for (const item of pastDelivery.deliveryItems) {
+        const current = totalReceivedBaseQtyMap.get(item.productId) || 0;
+        totalReceivedBaseQtyMap.set(
+          item.productId,
+          current + Number(item.actual_base_quantity),
+        );
+      }
+    }
+
+    // Index PO Items by productId for fast lookup and cost calculation
+    const poItemsMap = new Map<number, (typeof po.poItems)[0]>();
+    po.poItems.forEach((item) => {
+      poItemsMap.set(item.productId, item);
+    });
+
+    // 3. Validate submitted items against PO items & enforce base UOM guardrails
+    type ProcessedDeliveryInput = {
+      productId: number;
+      receivedQuantity: number;
+      receivedUom: UnitOfMeasure;
+      conversionFactor: number;
+      actualBaseQuantity: number;
+      poItem: (typeof po.poItems)[0];
+    };
+
+    const processedItems: ProcessedDeliveryInput[] = [];
+
+    for (const item of dto.items) {
+      const poItem = poItemsMap.get(item.productId);
+      if (!poItem) {
+        this.logger.warn(
+          `Delivery item error: Product #${item.productId} not in PO #${po.id}`,
+        );
+        throw new POItemNotFoundException(po.id, item.productId);
+      }
+
+      const product = productMap.get(item.productId)!;
+      const receivedUom = item.received_uom || poItem.ordered_uom;
+      const receivedQty = Number(item.received_quantity);
+
+      if (receivedQty <= 0) {
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          'Received quantity must be greater than zero.',
+        );
+      }
+
+      let conversionFactor =
+        item.uom_conversion_factor !== undefined
+          ? Number(item.uom_conversion_factor)
+          : Number(poItem.uom_conversion_factor);
+
+      // GUARDRAIL (BUG-015): Base UOM to Base UOM must always have a conversion factor of 1
+      if (receivedUom === product.base_uom) {
+        if (
+          item.uom_conversion_factor !== undefined &&
+          Number(item.uom_conversion_factor) !== 1
+        ) {
+          this.logger.warn(
+            `Rejected invalid conversion factor ${item.uom_conversion_factor} for base UOM ${product.base_uom} on Product #${product.id}`,
+          );
+          throw new InvalidDeliveryQuantityException(
+            item.productId,
+            `Conversion factor must be 1 when received_uom (${receivedUom}) matches the product's base_uom.`,
+          );
+        }
+        conversionFactor = 1;
+      }
+
+      if (conversionFactor <= 0) {
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          'Conversion factor must be greater than zero.',
+        );
+      }
+
+      // Calculate or use explicitly provided actual base quantity override
+      const actualBaseQuantity =
+        item.actual_base_quantity !== undefined
+          ? Number(item.actual_base_quantity)
+          : receivedQty * conversionFactor;
+
+      // GUARDRAIL: When receiving in base_uom, actual_base_quantity cannot diverge from received_quantity
+      if (
+        receivedUom === product.base_uom &&
+        actualBaseQuantity !== receivedQty
+      ) {
+        this.logger.warn(
+          `Rejected mismatched actual_base_quantity (${actualBaseQuantity}) vs received_quantity (${receivedQty}) for base UOM ${product.base_uom} on Product #${product.id}`,
+        );
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          `Actual base quantity (${actualBaseQuantity}) must equal received quantity (${receivedQty}) when receiving in base_uom (${receivedUom}).`,
+        );
+      }
+
+      if (actualBaseQuantity <= 0) {
+        throw new InvalidDeliveryQuantityException(
+          item.productId,
+          'Actual base quantity must be greater than zero.',
+        );
+      }
+
+      processedItems.push({
+        productId: item.productId,
+        receivedQuantity: receivedQty,
+        receivedUom,
+        conversionFactor,
+        actualBaseQuantity,
+        poItem,
+      });
+    }
+
+    // 4. Execute Transaction
     const result = await this.prisma.$transaction(async (tx) => {
       // Create Delivery record and DeliveryItems with snapshot metrics
       const delivery = await tx.delivery.create({
@@ -253,6 +292,10 @@ export class DeliveriesService {
           reason: `PO #${po.id} Delivery Receiving (Delivery #${delivery.id})`,
           operation_name: 'DELIVERY_RECEIVING',
         });
+
+        // Keep in-memory snapshot updated in case payload contains multiple lines for the same product
+        product.current_quantity = new Prisma.Decimal(totalNewQty);
+        product.cost_price = roundedNewCost;
       }
 
       // Track multi-item intake in case duplicate entries exist in delivery payload
@@ -303,7 +346,7 @@ export class DeliveriesService {
     );
 
     const message = result.isPartial
-      ? 'Quantities received do not match PO expected base quantities. PO marked as Partially Fulfilled.'
+      ? 'Quantities received do not match PO expected base quantities.'
       : 'Success: Delivery verified, WAC calculated, and inventory stock levels updated.';
 
     return {

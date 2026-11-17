@@ -1,3 +1,4 @@
+import { ItemCondition } from 'src/generated/prisma/client';
 import { prisma } from '../../client';
 
 export async function seedReturnsAndExchanges() {
@@ -67,6 +68,7 @@ export async function seedReturnsAndExchanges() {
         transactionId: validTx1.id,
         productId: validBolt.id,
         quantity: 1,
+        condition: ItemCondition.DEFECTIVE,
         defect_reason: 'Stripped threads upon opening box',
         refund_amount: 10.0,
         staffId: validStaff.id,
@@ -89,8 +91,7 @@ export async function seedReturnsAndExchanges() {
         transactionId: validTx3.id,
         productId: validDrill.id,
         quantity: 1,
-        price_difference: 0.0,
-        is_within_7_days: true,
+        staffId: validStaff.id,
         date: new Date('2026-03-16T11:20:00Z'),
       },
     });

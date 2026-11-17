@@ -50,6 +50,7 @@ export type ReturnMinAggregateOutputType = {
   productId: number | null
   quantity: runtime.Decimal | null
   date: Date | null
+  condition: $Enums.ItemCondition | null
   defect_reason: string | null
   refund_amount: runtime.Decimal | null
   staffId: number | null
@@ -61,6 +62,7 @@ export type ReturnMaxAggregateOutputType = {
   productId: number | null
   quantity: runtime.Decimal | null
   date: Date | null
+  condition: $Enums.ItemCondition | null
   defect_reason: string | null
   refund_amount: runtime.Decimal | null
   staffId: number | null
@@ -72,6 +74,7 @@ export type ReturnCountAggregateOutputType = {
   productId: number
   quantity: number
   date: number
+  condition: number
   defect_reason: number
   refund_amount: number
   staffId: number
@@ -103,6 +106,7 @@ export type ReturnMinAggregateInputType = {
   productId?: true
   quantity?: true
   date?: true
+  condition?: true
   defect_reason?: true
   refund_amount?: true
   staffId?: true
@@ -114,6 +118,7 @@ export type ReturnMaxAggregateInputType = {
   productId?: true
   quantity?: true
   date?: true
+  condition?: true
   defect_reason?: true
   refund_amount?: true
   staffId?: true
@@ -125,6 +130,7 @@ export type ReturnCountAggregateInputType = {
   productId?: true
   quantity?: true
   date?: true
+  condition?: true
   defect_reason?: true
   refund_amount?: true
   staffId?: true
@@ -223,6 +229,7 @@ export type ReturnGroupByOutputType = {
   productId: number
   quantity: runtime.Decimal
   date: Date
+  condition: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal
   staffId: number
@@ -257,6 +264,7 @@ export type ReturnWhereInput = {
   productId?: Prisma.IntFilter<"Return"> | number
   quantity?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Return"> | Date | string
+  condition?: Prisma.EnumItemConditionFilter<"Return"> | $Enums.ItemCondition
   defect_reason?: Prisma.StringFilter<"Return"> | string
   refund_amount?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFilter<"Return"> | number
@@ -271,6 +279,7 @@ export type ReturnOrderByWithRelationInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  condition?: Prisma.SortOrder
   defect_reason?: Prisma.SortOrder
   refund_amount?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -288,6 +297,7 @@ export type ReturnWhereUniqueInput = Prisma.AtLeast<{
   productId?: Prisma.IntFilter<"Return"> | number
   quantity?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Return"> | Date | string
+  condition?: Prisma.EnumItemConditionFilter<"Return"> | $Enums.ItemCondition
   defect_reason?: Prisma.StringFilter<"Return"> | string
   refund_amount?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFilter<"Return"> | number
@@ -302,6 +312,7 @@ export type ReturnOrderByWithAggregationInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  condition?: Prisma.SortOrder
   defect_reason?: Prisma.SortOrder
   refund_amount?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -321,6 +332,7 @@ export type ReturnScalarWhereWithAggregatesInput = {
   productId?: Prisma.IntWithAggregatesFilter<"Return"> | number
   quantity?: Prisma.DecimalWithAggregatesFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeWithAggregatesFilter<"Return"> | Date | string
+  condition?: Prisma.EnumItemConditionWithAggregatesFilter<"Return"> | $Enums.ItemCondition
   defect_reason?: Prisma.StringWithAggregatesFilter<"Return"> | string
   refund_amount?: Prisma.DecimalWithAggregatesFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntWithAggregatesFilter<"Return"> | number
@@ -329,6 +341,7 @@ export type ReturnScalarWhereWithAggregatesInput = {
 export type ReturnCreateInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   transaction: Prisma.TransactionCreateNestedOneWithoutReturnsInput
@@ -342,6 +355,7 @@ export type ReturnUncheckedCreateInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
@@ -350,6 +364,7 @@ export type ReturnUncheckedCreateInput = {
 export type ReturnUpdateInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutReturnsNestedInput
@@ -363,6 +378,7 @@ export type ReturnUncheckedUpdateInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -374,6 +390,7 @@ export type ReturnCreateManyInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
@@ -382,6 +399,7 @@ export type ReturnCreateManyInput = {
 export type ReturnUpdateManyMutationInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
@@ -392,6 +410,7 @@ export type ReturnUncheckedUpdateManyInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -413,6 +432,7 @@ export type ReturnCountOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  condition?: Prisma.SortOrder
   defect_reason?: Prisma.SortOrder
   refund_amount?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -433,6 +453,7 @@ export type ReturnMaxOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  condition?: Prisma.SortOrder
   defect_reason?: Prisma.SortOrder
   refund_amount?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -444,6 +465,7 @@ export type ReturnMinOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  condition?: Prisma.SortOrder
   defect_reason?: Prisma.SortOrder
   refund_amount?: Prisma.SortOrder
   staffId?: Prisma.SortOrder
@@ -498,6 +520,10 @@ export type ReturnUncheckedUpdateManyWithoutTransactionNestedInput = {
   update?: Prisma.ReturnUpdateWithWhereUniqueWithoutTransactionInput | Prisma.ReturnUpdateWithWhereUniqueWithoutTransactionInput[]
   updateMany?: Prisma.ReturnUpdateManyWithWhereWithoutTransactionInput | Prisma.ReturnUpdateManyWithWhereWithoutTransactionInput[]
   deleteMany?: Prisma.ReturnScalarWhereInput | Prisma.ReturnScalarWhereInput[]
+}
+
+export type EnumItemConditionFieldUpdateOperationsInput = {
+  set?: $Enums.ItemCondition
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -591,6 +617,7 @@ export type ReturnUncheckedUpdateManyWithoutProductNestedInput = {
 export type ReturnCreateWithoutTransactionInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   product: Prisma.ProductCreateNestedOneWithoutReturnsInput
@@ -602,6 +629,7 @@ export type ReturnUncheckedCreateWithoutTransactionInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
@@ -642,6 +670,7 @@ export type ReturnScalarWhereInput = {
   productId?: Prisma.IntFilter<"Return"> | number
   quantity?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Return"> | Date | string
+  condition?: Prisma.EnumItemConditionFilter<"Return"> | $Enums.ItemCondition
   defect_reason?: Prisma.StringFilter<"Return"> | string
   refund_amount?: Prisma.DecimalFilter<"Return"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFilter<"Return"> | number
@@ -650,6 +679,7 @@ export type ReturnScalarWhereInput = {
 export type ReturnCreateWithoutStaffInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   transaction: Prisma.TransactionCreateNestedOneWithoutReturnsInput
@@ -662,6 +692,7 @@ export type ReturnUncheckedCreateWithoutStaffInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
@@ -695,6 +726,7 @@ export type ReturnUpdateManyWithWhereWithoutStaffInput = {
 export type ReturnCreateWithoutProductInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   transaction: Prisma.TransactionCreateNestedOneWithoutReturnsInput
@@ -706,6 +738,7 @@ export type ReturnUncheckedCreateWithoutProductInput = {
   transactionId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
@@ -742,6 +775,7 @@ export type ReturnCreateManyTransactionInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
@@ -750,6 +784,7 @@ export type ReturnCreateManyTransactionInput = {
 export type ReturnUpdateWithoutTransactionInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   product?: Prisma.ProductUpdateOneRequiredWithoutReturnsNestedInput
@@ -761,6 +796,7 @@ export type ReturnUncheckedUpdateWithoutTransactionInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -771,6 +807,7 @@ export type ReturnUncheckedUpdateManyWithoutTransactionInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -782,6 +819,7 @@ export type ReturnCreateManyStaffInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
@@ -789,6 +827,7 @@ export type ReturnCreateManyStaffInput = {
 export type ReturnUpdateWithoutStaffInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutReturnsNestedInput
@@ -801,6 +840,7 @@ export type ReturnUncheckedUpdateWithoutStaffInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
@@ -811,6 +851,7 @@ export type ReturnUncheckedUpdateManyWithoutStaffInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
@@ -820,6 +861,7 @@ export type ReturnCreateManyProductInput = {
   transactionId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
+  condition?: $Enums.ItemCondition
   defect_reason: string
   refund_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId: number
@@ -828,6 +870,7 @@ export type ReturnCreateManyProductInput = {
 export type ReturnUpdateWithoutProductInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutReturnsNestedInput
@@ -839,6 +882,7 @@ export type ReturnUncheckedUpdateWithoutProductInput = {
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -849,6 +893,7 @@ export type ReturnUncheckedUpdateManyWithoutProductInput = {
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  condition?: Prisma.EnumItemConditionFieldUpdateOperationsInput | $Enums.ItemCondition
   defect_reason?: Prisma.StringFieldUpdateOperationsInput | string
   refund_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   staffId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -862,6 +907,7 @@ export type ReturnSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   productId?: boolean
   quantity?: boolean
   date?: boolean
+  condition?: boolean
   defect_reason?: boolean
   refund_amount?: boolean
   staffId?: boolean
@@ -876,6 +922,7 @@ export type ReturnSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   productId?: boolean
   quantity?: boolean
   date?: boolean
+  condition?: boolean
   defect_reason?: boolean
   refund_amount?: boolean
   staffId?: boolean
@@ -890,6 +937,7 @@ export type ReturnSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   productId?: boolean
   quantity?: boolean
   date?: boolean
+  condition?: boolean
   defect_reason?: boolean
   refund_amount?: boolean
   staffId?: boolean
@@ -904,12 +952,13 @@ export type ReturnSelectScalar = {
   productId?: boolean
   quantity?: boolean
   date?: boolean
+  condition?: boolean
   defect_reason?: boolean
   refund_amount?: boolean
   staffId?: boolean
 }
 
-export type ReturnOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "productId" | "quantity" | "date" | "defect_reason" | "refund_amount" | "staffId", ExtArgs["result"]["return"]>
+export type ReturnOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "productId" | "quantity" | "date" | "condition" | "defect_reason" | "refund_amount" | "staffId", ExtArgs["result"]["return"]>
 export type ReturnInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -939,6 +988,7 @@ export type $ReturnPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     productId: number
     quantity: runtime.Decimal
     date: Date
+    condition: $Enums.ItemCondition
     defect_reason: string
     refund_amount: runtime.Decimal
     staffId: number
@@ -1373,6 +1423,7 @@ export interface ReturnFieldRefs {
   readonly productId: Prisma.FieldRef<"Return", 'Int'>
   readonly quantity: Prisma.FieldRef<"Return", 'Decimal'>
   readonly date: Prisma.FieldRef<"Return", 'DateTime'>
+  readonly condition: Prisma.FieldRef<"Return", 'ItemCondition'>
   readonly defect_reason: Prisma.FieldRef<"Return", 'String'>
   readonly refund_amount: Prisma.FieldRef<"Return", 'Decimal'>
   readonly staffId: Prisma.FieldRef<"Return", 'Int'>

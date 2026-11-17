@@ -27,6 +27,7 @@ import {
 import { InvalidDateRangeException } from 'src/common/exceptions';
 import {
   CreditStatus,
+  ItemCondition,
   MovementType,
   TransactionStatus,
 } from 'src/generated/prisma/enums';
@@ -39,7 +40,8 @@ export class AnalyticsService {
 
   /**
    * Calculates real-time high-level KPI metrics for the executive dashboard.
-   * Computes Revenue, COGS, Gross Profit, OpEx, Net Profit, and Active AR.
+   * Accounts for COMPLETED & PARTIALLY_REFUNDED transactions, deducts refund amounts
+   * from revenue, and reverses COGS only for sellable (CHANGE_OF_MIND) returns.
    *
    * @param query AnalyticsQueryDto containing optional startDate and endDate
    * @returns DashboardSummaryResponseDto
@@ -60,54 +62,93 @@ export class AnalyticsService {
       `Fetching dashboard summary: startDate=${startDate?.toISOString() ?? 'ALL'}, endDate=${endDate?.toISOString() ?? 'ALL'}`,
     );
 
-    // Build common date filter clause for transactions and expenses
+    // Build common date filter clause for transactions, returns, and expenses
     const dateFilter: { gte?: Date; lte?: Date } = {};
     if (startDate) dateFilter.gte = startDate;
     if (endDate) dateFilter.lte = endDate;
 
+    const hasDateFilter = Object.keys(dateFilter).length > 0;
+
+    // Include both COMPLETED and PARTIALLY_REFUNDED so partial returns don't wipe out valid sales
     const transactionWhere = {
-      status: TransactionStatus.COMPLETED,
-      ...(Object.keys(dateFilter).length > 0 && { date: dateFilter }),
+      status: {
+        in: [TransactionStatus.COMPLETED, TransactionStatus.PARTIALLY_REFUNDED],
+      },
+      ...(hasDateFilter && { date: dateFilter }),
+    };
+
+    const returnWhere = {
+      ...(hasDateFilter && { date: dateFilter }),
     };
 
     const expenseWhere = {
-      ...(Object.keys(dateFilter).length > 0 && { date: dateFilter }),
+      ...(hasDateFilter && { date: dateFilter }),
     };
 
     // Execute queries concurrently for high performance
-    const [revenueAggregate, transactionItems, expenseAggregate, arAggregate] =
-      await Promise.all([
-        // 1. Total Sales Revenue
-        this.prisma.transaction.aggregate({
-          _sum: { grand_total: true },
-          where: transactionWhere,
-        }),
+    const [
+      revenueAggregate,
+      transactionItems,
+      returns,
+      expenseAggregate,
+      arAggregate,
+    ] = await Promise.all([
+      // 1. Gross Sales Revenue (before refunds)
+      this.prisma.transaction.aggregate({
+        _sum: { grand_total: true },
+        where: transactionWhere,
+      }),
 
-        // 2. Fetch Transaction Items to calculate Cost of Goods Sold (COGS)
-        this.prisma.transactionItem.findMany({
-          where: {
-            transaction: transactionWhere,
+      // 2. Fetch Transaction Items to calculate Gross COGS
+      this.prisma.transactionItem.findMany({
+        where: {
+          transaction: transactionWhere,
+        },
+        select: {
+          base_quantity_deducted: true,
+          cost_price: true,
+        },
+      }),
+
+      // 3. Fetch Returns within the period to adjust Net Revenue & sellable COGS
+      this.prisma.return.findMany({
+        where: returnWhere,
+        select: {
+          transactionId: true,
+          productId: true,
+          quantity: true,
+          condition: true,
+          refund_amount: true,
+          product: {
+            select: { cost_price: true },
           },
-          select: {
-            base_quantity_deducted: true,
-            cost_price: true,
+          transaction: {
+            select: {
+              transactionItems: {
+                select: {
+                  productId: true,
+                  cost_price: true,
+                },
+              },
+            },
           },
-        }),
+        },
+      }),
 
-        // 3. Total OpEx (General Expenses)
-        this.prisma.expense.aggregate({
-          _sum: { amount: true },
-          where: expenseWhere,
-        }),
+      // 4. Total OpEx (General Expenses)
+      this.prisma.expense.aggregate({
+        _sum: { amount: true },
+        where: expenseWhere,
+      }),
 
-        // 4. Total Active Accounts Receivable (Current outstanding balance across all wholesale profiles)
-        this.prisma.wholeSaleCustomer.aggregate({
-          _sum: { outstanding_balance: true },
-        }),
-      ]);
+      // 5. Total Active Accounts Receivable (Point-in-time outstanding debt)
+      this.prisma.wholeSaleCustomer.aggregate({
+        _sum: { outstanding_balance: true },
+      }),
+    ]);
 
     // Parse aggregated values securely (Fallback to 0 if null)
-    const totalRevenue = revenueAggregate._sum.grand_total
+    const grossRevenue = revenueAggregate._sum.grand_total
       ? Number(revenueAggregate._sum.grand_total)
       : 0;
 
@@ -119,24 +160,48 @@ export class AnalyticsService {
       ? Number(arAggregate._sum.outstanding_balance)
       : 0;
 
-    // Calculate COGS: Sum of (base_quantity_deducted * cost_price) for each item
-    const totalCogs = transactionItems.reduce((acc, item) => {
+    // Calculate Gross COGS: Sum of (base_quantity_deducted * cost_price) for each sold item
+    const grossCogs = transactionItems.reduce((acc, item) => {
       const itemCogs =
         Number(item.base_quantity_deducted) * Number(item.cost_price);
       return acc + itemCogs;
     }, 0);
 
+    // Process Returns: Sum total refunds & compute COGS reversal for CHANGE_OF_MIND items
+    let totalRefunds = 0;
+    let recoveredCogs = 0;
+
+    for (const ret of returns) {
+      totalRefunds += Number(ret.refund_amount);
+
+      // Only CHANGE_OF_MIND items return to sellable stock; DEFECTIVE items remain a loss in COGS
+      if (ret.condition === ItemCondition.CHANGE_OF_MIND) {
+        const matchedLineItem = ret.transaction.transactionItems.find(
+          (ti) => ti.productId === ret.productId,
+        );
+        const unitCost = matchedLineItem
+          ? Number(matchedLineItem.cost_price)
+          : Number(ret.product.cost_price);
+
+        recoveredCogs += Number(ret.quantity) * unitCost;
+      }
+    }
+
+    // Net Revenue & Net COGS after Return adjustments
+    const totalRevenue = Math.max(0, grossRevenue - totalRefunds);
+    const totalCogs = Math.max(0, grossCogs - recoveredCogs);
+
     // Profit and Margin Calculations
     const grossProfit = totalRevenue - totalCogs;
     const grossMarginPercentage =
-      totalRevenue > 0 ? (grossProfit / totalRevenue) * 10 : 0;
+      totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
 
     const netProfit = grossProfit - totalOpEx;
     const netMarginPercentage =
       totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
     this.logger.log(
-      `Dashboard summary computed successfully: Revenue=${totalRevenue}, COGS=${totalCogs}, GrossProfit=${grossProfit}, OpEx=${totalOpEx}, NetProfit=${netProfit}, AR=${totalActiveReceivables}`,
+      `Dashboard summary computed: NetRevenue=${totalRevenue} (Gross=${grossRevenue}, Refunds=${totalRefunds}), NetCOGS=${totalCogs} (Recovered=${recoveredCogs}), GrossProfit=${grossProfit}, OpEx=${totalOpEx}, NetProfit=${netProfit}, AR=${totalActiveReceivables}`,
     );
 
     return DashboardSummaryResponseDto.fromMetrics({
@@ -153,6 +218,8 @@ export class AnalyticsService {
 
   /**
    * Generates Sales & Net Profit trend, payment method breakdown, and summary ledger.
+   * Accounts for COMPLETED & PARTIALLY_REFUNDED transactions, deducts refund amounts
+   * from revenue buckets/totals, and reverses COGS only for sellable (CHANGE_OF_MIND) returns.
    *
    * @param query SalesPerformanceQueryDto
    * @returns SalesPerformanceResponseDto
@@ -177,18 +244,27 @@ export class AnalyticsService {
     if (startDate) dateFilter.gte = startDate;
     if (endDate) dateFilter.lte = endDate;
 
+    const hasDateFilter = Object.keys(dateFilter).length > 0;
+
+    // Include COMPLETED and PARTIALLY_REFUNDED so partial returns remain represented
     const transactionWhere = {
-      status: TransactionStatus.COMPLETED,
-      ...(Object.keys(dateFilter).length > 0 && { date: dateFilter }),
+      status: {
+        in: [TransactionStatus.COMPLETED, TransactionStatus.PARTIALLY_REFUNDED],
+      },
+      ...(hasDateFilter && { date: dateFilter }),
+    };
+
+    const returnWhere = {
+      ...(hasDateFilter && { date: dateFilter }),
     };
 
     const expenseWhere = {
-      ...(Object.keys(dateFilter).length > 0 && { date: dateFilter }),
+      ...(hasDateFilter && { date: dateFilter }),
     };
 
     // Parallel Database Execution
-    const [transactions, expenses, payments] = await Promise.all([
-      // 1. Fetch Completed Transactions with items
+    const [transactions, returns, expenses, payments] = await Promise.all([
+      // 1. Fetch Valid Transactions with items
       this.prisma.transaction.findMany({
         where: transactionWhere,
         select: {
@@ -206,7 +282,33 @@ export class AnalyticsService {
         orderBy: { date: 'asc' },
       }),
 
-      // 2. Fetch Expenses for interval Net Profit calculation
+      // 2. Fetch Returns within period for Revenue & sellable COGS adjustments
+      this.prisma.return.findMany({
+        where: returnWhere,
+        select: {
+          transactionId: true,
+          productId: true,
+          quantity: true,
+          date: true,
+          condition: true,
+          refund_amount: true,
+          product: {
+            select: { cost_price: true },
+          },
+          transaction: {
+            select: {
+              transactionItems: {
+                select: {
+                  productId: true,
+                  cost_price: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+
+      // 3. Fetch Expenses for interval Net Profit calculation
       this.prisma.expense.findMany({
         where: expenseWhere,
         select: {
@@ -215,7 +317,7 @@ export class AnalyticsService {
         },
       }),
 
-      // 3. Fetch Payments associated with completed transactions
+      // 4. Fetch Payments associated with valid transactions
       this.prisma.payment.findMany({
         where: {
           transaction: transactionWhere,
@@ -258,9 +360,9 @@ export class AnalyticsService {
       { revenue: number; cogs: number; opex: number }
     >();
 
-    let totalRevenue = 0;
+    let grossRevenue = 0;
     let totalDiscounts = 0;
-    let totalCogs = 0;
+    let grossCogs = 0;
 
     for (const tx of transactions) {
       const label = getPeriodLabel(tx.date);
@@ -273,14 +375,45 @@ export class AnalyticsService {
         );
       }, 0);
 
-      totalRevenue += rev;
+      grossRevenue += rev;
       totalDiscounts += disc;
-      totalCogs += txCogs;
+      grossCogs += txCogs;
 
       const current = trendMap.get(label) || { revenue: 0, cogs: 0, opex: 0 };
       trendMap.set(label, {
         revenue: current.revenue + rev,
         cogs: current.cogs + txCogs,
+        opex: current.opex,
+      });
+    }
+
+    // Apply Returns into Trend buckets & Summary totals
+    let totalRefunds = 0;
+    let recoveredCogs = 0;
+
+    for (const ret of returns) {
+      const label = getPeriodLabel(ret.date);
+      const refundAmt = Number(ret.refund_amount);
+      totalRefunds += refundAmt;
+
+      let itemRecoveredCogs = 0;
+      // Only CHANGE_OF_MIND items return to sellable stock; DEFECTIVE items remain a loss in COGS
+      if (ret.condition === ItemCondition.CHANGE_OF_MIND) {
+        const matchedLineItem = ret.transaction.transactionItems.find(
+          (ti) => ti.productId === ret.productId,
+        );
+        const unitCost = matchedLineItem
+          ? Number(matchedLineItem.cost_price)
+          : Number(ret.product.cost_price);
+
+        itemRecoveredCogs = Number(ret.quantity) * unitCost;
+        recoveredCogs += itemRecoveredCogs;
+      }
+
+      const current = trendMap.get(label) || { revenue: 0, cogs: 0, opex: 0 };
+      trendMap.set(label, {
+        revenue: current.revenue - refundAmt,
+        cogs: current.cogs - itemRecoveredCogs,
         opex: current.opex,
       });
     }
@@ -299,11 +432,17 @@ export class AnalyticsService {
     // Convert Trend Map to Sorted Array
     const trend: SalesTrendDataPointDto[] = Array.from(trendMap.entries())
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([date_label, data]) => ({
-        date_label,
-        revenue: Number(data.revenue.toFixed(2)),
-        net_profit: Number((data.revenue - data.cogs - data.opex).toFixed(2)),
-      }));
+      .map(([date_label, data]) => {
+        const netPeriodRevenue = Math.max(0, data.revenue);
+        const netPeriodCogs = Math.max(0, data.cogs);
+        return {
+          date_label,
+          revenue: Number(netPeriodRevenue.toFixed(2)),
+          net_profit: Number(
+            (netPeriodRevenue - netPeriodCogs - data.opex).toFixed(2),
+          ),
+        };
+      });
 
     // Payment Method Breakdown Calculation
     const paymentMap = new Map<string, number>();
@@ -331,15 +470,17 @@ export class AnalyticsService {
           : 0,
     }));
 
-    // Summary Ledger Calculation
-    const grossProfit = totalRevenue - totalCogs;
+    // Summary Ledger Calculation (Net of Refunds & Sellable Return Cost Recovery)
+    const netTotalRevenue = Math.max(0, grossRevenue - totalRefunds);
+    const netTotalCogs = Math.max(0, grossCogs - recoveredCogs);
+    const grossProfit = netTotalRevenue - netTotalCogs;
     const grossMarginPct =
-      totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+      netTotalRevenue > 0 ? (grossProfit / netTotalRevenue) * 100 : 0;
 
     const summary_ledger: SummaryLedgerDto = {
-      total_revenue: Number(totalRevenue.toFixed(2)),
+      total_revenue: Number(netTotalRevenue.toFixed(2)),
       total_discounts: Number(totalDiscounts.toFixed(2)),
-      total_cogs: Number(totalCogs.toFixed(2)),
+      total_cogs: Number(netTotalCogs.toFixed(2)),
       gross_profit: Number(grossProfit.toFixed(2)),
       gross_profit_margin_percentage: Number(grossMarginPct.toFixed(2)),
     };
@@ -354,6 +495,8 @@ export class AnalyticsService {
   /**
    * Generates Operational Expenses (OpEx) Report.
    * Provides spending breakdown by category and paginated expense table entries.
+   * Note: Customer refunds, 1-to-1 exchanges, and inventory Purchase Orders are
+   * excluded from OpEx as they are accounted for in Net Revenue, COGS, and Inventory Assets.
    *
    * @param query ExpenseAnalyticsQueryDto
    * @returns ExpenseAnalyticsResponseDto
@@ -424,7 +567,7 @@ export class AnalyticsService {
               },
             },
           },
-          orderBy: { date: 'desc' },
+          orderBy: [{ date: 'desc' }, { id: 'desc' }],
           skip,
           take: limit,
         }),
@@ -439,9 +582,9 @@ export class AnalyticsService {
       ? Number(totalAggregate._sum.amount)
       : 0;
 
-    // Format Category Breakdown with percentage share
-    const category_breakdown: CategoryBreakdownItemDto[] = categoryGroups.map(
-      (group) => {
+    // Format Category Breakdown with percentage share, ordered from highest spend to lowest
+    const category_breakdown: CategoryBreakdownItemDto[] = categoryGroups
+      .map((group) => {
         const categoryAmount = group._sum.amount
           ? Number(group._sum.amount)
           : 0;
@@ -455,8 +598,8 @@ export class AnalyticsService {
           log_count: logCount,
           percentage_share: Number(percentageShare.toFixed(2)),
         };
-      },
-    );
+      })
+      .sort((a, b) => b.total_amount - a.total_amount);
 
     // Format Detailed Expense List
     const expense_list: ExpenseListItemDto[] = expenses.map((exp) => ({
@@ -490,6 +633,9 @@ export class AnalyticsService {
 
   /**
    * Generates Product Inventory Velocity Report (Fast & Slow-Moving / Dead Stock Items).
+   * Accounts for COMPLETED & PARTIALLY_REFUNDED transactions, deducts returned base
+   * quantities and refund amounts from product sales totals, and adjusts item COGS
+   * based on return condition (CHANGE_OF_MIND vs. DEFECTIVE).
    *
    * @param query InventoryVelocityQueryDto
    * @returns InventoryVelocityResponseDto
@@ -522,9 +668,21 @@ export class AnalyticsService {
     if (startDate) fastDateFilter.gte = startDate;
     if (endDate) fastDateFilter.lte = endDate;
 
+    const hasFastDateFilter = Object.keys(fastDateFilter).length > 0;
+
+    // Include COMPLETED and PARTIALLY_REFUNDED transactions
+    const validStatuses = [
+      TransactionStatus.COMPLETED,
+      TransactionStatus.PARTIALLY_REFUNDED,
+    ];
+
     const fastTransactionWhere = {
-      status: TransactionStatus.COMPLETED,
-      ...(Object.keys(fastDateFilter).length > 0 && { date: fastDateFilter }),
+      status: { in: validStatuses },
+      ...(hasFastDateFilter && { date: fastDateFilter }),
+    };
+
+    const fastReturnWhere = {
+      ...(hasFastDateFilter && { date: fastDateFilter }),
     };
 
     // Cutoff date for Slow-Moving / Dead Stock aging calculation
@@ -534,76 +692,171 @@ export class AnalyticsService {
     );
 
     // Parallel DB Execution
-    const [fastMovingGroups, activeProducts] = await Promise.all([
-      // 1. Group TransactionItems by Product for Fast-Moving analytics
-      this.prisma.transactionItem.groupBy({
-        by: ['productId'],
-        _sum: {
-          base_quantity_deducted: true,
-          subtotal: true,
-        },
-        _count: {
-          transactionId: true,
-        },
-        where: {
-          transaction: fastTransactionWhere,
-        },
-      }),
+    const [fastTransactionItems, fastReturns, activeProducts] =
+      await Promise.all([
+        // 1. Fetch TransactionItems for Fast-Moving analytics (using historical cost_price snapshot)
+        this.prisma.transactionItem.findMany({
+          where: {
+            transaction: fastTransactionWhere,
+          },
+          select: {
+            transactionId: true,
+            productId: true,
+            base_quantity_deducted: true,
+            subtotal: true,
+            cost_price: true,
+          },
+        }),
 
-      // 2. Fetch Active Products with current stock > 0 for Slow-Moving analytics
-      this.prisma.product.findMany({
-        where: {
-          current_quantity: { gt: 0 },
-        },
-        include: {
-          category: { select: { name: true } },
-          bin_location: true,
-          transactionItems: {
-            where: {
-              transaction: {
-                status: TransactionStatus.COMPLETED,
-                date: { gte: agingCutoffDate },
+        // 2. Fetch Returns within the Fast-Moving date window
+        this.prisma.return.findMany({
+          where: fastReturnWhere,
+          select: {
+            transactionId: true,
+            productId: true,
+            quantity: true,
+            refund_amount: true,
+            condition: true,
+            transaction: {
+              select: {
+                transactionItems: {
+                  select: {
+                    productId: true,
+                    cost_price: true,
+                  },
+                },
               },
             },
-            select: {
-              base_quantity_deducted: true,
-            },
           },
-          stockMovements: {
-            where: {
-              type: { in: [MovementType.OUT, MovementType.SALE] },
-            },
-            orderBy: { date: 'desc' },
-            take: 1,
-            select: { date: true },
-          },
-        },
-      }),
-    ]);
+        }),
 
-    // Fetch Details for Fast Moving Products
-    const fastProductIds = fastMovingGroups.map((g) => g.productId);
+        // 3. Fetch Active Products with current stock > 0 for Slow-Moving analytics
+        this.prisma.product.findMany({
+          where: {
+            current_quantity: { gt: 0 },
+          },
+          include: {
+            category: { select: { name: true } },
+            bin_location: true,
+            transactionItems: {
+              where: {
+                transaction: {
+                  status: { in: validStatuses },
+                  date: { gte: agingCutoffDate },
+                },
+              },
+              select: {
+                base_quantity_deducted: true,
+              },
+            },
+            returns: {
+              where: {
+                date: { gte: agingCutoffDate },
+              },
+              select: {
+                quantity: true,
+              },
+            },
+            stockMovements: {
+              where: {
+                type: { in: [MovementType.OUT, MovementType.SALE] },
+              },
+              orderBy: { date: 'desc' },
+              take: 1,
+              select: { date: true },
+            },
+          },
+        }),
+      ]);
+
+    // Aggregate Fast-Moving Sales & Historical COGS per Product
+    const productStatsMap = new Map<
+      number,
+      {
+        grossQty: number;
+        grossRevenue: number;
+        grossCogs: number;
+        returnedQty: number;
+        refundAmount: number;
+        recoveredCogs: number;
+        transactionIds: Set<number>;
+      }
+    >();
+
+    const getOrCreateStats = (productId: number) => {
+      if (!productStatsMap.has(productId)) {
+        productStatsMap.set(productId, {
+          grossQty: 0,
+          grossRevenue: 0,
+          grossCogs: 0,
+          returnedQty: 0,
+          refundAmount: 0,
+          recoveredCogs: 0,
+          transactionIds: new Set<number>(),
+        });
+      }
+      return productStatsMap.get(productId)!;
+    };
+
+    for (const item of fastTransactionItems) {
+      const stats = getOrCreateStats(item.productId);
+      const qty = Number(item.base_quantity_deducted);
+      const rev = Number(item.subtotal);
+      const itemCogs = qty * Number(item.cost_price);
+
+      stats.grossQty += qty;
+      stats.grossRevenue += rev;
+      stats.grossCogs += itemCogs;
+      stats.transactionIds.add(item.transactionId);
+    }
+
+    // Fetch product master details for all products with activity
+    const fastProductIds = Array.from(productStatsMap.keys());
     const fastProducts = await this.prisma.product.findMany({
       where: { id: { in: fastProductIds } },
       include: { category: { select: { name: true } } },
     });
-
     const fastProductMap = new Map(fastProducts.map((p) => [p.id, p]));
 
+    // Deduct Returns from Fast-Moving Metrics
+    for (const ret of fastReturns) {
+      const stats = productStatsMap.get(ret.productId);
+      if (!stats) continue;
+
+      const retQty = Number(ret.quantity);
+      const refAmt = Number(ret.refund_amount);
+
+      stats.returnedQty += retQty;
+      stats.refundAmount += refAmt;
+
+      // Only CHANGE_OF_MIND returns recover COGS; DEFECTIVE returns remain a loss
+      if (ret.condition === ItemCondition.CHANGE_OF_MIND) {
+        const matchedLineItem = ret.transaction.transactionItems.find(
+          (ti) => ti.productId === ret.productId,
+        );
+        const fallbackCost = fastProductMap.get(ret.productId)?.cost_price ?? 0;
+        const unitCost = matchedLineItem
+          ? Number(matchedLineItem.cost_price)
+          : Number(fallbackCost);
+
+        stats.recoveredCogs += retQty * unitCost;
+      }
+    }
+
     // Format Fast-Moving Items List
-    let fast_moving_items: FastMovingItemDto[] = fastMovingGroups
-      .map((group) => {
-        const product = fastProductMap.get(group.productId);
+    let fast_moving_items: FastMovingItemDto[] = Array.from(
+      productStatsMap.entries(),
+    )
+      .map(([productId, stats]) => {
+        const product = fastProductMap.get(productId);
         if (!product) return null;
 
-        const totalQty = group._sum.base_quantity_deducted
-          ? Number(group._sum.base_quantity_deducted)
-          : 0;
-        const totalRevenue = group._sum.subtotal
-          ? Number(group._sum.subtotal)
-          : 0;
-        const totalCogs = totalQty * Number(product.cost_price);
-        const grossProfit = totalRevenue - totalCogs;
+        const netQtySold = Math.max(0, stats.grossQty - stats.returnedQty);
+        if (netQtySold <= 0) return null;
+
+        const netRevenue = Math.max(0, stats.grossRevenue - stats.refundAmount);
+        const netCogs = Math.max(0, stats.grossCogs - stats.recoveredCogs);
+        const grossProfit = netRevenue - netCogs;
 
         return {
           productId: product.id,
@@ -612,10 +865,10 @@ export class AnalyticsService {
           category_name: product.category.name,
           base_uom: product.base_uom,
           current_quantity: Number(product.current_quantity),
-          total_base_quantity_sold: Number(totalQty.toFixed(3)),
-          total_revenue: Number(totalRevenue.toFixed(2)),
+          total_base_quantity_sold: Number(netQtySold.toFixed(3)),
+          total_revenue: Number(netRevenue.toFixed(2)),
           total_gross_profit: Number(grossProfit.toFixed(2)),
-          transaction_count: group._count.transactionId,
+          transaction_count: stats.transactionIds.size,
         };
       })
       .filter((item): item is FastMovingItemDto => item !== null);
@@ -634,10 +887,18 @@ export class AnalyticsService {
     const slow_moving_items: SlowMovingItemDto[] = [];
 
     for (const prod of activeProducts) {
-      // Sum sales volume during aging period
-      const agingSalesVolume = prod.transactionItems.reduce(
+      // Sum gross sales volume minus returned volume during aging period
+      const grossAgingSales = prod.transactionItems.reduce(
         (sum, item) => sum + Number(item.base_quantity_deducted),
         0,
+      );
+      const returnedAgingVolume = prod.returns.reduce(
+        (sum, ret) => sum + Number(ret.quantity),
+        0,
+      );
+      const agingSalesVolume = Math.max(
+        0,
+        grossAgingSales - returnedAgingVolume,
       );
 
       // Check if product qualifies as slow-moving based on threshold
@@ -690,6 +951,9 @@ export class AnalyticsService {
 
   /**
    * Generates Customer Accounts Receivable (AR) & Credit Analytics Report.
+   * Accounts for COMPLETED & PARTIALLY_REFUNDED wholesale transactions, deducts
+   * customer return refunds from net sales volume, and excludes cancelled/fully
+   * refunded transactions from active AR aging buckets.
    *
    * @param query AccountsReceivableQueryDto
    * @returns AccountsReceivableResponseDto
@@ -703,63 +967,101 @@ export class AnalyticsService {
       `Fetching Accounts Receivable analytics report: limit=${limit}`,
     );
 
-    // Parallel DB Execution
-    const [wholesaleCustomers, openCreditPayments, wholesaleSales] =
-      await Promise.all([
-        // 1. Fetch Wholesale Profiles with basic Customer contact info
-        this.prisma.wholeSaleCustomer.findMany({
-          include: {
-            customer: {
-              select: {
-                name: true,
-                contact_number: true,
-              },
-            },
-            customerPayments: {
-              select: {
-                amount_paid: true,
-              },
-            },
-          },
-        }),
+    const validTransactionStatuses = [
+      TransactionStatus.COMPLETED,
+      TransactionStatus.PARTIALLY_REFUNDED,
+    ];
 
-        // 2. Fetch Open/Unpaid Credit Payments with Transaction & Customer relations
-        this.prisma.creditPayment.findMany({
-          where: {
-            status: {
-              in: [
-                CreditStatus.UNPAID,
-                CreditStatus.PARTIALLY_PAID,
-                CreditStatus.OVERDUE,
-              ],
+    // Parallel DB Execution
+    const [
+      wholesaleCustomers,
+      openCreditPayments,
+      wholesaleSales,
+      customerReturns,
+    ] = await Promise.all([
+      // 1. Fetch Wholesale Profiles with basic Customer contact info
+      this.prisma.wholeSaleCustomer.findMany({
+        include: {
+          customer: {
+            select: {
+              name: true,
+              contact_number: true,
             },
-            remaining_credit_balance: { gt: 0 },
           },
-          include: {
-            payment: {
-              include: {
-                transaction: {
-                  select: {
-                    customerId: true,
-                  },
+          customerPayments: {
+            select: {
+              amount_paid: true,
+            },
+          },
+        },
+      }),
+
+      // 2. Fetch Open/Unpaid Credit Payments tied to valid (non-cancelled/non-refunded) transactions
+      this.prisma.creditPayment.findMany({
+        where: {
+          status: {
+            in: [
+              CreditStatus.UNPAID,
+              CreditStatus.PARTIALLY_PAID,
+              CreditStatus.OVERDUE,
+            ],
+          },
+          remaining_credit_balance: { gt: 0 },
+          payment: {
+            transaction: {
+              status: { in: validTransactionStatuses },
+            },
+          },
+        },
+        include: {
+          payment: {
+            include: {
+              transaction: {
+                select: {
+                  customerId: true,
                 },
               },
             },
           },
-        }),
+        },
+      }),
 
-        // 3. Fetch Completed Sales Transactions grouped by Wholesale Customer
-        this.prisma.transaction.groupBy({
-          by: ['customerId'],
-          _sum: {
-            grand_total: true,
-          },
-          where: {
-            status: TransactionStatus.COMPLETED,
+      // 3. Fetch Gross Sales Transactions (COMPLETED & PARTIALLY_REFUNDED) grouped by Customer
+      this.prisma.transaction.groupBy({
+        by: ['customerId'],
+        _sum: {
+          grand_total: true,
+        },
+        where: {
+          status: { in: validTransactionStatuses },
+          customerId: { not: null },
+        },
+      }),
+
+      // 4. Fetch Customer Returns to deduct refund amounts from wholesale sales volume
+      this.prisma.return.findMany({
+        where: {
+          transaction: {
             customerId: { not: null },
+            status: {
+              in: [
+                TransactionStatus.COMPLETED,
+                TransactionStatus.PARTIALLY_REFUNDED,
+                TransactionStatus.REFUNDED,
+              ],
+            },
           },
-        }),
-      ]);
+        },
+        select: {
+          refund_amount: true,
+          transaction: {
+            select: {
+              customerId: true,
+            },
+          },
+        },
+      }),
+    ]);
 
     // 1. Credit Overview Calculations
     let totalCreditExtended = 0;
@@ -843,7 +1145,7 @@ export class AnalyticsService {
         (a, b) => b.total_outstanding_balance - a.total_outstanding_balance,
       );
 
-    // 3. Top Credit Customers Calculation
+    // 3. Top Credit Customers Calculation (Net of Refunds)
     const salesVolumeMap = new Map<number, number>();
     wholesaleSales.forEach((s) => {
       if (s.customerId) {
@@ -851,9 +1153,24 @@ export class AnalyticsService {
       }
     });
 
+    const refundsByCustomerMap = new Map<number, number>();
+    customerReturns.forEach((ret) => {
+      const custId = ret.transaction.customerId;
+      if (custId) {
+        const currentRefunds = refundsByCustomerMap.get(custId) || 0;
+        refundsByCustomerMap.set(
+          custId,
+          currentRefunds + Number(ret.refund_amount),
+        );
+      }
+    });
+
     const top_credit_customers: TopCreditCustomerDto[] = wholesaleCustomers
       .map((wc) => {
-        const salesVolume = salesVolumeMap.get(wc.customerId) || 0;
+        const grossSalesVolume = salesVolumeMap.get(wc.customerId) || 0;
+        const totalRefunds = refundsByCustomerMap.get(wc.customerId) || 0;
+        const netSalesVolume = Math.max(0, grossSalesVolume - totalRefunds);
+
         const totalSettled = wc.customerPayments.reduce(
           (sum, p) => sum + Number(p.amount_paid),
           0,
@@ -868,7 +1185,7 @@ export class AnalyticsService {
         return {
           customerId: wc.customerId,
           company_name: wc.company_name,
-          total_sales_volume: Number(salesVolume.toFixed(2)),
+          total_sales_volume: Number(netSalesVolume.toFixed(2)),
           total_settled_payments: Number(totalSettled.toFixed(2)),
           current_outstanding_balance: Number(outstanding.toFixed(2)),
           promptness_score: Number(promptnessScore.toFixed(2)),

@@ -8,8 +8,12 @@ import { ApprovalService } from 'src/approval/approval.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SystemSettingsService } from 'src/system-settings/system-settings.service';
 import { CreateRefundDto, CreateExchangeDto, ReturnResponseDto } from './dto';
-import { RequestType } from 'src/generated/prisma/enums';
-import { RefundPaymentBreakdown } from './interfaces';
+import { RequestType, UnitOfMeasure } from 'src/generated/prisma/enums';
+import {
+  ExchangeItemPayload,
+  RefundItemPayload,
+  RefundPaymentBreakdown,
+} from './interfaces';
 
 @Injectable()
 export class ReturnsService {
@@ -30,7 +34,7 @@ export class ReturnsService {
     });
 
     if (!transaction) {
-      throw new NotFoundException(`Transaction #${transactionId} not found`);
+      throw new NotFoundException(`Transaction #${transactionId} not found.`);
     }
 
     // Fetch dynamic return window setting, defaulting to 7 days
@@ -62,58 +66,139 @@ export class ReturnsService {
     return isWithinWindow;
   }
 
-  private async calculateRefundBreakdown(
+  private async resolveAndValidateRefundItems(
     transactionId: number,
-    productId: number,
-    refundQuantity: number,
-  ): Promise<RefundPaymentBreakdown> {
-    const txItem = await this.prisma.transactionItem.findFirst({
-      where: { transactionId, productId },
+    items: CreateRefundDto['items'],
+  ): Promise<{
+    resolvedItems: RefundItemPayload[];
+    paymentBreakdown: RefundPaymentBreakdown;
+  }> {
+    // Prevent duplicate productIds in the same payload
+    const seenProductIds = new Set<number>();
+    for (const item of items) {
+      if (seenProductIds.has(item.productId)) {
+        throw new BadRequestException(
+          `Duplicate Product #${item.productId} found in refund request. Combine quantities into a single line item.`,
+        );
+      }
+      seenProductIds.add(item.productId);
+    }
+
+    // Fetch transaction with all items, products, payments, and prior returns
+    const transaction = await this.prisma.transaction.findUnique({
+      where: { id: transactionId },
       include: {
-        transaction: {
-          include: {
-            payments: {
-              include: {
-                creditPayment: true,
-                cashPayment: true,
-                gCashPayment: true,
-              },
-            },
-          },
+        transactionItems: {
+          include: { product: true },
         },
+        payments: {
+          include: { creditPayment: true },
+        },
+        returns: true,
+        exchanges: true,
       },
     });
 
-    if (!txItem) {
-      throw new NotFoundException(
-        `Item (Product #${productId}) not found in Transaction #${transactionId}`,
-      );
+    if (!transaction) {
+      throw new NotFoundException(`Transaction #${transactionId} not found.`);
     }
 
-    const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
-    const effectiveBaseUnitPrice =
-      txItem.subtotal.toNumber() / baseQuantityDeducted;
-    const totalRefundAmount = effectiveBaseUnitPrice * refundQuantity;
+    const resolvedItems: RefundItemPayload[] = [];
+    let totalRefundAmount = 0;
 
-    // Check for open credit payment balance
-    const creditPayment = txItem.transaction.payments.find(
+    for (const item of items) {
+      const txItem = transaction.transactionItems.find(
+        (ti) => ti.productId === item.productId,
+      );
+
+      if (!txItem) {
+        throw new NotFoundException(
+          `Product #${item.productId} was not found in Transaction #${transactionId}.`,
+        );
+      }
+
+      const purchasedUom = txItem.unit_of_measure;
+      const baseUom = txItem.product.base_uom;
+      const chosenUom = item.unit_of_measure ?? baseUom;
+
+      // Requirement 2: Accepted UOM must be either the purchased UOM or the base UOM
+      if (chosenUom !== purchasedUom && chosenUom !== baseUom) {
+        throw new BadRequestException(
+          `Invalid UOM '${chosenUom}' for Product #${item.productId} (${txItem.product.name}). Allowed UOMs: '${purchasedUom}' (purchased) or '${baseUom}' (base).`,
+        );
+      }
+
+      const conversionFactor =
+        chosenUom === baseUom ? 1 : txItem.uom_conversion_factor.toNumber();
+      const baseQuantity = Number(
+        (item.quantity * conversionFactor).toFixed(3),
+      );
+
+      // Requirement 3: Total returned + exchanged base quantity must not exceed purchased base_quantity_deducted
+      const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+
+      const alreadyReturnedBaseQty = transaction.returns
+        .filter((r) => r.productId === item.productId)
+        .reduce((sum, r) => sum + r.quantity.toNumber(), 0);
+
+      const alreadyExchangedBaseQty = transaction.exchanges
+        .filter((e) => e.productId === item.productId)
+        .reduce((sum, e) => sum + e.quantity.toNumber(), 0);
+
+      const remainingReturnableBaseQty = Number(
+        (
+          baseQuantityDeducted -
+          alreadyReturnedBaseQty -
+          alreadyExchangedBaseQty
+        ).toFixed(3),
+      );
+
+      if (baseQuantity > remainingReturnableBaseQty) {
+        throw new BadRequestException(
+          `Refund quantity (${baseQuantity} ${baseUom}) for Product #${item.productId} (${txItem.product.name}) exceeds remaining returnable quantity (${remainingReturnableBaseQty} ${baseUom}).`,
+        );
+      }
+
+      // Snapshotted effective unit price in base UOM
+      const effectiveBaseUnitPrice =
+        txItem.subtotal.toNumber() / baseQuantityDeducted;
+      const itemRefundAmount = Number(
+        (effectiveBaseUnitPrice * baseQuantity).toFixed(2),
+      );
+
+      totalRefundAmount = Number(
+        (totalRefundAmount + itemRefundAmount).toFixed(2),
+      );
+
+      resolvedItems.push({
+        productId: item.productId,
+        productName: txItem.product.name,
+        requestedQuantity: item.quantity,
+        unitOfMeasure: chosenUom,
+        conversionFactor,
+        baseQuantity,
+        itemRefundAmount,
+        condition: item.condition,
+        reason: item.reason,
+      });
+    }
+
+    // Allocate total refund: wholesale credit debt reduction first, remaining as cash payout
+    const creditPayment = transaction.payments.find(
       (p) => p.creditPayment,
     )?.creditPayment;
     const remainingCreditBalance = creditPayment
       ? creditPayment.remaining_credit_balance.toNumber()
       : 0;
 
-    // Allocate refund: debt reduction first, remaining balance as cash payout
-    const creditDebtReduction = Math.min(
-      remainingCreditBalance,
-      totalRefundAmount,
+    const creditDebtReduction = Number(
+      Math.min(remainingCreditBalance, totalRefundAmount).toFixed(2),
     );
-    const cashPayoutAmount = Math.max(
-      0,
-      totalRefundAmount - creditDebtReduction,
+    const cashPayoutAmount = Number(
+      Math.max(0, totalRefundAmount - creditDebtReduction).toFixed(2),
     );
 
-    const originalPayments = txItem.transaction.payments.map((p) => ({
+    const originalPayments = transaction.payments.map((p) => ({
       method: p.payment_method,
       amountPaid: p.amount_paid.toNumber(),
       remainingCreditBalance: p.creditPayment
@@ -122,10 +207,13 @@ export class ReturnsService {
     }));
 
     return {
-      totalRefundAmount,
-      creditDebtReduction,
-      cashPayoutAmount,
-      originalPayments,
+      resolvedItems,
+      paymentBreakdown: {
+        totalRefundAmount,
+        creditDebtReduction,
+        cashPayoutAmount,
+        originalPayments,
+      },
     };
   }
 
@@ -134,28 +222,21 @@ export class ReturnsService {
     staffId: number,
   ): Promise<ReturnResponseDto> {
     this.logger.log(
-      `Staff #${staffId} initiating Refund request for Tx #${dto.transactionId}`,
+      `Staff #${staffId} initiating Refund request for Tx #${dto.transactionId} (${dto.items.length} item(s))`,
     );
 
     await this.validateReturnWindow(dto.transactionId);
 
-    // Calculate multi-payment allocation breakdown for manager review
-    const paymentBreakdown = await this.calculateRefundBreakdown(
-      dto.transactionId,
-      dto.productId,
-      dto.quantity,
-    );
+    const { resolvedItems, paymentBreakdown } =
+      await this.resolveAndValidateRefundItems(dto.transactionId, dto.items);
 
     const approvalRequest = await this.approvalService.createRequest(
       {
         type: RequestType.REFUND_TRANSACTION,
         payload: {
           transactionId: dto.transactionId,
-          productId: dto.productId,
-          quantity: dto.quantity,
-          condition: dto.condition,
-          reason: dto.reason,
-          paymentBreakdown, // Attached explicitly to payload
+          items: resolvedItems,
+          paymentBreakdown,
         },
       },
       staffId,
@@ -167,31 +248,132 @@ export class ReturnsService {
     };
   }
 
+  private async resolveAndValidateExchangeItems(
+    transactionId: number,
+    items: CreateExchangeDto['items'],
+  ): Promise<ExchangeItemPayload[]> {
+    // Prevent duplicate productIds in the same payload
+    const seenProductIds = new Set<number>();
+    for (const item of items) {
+      if (seenProductIds.has(item.productId)) {
+        throw new BadRequestException(
+          `Duplicate Product #${item.productId} found in exchange request. Combine quantities into a single line item.`,
+        );
+      }
+      seenProductIds.add(item.productId);
+    }
+
+    // Fetch transaction with items, products, prior returns, and prior exchanges
+    const transaction = await this.prisma.transaction.findUnique({
+      where: { id: transactionId },
+      include: {
+        transactionItems: {
+          include: { product: true },
+        },
+        returns: true,
+        exchanges: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException(`Transaction #${transactionId} not found.`);
+    }
+
+    const resolvedItems: ExchangeItemPayload[] = [];
+
+    for (const item of items) {
+      const txItem = transaction.transactionItems.find(
+        (ti) => ti.productId === item.productId,
+      );
+
+      if (!txItem) {
+        throw new NotFoundException(
+          `Product #${item.productId} was not found in Transaction #${transactionId}.`,
+        );
+      }
+
+      const purchasedUom = txItem.unit_of_measure;
+      const baseUom = txItem.product.base_uom;
+      const chosenUom = item.unit_of_measure ?? baseUom;
+
+      // Requirement 2: Accepted UOM must be either the purchased UOM or the base UOM
+      if (chosenUom !== purchasedUom && chosenUom !== baseUom) {
+        throw new BadRequestException(
+          `Invalid UOM '${chosenUom}' for Product #${item.productId} (${txItem.product.name}). Allowed UOMs: '${purchasedUom}' (purchased) or '${baseUom}' (base).`,
+        );
+      }
+
+      const conversionFactor =
+        chosenUom === baseUom ? 1 : txItem.uom_conversion_factor.toNumber();
+      const baseQuantity = Number(
+        (item.quantity * conversionFactor).toFixed(3),
+      );
+
+      // Requirement 3: Total returned + exchanged base quantity must not exceed purchased base_quantity_deducted
+      const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+
+      const alreadyReturnedBaseQty = transaction.returns
+        .filter((r) => r.productId === item.productId)
+        .reduce((sum, r) => sum + r.quantity.toNumber(), 0);
+
+      const alreadyExchangedBaseQty = transaction.exchanges
+        .filter((e) => e.productId === item.productId)
+        .reduce((sum, e) => sum + e.quantity.toNumber(), 0);
+
+      const remainingEligibleBaseQty = Number(
+        (
+          baseQuantityDeducted -
+          alreadyReturnedBaseQty -
+          alreadyExchangedBaseQty
+        ).toFixed(3),
+      );
+
+      if (baseQuantity > remainingEligibleBaseQty) {
+        throw new BadRequestException(
+          `Exchange quantity (${baseQuantity} ${baseUom}) for Product #${item.productId} (${txItem.product.name}) exceeds remaining eligible quantity (${remainingEligibleBaseQty} ${baseUom}).`,
+        );
+      }
+
+      resolvedItems.push({
+        productId: item.productId,
+        productName: txItem.product.name,
+        requestedQuantity: item.quantity,
+        unitOfMeasure: chosenUom,
+        conversionFactor,
+        baseQuantity,
+        condition: item.condition,
+        reason: item.reason,
+      });
+    }
+
+    return resolvedItems;
+  }
+
   async requestExchange(
     dto: CreateExchangeDto,
     staffId: number,
   ): Promise<ReturnResponseDto> {
     this.logger.log(
-      `Staff #${staffId} initiating Exchange request for Tx #${dto.transactionId}`,
+      `Staff #${staffId} initiating Exchange request for Tx #${dto.transactionId} (${dto.items.length} item(s))`,
     );
 
     // 1. Date Verification
-    const isWithinWindow = await this.validateReturnWindow(dto.transactionId);
+    await this.validateReturnWindow(dto.transactionId);
 
-    // 2. Create Approval Request
+    // 2. Validate items, UOMs, and cumulative return + exchange limits
+    const resolvedItems = await this.resolveAndValidateExchangeItems(
+      dto.transactionId,
+      dto.items,
+    );
+
+    // 3. Create Approval Request
     const approvalRequest = await this.approvalService.createRequest(
       {
         type: RequestType.EXCHANGE_TRANSACTION,
         payload: {
           transactionId: dto.transactionId,
-          oldProductId: dto.productId,
-          oldQuantity: dto.quantity,
-          condition: dto.condition,
-          reason: dto.reason,
-          newProductId: dto.newProductId,
-          newQuantity: dto.newQuantity,
-          allowStockOverride: dto.allowStockOverride,
-          is_within_7_days: isWithinWindow, // Passes into payload so handler can write to Exchange DB
+          items: resolvedItems,
+          allowStockOverride: dto.allowStockOverride ?? false,
         },
       },
       staffId,

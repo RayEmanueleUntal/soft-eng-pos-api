@@ -8,21 +8,9 @@ import {
 import { ApprovalRegistry } from 'src/approval/approval-registry.service';
 import { ApprovalHandler } from 'src/approval/interfaces/approval-handler.interface';
 import { Prisma } from 'src/generated/prisma/client';
-import { RequestType } from 'src/generated/prisma/enums';
+import { ItemCondition, RequestType } from 'src/generated/prisma/enums';
 import { InventoryService } from 'src/inventory/inventory.service';
-import { ItemCondition } from 'src/returns/dto';
-
-export interface ExchangeApprovalPayload {
-  transactionId: number;
-  oldProductId: number;
-  oldQuantity: number;
-  condition: ItemCondition;
-  reason: string;
-  newProductId: number;
-  newQuantity: number;
-  allowStockOverride: boolean;
-  is_within_7_days?: boolean;
-}
+import { ExchangeApprovalPayload } from 'src/returns/interfaces';
 
 @Injectable()
 export class ExchangeApprovalHandler
@@ -45,100 +33,102 @@ export class ExchangeApprovalHandler
     tx: Prisma.TransactionClient,
     requestedById: number,
   ): Promise<void> {
+    const { transactionId, items, allowStockOverride } = payload;
+
     this.logger.log(
-      `Executing Exchange: Tx #${payload.transactionId} | In: Product #${payload.oldProductId} | Out: Product #${payload.newProductId}`,
+      `Executing Exchange for Tx #${transactionId} (${items.length} item(s))`,
     );
 
-    // 1. Fetch Old Transaction Item & Calculate Refund Value using Snapshotted Pricing
-    const oldTransactionItem = await tx.transactionItem.findFirst({
-      where: {
-        transactionId: payload.transactionId,
-        productId: payload.oldProductId,
+    const transaction = await tx.transaction.findUnique({
+      where: { id: transactionId },
+      include: {
+        transactionItems: { include: { product: true } },
+        returns: true,
+        exchanges: true,
       },
-      include: { product: true },
     });
 
-    if (!oldTransactionItem) {
-      throw new NotFoundException(
-        `Transaction item not found for Transaction #${payload.transactionId} and Product #${payload.oldProductId}`,
+    if (!transaction) {
+      throw new NotFoundException(`Transaction #${transactionId} not found.`);
+    }
+
+    // Track cumulative (returns + exchanges) in-memory across the loop
+    const usedQtyByProduct = new Map<number, number>();
+    for (const r of transaction.returns) {
+      usedQtyByProduct.set(
+        r.productId,
+        (usedQtyByProduct.get(r.productId) ?? 0) + r.quantity.toNumber(),
+      );
+    }
+    for (const e of transaction.exchanges) {
+      usedQtyByProduct.set(
+        e.productId,
+        (usedQtyByProduct.get(e.productId) ?? 0) + e.quantity.toNumber(),
       );
     }
 
-    const oldBaseQuantityDeducted =
-      oldTransactionItem.base_quantity_deducted.toNumber();
-
-    if (oldBaseQuantityDeducted <= 0) {
-      throw new BadRequestException(
-        `Invalid transaction item base quantity deducted (${oldBaseQuantityDeducted}).`,
+    for (const item of items) {
+      const txItem = transaction.transactionItems.find(
+        (ti) => ti.productId === item.productId,
       );
-    }
 
-    // Effective price per base unit = subtotal / base_quantity_deducted
-    const oldEffectiveBaseUnitPrice =
-      oldTransactionItem.subtotal.toNumber() / oldBaseQuantityDeducted;
-    const oldItemValue = oldEffectiveBaseUnitPrice * payload.oldQuantity;
+      if (!txItem) {
+        throw new NotFoundException(
+          `Product #${item.productId} not found in Transaction #${transactionId}.`,
+        );
+      }
 
-    // 2. Fetch New Item & Calculate Difference (newQuantity is in Base UOM)
-    const newProduct = await tx.product.findUnique({
-      where: { id: payload.newProductId },
-    });
+      // Concurrency-safe re-check against over-returning/exchanging
+      const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+      const alreadyUsedBaseQty = usedQtyByProduct.get(item.productId) ?? 0;
 
-    if (!newProduct) {
-      throw new NotFoundException(`Product #${payload.newProductId} not found`);
-    }
+      if (alreadyUsedBaseQty + item.baseQuantity > baseQuantityDeducted) {
+        throw new BadRequestException(
+          `Cannot approve exchange: ${item.baseQuantity} ${txItem.product.base_uom} for Product #${item.productId} exceeds remaining eligible quantity (${baseQuantityDeducted - alreadyUsedBaseQty}).`,
+        );
+      }
 
-    const newItemValue =
-      newProduct.retail_price.toNumber() * payload.newQuantity;
-    const priceDifference = new Prisma.Decimal(newItemValue - oldItemValue);
+      usedQtyByProduct.set(
+        item.productId,
+        alreadyUsedBaseQty + item.baseQuantity,
+      );
 
-    // 3. Process the Old Item Return
-    await tx.return.create({
-      data: {
-        transactionId: payload.transactionId,
-        productId: payload.oldProductId,
-        quantity: new Prisma.Decimal(payload.oldQuantity),
-        defect_reason: payload.reason,
-        refund_amount: new Prisma.Decimal(oldItemValue),
-        staffId: requestedById,
-      },
-    });
-
-    // 4. Process the Exchange Record
-    await tx.exchange.create({
-      data: {
-        transactionId: payload.transactionId,
-        productId: payload.newProductId,
-        quantity: new Prisma.Decimal(payload.newQuantity),
-        price_difference: priceDifference,
-        is_within_7_days: payload.is_within_7_days ?? true,
-      },
-    });
-
-    // 5. Inventory: Reduce stock for New Item
-    await this.inventoryService.reduceProductStock(tx, {
-      productId: payload.newProductId,
-      quantityToDeduct: payload.newQuantity,
-      provided_uom: newProduct.base_uom,
-      userId: requestedById,
-      reason: `EXCHANGE ISSUED for Tx #${payload.transactionId}`,
-      allowOverride: payload.allowStockOverride,
-      operation_name: 'EXCHANGE',
-    });
-
-    // 6. Restock Old Item via InventoryService.restockProductStock if not defective
-    if (payload.condition === ItemCondition.CHANGE_OF_MIND) {
-      await this.inventoryService.restockProductStock(tx, {
-        productId: payload.oldProductId,
-        quantityToAdd: payload.oldQuantity,
-        provided_uom: oldTransactionItem.product.base_uom,
-        userId: requestedById,
-        reason: `EXCHANGE RESTOCK: Returned in sellable condition (Tx #${payload.transactionId})`,
-        operation_name: 'EXCHANGE_RESTOCK',
+      // 1. Record the Exchange (1-to-1 same-product replacement in Base UOM)
+      await tx.exchange.create({
+        data: {
+          transactionId,
+          productId: item.productId,
+          quantity: new Prisma.Decimal(item.baseQuantity),
+          staffId: requestedById,
+        },
       });
-    } else {
-      this.logger.warn(
-        `Returned product #${payload.oldProductId} was marked ${payload.condition}. Skipping restock into sellable inventory.`,
-      );
+
+      // 2. Inventory: Deduct replacement stock issued to customer (in Base UOM)
+      await this.inventoryService.reduceProductStock(tx, {
+        productId: item.productId,
+        quantityToDeduct: item.baseQuantity,
+        provided_uom: txItem.product.base_uom,
+        userId: requestedById,
+        reason: `EXCHANGE ISSUED: ${item.reason} (Tx #${transactionId})`,
+        allowOverride: allowStockOverride,
+        operation_name: 'EXCHANGE',
+      });
+
+      // 3. Inventory: Restock returned unit ONLY if in sellable condition
+      if (item.condition === ItemCondition.CHANGE_OF_MIND) {
+        await this.inventoryService.restockProductStock(tx, {
+          productId: item.productId,
+          quantityToAdd: item.baseQuantity,
+          provided_uom: txItem.product.base_uom,
+          userId: requestedById,
+          reason: `EXCHANGE RESTOCK: Returned in sellable condition (Tx #${transactionId})`,
+          operation_name: 'EXCHANGE_RESTOCK',
+        });
+      } else {
+        this.logger.warn(
+          `Returned product #${item.productId} was marked ${item.condition}. Skipping restock into sellable inventory.`,
+        );
+      }
     }
   }
 }

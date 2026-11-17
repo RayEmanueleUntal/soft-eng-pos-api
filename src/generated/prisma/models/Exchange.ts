@@ -31,7 +31,7 @@ export type ExchangeAvgAggregateOutputType = {
   transactionId: number | null
   productId: number | null
   quantity: runtime.Decimal | null
-  price_difference: runtime.Decimal | null
+  staffId: number | null
 }
 
 export type ExchangeSumAggregateOutputType = {
@@ -39,7 +39,7 @@ export type ExchangeSumAggregateOutputType = {
   transactionId: number | null
   productId: number | null
   quantity: runtime.Decimal | null
-  price_difference: runtime.Decimal | null
+  staffId: number | null
 }
 
 export type ExchangeMinAggregateOutputType = {
@@ -48,8 +48,7 @@ export type ExchangeMinAggregateOutputType = {
   productId: number | null
   quantity: runtime.Decimal | null
   date: Date | null
-  price_difference: runtime.Decimal | null
-  is_within_7_days: boolean | null
+  staffId: number | null
 }
 
 export type ExchangeMaxAggregateOutputType = {
@@ -58,8 +57,7 @@ export type ExchangeMaxAggregateOutputType = {
   productId: number | null
   quantity: runtime.Decimal | null
   date: Date | null
-  price_difference: runtime.Decimal | null
-  is_within_7_days: boolean | null
+  staffId: number | null
 }
 
 export type ExchangeCountAggregateOutputType = {
@@ -68,8 +66,7 @@ export type ExchangeCountAggregateOutputType = {
   productId: number
   quantity: number
   date: number
-  price_difference: number
-  is_within_7_days: number
+  staffId: number
   _all: number
 }
 
@@ -79,7 +76,7 @@ export type ExchangeAvgAggregateInputType = {
   transactionId?: true
   productId?: true
   quantity?: true
-  price_difference?: true
+  staffId?: true
 }
 
 export type ExchangeSumAggregateInputType = {
@@ -87,7 +84,7 @@ export type ExchangeSumAggregateInputType = {
   transactionId?: true
   productId?: true
   quantity?: true
-  price_difference?: true
+  staffId?: true
 }
 
 export type ExchangeMinAggregateInputType = {
@@ -96,8 +93,7 @@ export type ExchangeMinAggregateInputType = {
   productId?: true
   quantity?: true
   date?: true
-  price_difference?: true
-  is_within_7_days?: true
+  staffId?: true
 }
 
 export type ExchangeMaxAggregateInputType = {
@@ -106,8 +102,7 @@ export type ExchangeMaxAggregateInputType = {
   productId?: true
   quantity?: true
   date?: true
-  price_difference?: true
-  is_within_7_days?: true
+  staffId?: true
 }
 
 export type ExchangeCountAggregateInputType = {
@@ -116,8 +111,7 @@ export type ExchangeCountAggregateInputType = {
   productId?: true
   quantity?: true
   date?: true
-  price_difference?: true
-  is_within_7_days?: true
+  staffId?: true
   _all?: true
 }
 
@@ -213,8 +207,7 @@ export type ExchangeGroupByOutputType = {
   productId: number
   quantity: runtime.Decimal
   date: Date
-  price_difference: runtime.Decimal
-  is_within_7_days: boolean
+  staffId: number
   _count: ExchangeCountAggregateOutputType | null
   _avg: ExchangeAvgAggregateOutputType | null
   _sum: ExchangeSumAggregateOutputType | null
@@ -246,10 +239,10 @@ export type ExchangeWhereInput = {
   productId?: Prisma.IntFilter<"Exchange"> | number
   quantity?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Exchange"> | Date | string
-  price_difference?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFilter<"Exchange"> | boolean
+  staffId?: Prisma.IntFilter<"Exchange"> | number
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  staff?: Prisma.XOR<Prisma.StaffUserScalarRelationFilter, Prisma.StaffUserWhereInput>
 }
 
 export type ExchangeOrderByWithRelationInput = {
@@ -258,10 +251,10 @@ export type ExchangeOrderByWithRelationInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
-  is_within_7_days?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
   transaction?: Prisma.TransactionOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
+  staff?: Prisma.StaffUserOrderByWithRelationInput
 }
 
 export type ExchangeWhereUniqueInput = Prisma.AtLeast<{
@@ -273,10 +266,10 @@ export type ExchangeWhereUniqueInput = Prisma.AtLeast<{
   productId?: Prisma.IntFilter<"Exchange"> | number
   quantity?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Exchange"> | Date | string
-  price_difference?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFilter<"Exchange"> | boolean
+  staffId?: Prisma.IntFilter<"Exchange"> | number
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  staff?: Prisma.XOR<Prisma.StaffUserScalarRelationFilter, Prisma.StaffUserWhereInput>
 }, "id">
 
 export type ExchangeOrderByWithAggregationInput = {
@@ -285,8 +278,7 @@ export type ExchangeOrderByWithAggregationInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
-  is_within_7_days?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
   _count?: Prisma.ExchangeCountOrderByAggregateInput
   _avg?: Prisma.ExchangeAvgOrderByAggregateInput
   _max?: Prisma.ExchangeMaxOrderByAggregateInput
@@ -303,17 +295,15 @@ export type ExchangeScalarWhereWithAggregatesInput = {
   productId?: Prisma.IntWithAggregatesFilter<"Exchange"> | number
   quantity?: Prisma.DecimalWithAggregatesFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeWithAggregatesFilter<"Exchange"> | Date | string
-  price_difference?: Prisma.DecimalWithAggregatesFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolWithAggregatesFilter<"Exchange"> | boolean
+  staffId?: Prisma.IntWithAggregatesFilter<"Exchange"> | number
 }
 
 export type ExchangeCreateInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
   transaction: Prisma.TransactionCreateNestedOneWithoutExchangesInput
   product: Prisma.ProductCreateNestedOneWithoutExchangesInput
+  staff: Prisma.StaffUserCreateNestedOneWithoutExchangesInput
 }
 
 export type ExchangeUncheckedCreateInput = {
@@ -322,17 +312,15 @@ export type ExchangeUncheckedCreateInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
+  staffId: number
 }
 
 export type ExchangeUpdateInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutExchangesNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutExchangesNestedInput
+  staff?: Prisma.StaffUserUpdateOneRequiredWithoutExchangesNestedInput
 }
 
 export type ExchangeUncheckedUpdateInput = {
@@ -341,8 +329,7 @@ export type ExchangeUncheckedUpdateInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ExchangeCreateManyInput = {
@@ -351,15 +338,12 @@ export type ExchangeCreateManyInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
+  staffId: number
 }
 
 export type ExchangeUpdateManyMutationInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ExchangeUncheckedUpdateManyInput = {
@@ -368,8 +352,7 @@ export type ExchangeUncheckedUpdateManyInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ExchangeListRelationFilter = {
@@ -388,8 +371,7 @@ export type ExchangeCountOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
-  is_within_7_days?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
 }
 
 export type ExchangeAvgOrderByAggregateInput = {
@@ -397,7 +379,7 @@ export type ExchangeAvgOrderByAggregateInput = {
   transactionId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
 }
 
 export type ExchangeMaxOrderByAggregateInput = {
@@ -406,8 +388,7 @@ export type ExchangeMaxOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
-  is_within_7_days?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
 }
 
 export type ExchangeMinOrderByAggregateInput = {
@@ -416,8 +397,7 @@ export type ExchangeMinOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
-  is_within_7_days?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
 }
 
 export type ExchangeSumOrderByAggregateInput = {
@@ -425,7 +405,7 @@ export type ExchangeSumOrderByAggregateInput = {
   transactionId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
-  price_difference?: Prisma.SortOrder
+  staffId?: Prisma.SortOrder
 }
 
 export type ExchangeCreateNestedManyWithoutTransactionInput = {
@@ -470,8 +450,46 @@ export type ExchangeUncheckedUpdateManyWithoutTransactionNestedInput = {
   deleteMany?: Prisma.ExchangeScalarWhereInput | Prisma.ExchangeScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type ExchangeCreateNestedManyWithoutStaffInput = {
+  create?: Prisma.XOR<Prisma.ExchangeCreateWithoutStaffInput, Prisma.ExchangeUncheckedCreateWithoutStaffInput> | Prisma.ExchangeCreateWithoutStaffInput[] | Prisma.ExchangeUncheckedCreateWithoutStaffInput[]
+  connectOrCreate?: Prisma.ExchangeCreateOrConnectWithoutStaffInput | Prisma.ExchangeCreateOrConnectWithoutStaffInput[]
+  createMany?: Prisma.ExchangeCreateManyStaffInputEnvelope
+  connect?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+}
+
+export type ExchangeUncheckedCreateNestedManyWithoutStaffInput = {
+  create?: Prisma.XOR<Prisma.ExchangeCreateWithoutStaffInput, Prisma.ExchangeUncheckedCreateWithoutStaffInput> | Prisma.ExchangeCreateWithoutStaffInput[] | Prisma.ExchangeUncheckedCreateWithoutStaffInput[]
+  connectOrCreate?: Prisma.ExchangeCreateOrConnectWithoutStaffInput | Prisma.ExchangeCreateOrConnectWithoutStaffInput[]
+  createMany?: Prisma.ExchangeCreateManyStaffInputEnvelope
+  connect?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+}
+
+export type ExchangeUpdateManyWithoutStaffNestedInput = {
+  create?: Prisma.XOR<Prisma.ExchangeCreateWithoutStaffInput, Prisma.ExchangeUncheckedCreateWithoutStaffInput> | Prisma.ExchangeCreateWithoutStaffInput[] | Prisma.ExchangeUncheckedCreateWithoutStaffInput[]
+  connectOrCreate?: Prisma.ExchangeCreateOrConnectWithoutStaffInput | Prisma.ExchangeCreateOrConnectWithoutStaffInput[]
+  upsert?: Prisma.ExchangeUpsertWithWhereUniqueWithoutStaffInput | Prisma.ExchangeUpsertWithWhereUniqueWithoutStaffInput[]
+  createMany?: Prisma.ExchangeCreateManyStaffInputEnvelope
+  set?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  disconnect?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  delete?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  connect?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  update?: Prisma.ExchangeUpdateWithWhereUniqueWithoutStaffInput | Prisma.ExchangeUpdateWithWhereUniqueWithoutStaffInput[]
+  updateMany?: Prisma.ExchangeUpdateManyWithWhereWithoutStaffInput | Prisma.ExchangeUpdateManyWithWhereWithoutStaffInput[]
+  deleteMany?: Prisma.ExchangeScalarWhereInput | Prisma.ExchangeScalarWhereInput[]
+}
+
+export type ExchangeUncheckedUpdateManyWithoutStaffNestedInput = {
+  create?: Prisma.XOR<Prisma.ExchangeCreateWithoutStaffInput, Prisma.ExchangeUncheckedCreateWithoutStaffInput> | Prisma.ExchangeCreateWithoutStaffInput[] | Prisma.ExchangeUncheckedCreateWithoutStaffInput[]
+  connectOrCreate?: Prisma.ExchangeCreateOrConnectWithoutStaffInput | Prisma.ExchangeCreateOrConnectWithoutStaffInput[]
+  upsert?: Prisma.ExchangeUpsertWithWhereUniqueWithoutStaffInput | Prisma.ExchangeUpsertWithWhereUniqueWithoutStaffInput[]
+  createMany?: Prisma.ExchangeCreateManyStaffInputEnvelope
+  set?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  disconnect?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  delete?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  connect?: Prisma.ExchangeWhereUniqueInput | Prisma.ExchangeWhereUniqueInput[]
+  update?: Prisma.ExchangeUpdateWithWhereUniqueWithoutStaffInput | Prisma.ExchangeUpdateWithWhereUniqueWithoutStaffInput[]
+  updateMany?: Prisma.ExchangeUpdateManyWithWhereWithoutStaffInput | Prisma.ExchangeUpdateManyWithWhereWithoutStaffInput[]
+  deleteMany?: Prisma.ExchangeScalarWhereInput | Prisma.ExchangeScalarWhereInput[]
 }
 
 export type ExchangeCreateNestedManyWithoutProductInput = {
@@ -519,9 +537,8 @@ export type ExchangeUncheckedUpdateManyWithoutProductNestedInput = {
 export type ExchangeCreateWithoutTransactionInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
   product: Prisma.ProductCreateNestedOneWithoutExchangesInput
+  staff: Prisma.StaffUserCreateNestedOneWithoutExchangesInput
 }
 
 export type ExchangeUncheckedCreateWithoutTransactionInput = {
@@ -529,8 +546,7 @@ export type ExchangeUncheckedCreateWithoutTransactionInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
+  staffId: number
 }
 
 export type ExchangeCreateOrConnectWithoutTransactionInput = {
@@ -568,16 +584,55 @@ export type ExchangeScalarWhereInput = {
   productId?: Prisma.IntFilter<"Exchange"> | number
   quantity?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFilter<"Exchange"> | Date | string
-  price_difference?: Prisma.DecimalFilter<"Exchange"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFilter<"Exchange"> | boolean
+  staffId?: Prisma.IntFilter<"Exchange"> | number
+}
+
+export type ExchangeCreateWithoutStaffInput = {
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Date | string
+  transaction: Prisma.TransactionCreateNestedOneWithoutExchangesInput
+  product: Prisma.ProductCreateNestedOneWithoutExchangesInput
+}
+
+export type ExchangeUncheckedCreateWithoutStaffInput = {
+  id?: number
+  transactionId: number
+  productId: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Date | string
+}
+
+export type ExchangeCreateOrConnectWithoutStaffInput = {
+  where: Prisma.ExchangeWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExchangeCreateWithoutStaffInput, Prisma.ExchangeUncheckedCreateWithoutStaffInput>
+}
+
+export type ExchangeCreateManyStaffInputEnvelope = {
+  data: Prisma.ExchangeCreateManyStaffInput | Prisma.ExchangeCreateManyStaffInput[]
+  skipDuplicates?: boolean
+}
+
+export type ExchangeUpsertWithWhereUniqueWithoutStaffInput = {
+  where: Prisma.ExchangeWhereUniqueInput
+  update: Prisma.XOR<Prisma.ExchangeUpdateWithoutStaffInput, Prisma.ExchangeUncheckedUpdateWithoutStaffInput>
+  create: Prisma.XOR<Prisma.ExchangeCreateWithoutStaffInput, Prisma.ExchangeUncheckedCreateWithoutStaffInput>
+}
+
+export type ExchangeUpdateWithWhereUniqueWithoutStaffInput = {
+  where: Prisma.ExchangeWhereUniqueInput
+  data: Prisma.XOR<Prisma.ExchangeUpdateWithoutStaffInput, Prisma.ExchangeUncheckedUpdateWithoutStaffInput>
+}
+
+export type ExchangeUpdateManyWithWhereWithoutStaffInput = {
+  where: Prisma.ExchangeScalarWhereInput
+  data: Prisma.XOR<Prisma.ExchangeUpdateManyMutationInput, Prisma.ExchangeUncheckedUpdateManyWithoutStaffInput>
 }
 
 export type ExchangeCreateWithoutProductInput = {
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
   transaction: Prisma.TransactionCreateNestedOneWithoutExchangesInput
+  staff: Prisma.StaffUserCreateNestedOneWithoutExchangesInput
 }
 
 export type ExchangeUncheckedCreateWithoutProductInput = {
@@ -585,8 +640,7 @@ export type ExchangeUncheckedCreateWithoutProductInput = {
   transactionId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
+  staffId: number
 }
 
 export type ExchangeCreateOrConnectWithoutProductInput = {
@@ -620,16 +674,14 @@ export type ExchangeCreateManyTransactionInput = {
   productId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
+  staffId: number
 }
 
 export type ExchangeUpdateWithoutTransactionInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
   product?: Prisma.ProductUpdateOneRequiredWithoutExchangesNestedInput
+  staff?: Prisma.StaffUserUpdateOneRequiredWithoutExchangesNestedInput
 }
 
 export type ExchangeUncheckedUpdateWithoutTransactionInput = {
@@ -637,8 +689,7 @@ export type ExchangeUncheckedUpdateWithoutTransactionInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ExchangeUncheckedUpdateManyWithoutTransactionInput = {
@@ -646,8 +697,38 @@ export type ExchangeUncheckedUpdateManyWithoutTransactionInput = {
   productId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ExchangeCreateManyStaffInput = {
+  id?: number
+  transactionId: number
+  productId: number
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Date | string
+}
+
+export type ExchangeUpdateWithoutStaffInput = {
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transaction?: Prisma.TransactionUpdateOneRequiredWithoutExchangesNestedInput
+  product?: Prisma.ProductUpdateOneRequiredWithoutExchangesNestedInput
+}
+
+export type ExchangeUncheckedUpdateWithoutStaffInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionId?: Prisma.IntFieldUpdateOperationsInput | number
+  productId?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ExchangeUncheckedUpdateManyWithoutStaffInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionId?: Prisma.IntFieldUpdateOperationsInput | number
+  productId?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ExchangeCreateManyProductInput = {
@@ -655,16 +736,14 @@ export type ExchangeCreateManyProductInput = {
   transactionId: number
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Date | string
-  price_difference: runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: boolean
+  staffId: number
 }
 
 export type ExchangeUpdateWithoutProductInput = {
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transaction?: Prisma.TransactionUpdateOneRequiredWithoutExchangesNestedInput
+  staff?: Prisma.StaffUserUpdateOneRequiredWithoutExchangesNestedInput
 }
 
 export type ExchangeUncheckedUpdateWithoutProductInput = {
@@ -672,8 +751,7 @@ export type ExchangeUncheckedUpdateWithoutProductInput = {
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ExchangeUncheckedUpdateManyWithoutProductInput = {
@@ -681,8 +759,7 @@ export type ExchangeUncheckedUpdateManyWithoutProductInput = {
   transactionId?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  price_difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  is_within_7_days?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  staffId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -693,10 +770,10 @@ export type ExchangeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   productId?: boolean
   quantity?: boolean
   date?: boolean
-  price_difference?: boolean
-  is_within_7_days?: boolean
+  staffId?: boolean
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["exchange"]>
 
 export type ExchangeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -705,10 +782,10 @@ export type ExchangeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   productId?: boolean
   quantity?: boolean
   date?: boolean
-  price_difference?: boolean
-  is_within_7_days?: boolean
+  staffId?: boolean
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["exchange"]>
 
 export type ExchangeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -717,10 +794,10 @@ export type ExchangeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   productId?: boolean
   quantity?: boolean
   date?: boolean
-  price_difference?: boolean
-  is_within_7_days?: boolean
+  staffId?: boolean
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["exchange"]>
 
 export type ExchangeSelectScalar = {
@@ -729,22 +806,24 @@ export type ExchangeSelectScalar = {
   productId?: boolean
   quantity?: boolean
   date?: boolean
-  price_difference?: boolean
-  is_within_7_days?: boolean
+  staffId?: boolean
 }
 
-export type ExchangeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "productId" | "quantity" | "date" | "price_difference" | "is_within_7_days", ExtArgs["result"]["exchange"]>
+export type ExchangeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "productId" | "quantity" | "date" | "staffId", ExtArgs["result"]["exchange"]>
 export type ExchangeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
 }
 export type ExchangeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
 }
 export type ExchangeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.StaffUserDefaultArgs<ExtArgs>
 }
 
 export type $ExchangePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -752,6 +831,7 @@ export type $ExchangePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     transaction: Prisma.$TransactionPayload<ExtArgs>
     product: Prisma.$ProductPayload<ExtArgs>
+    staff: Prisma.$StaffUserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -759,8 +839,7 @@ export type $ExchangePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     productId: number
     quantity: runtime.Decimal
     date: Date
-    price_difference: runtime.Decimal
-    is_within_7_days: boolean
+    staffId: number
   }, ExtArgs["result"]["exchange"]>
   composites: {}
 }
@@ -1157,6 +1236,7 @@ export interface Prisma__ExchangeClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   transaction<T extends Prisma.TransactionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TransactionDefaultArgs<ExtArgs>>): Prisma.Prisma__TransactionClient<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   product<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  staff<T extends Prisma.StaffUserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUserDefaultArgs<ExtArgs>>): Prisma.Prisma__StaffUserClient<runtime.Types.Result.GetResult<Prisma.$StaffUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1191,8 +1271,7 @@ export interface ExchangeFieldRefs {
   readonly productId: Prisma.FieldRef<"Exchange", 'Int'>
   readonly quantity: Prisma.FieldRef<"Exchange", 'Decimal'>
   readonly date: Prisma.FieldRef<"Exchange", 'DateTime'>
-  readonly price_difference: Prisma.FieldRef<"Exchange", 'Decimal'>
-  readonly is_within_7_days: Prisma.FieldRef<"Exchange", 'Boolean'>
+  readonly staffId: Prisma.FieldRef<"Exchange", 'Int'>
 }
     
 

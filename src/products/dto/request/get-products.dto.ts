@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsInt,
   IsOptional,
   IsPositive,
@@ -34,6 +35,20 @@ export class GetProductsDto {
   @IsString()
   @ApiProperty({ example: 'Stainless 304' })
   material?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
+  @IsBoolean()
+  @ApiPropertyOptional({
+    example: true,
+    description:
+      'Filter products whose current_quantity is at or below their reorder_point_ROP',
+  })
+  belowRop?: boolean;
 
   @IsOptional()
   @Type(() => Number)

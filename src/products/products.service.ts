@@ -32,6 +32,7 @@ export class ProductsService {
       size,
       thread,
       material,
+      belowRop,
       page = 1,
       limit = 15,
     } = productsDto;
@@ -66,6 +67,13 @@ export class ProductsService {
       where.material_grade = { contains: material, mode: 'insensitive' };
     }
 
+    // C. Filter products at or below Reorder Point (ROP) using Prisma Field Reference
+    if (belowRop) {
+      where.current_quantity = {
+        lte: this.prisma.product.fields.reorder_point_ROP,
+      };
+    }
+
     const skip = (page - 1) * limit;
 
     const [products, total] = await this.prisma.$transaction([
@@ -73,7 +81,7 @@ export class ProductsService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         include: { bin_location: true, category: true, uoms: true },
       }),
       this.prisma.product.count({ where }),

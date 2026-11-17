@@ -29,7 +29,7 @@ export class CreateExchangeDto extends CreateRefundDto {
   @ApiProperty({
     example: true,
     description:
-      'If true, admin is requesting to override stock limits if new item is out of stock',
+      'If true, user is requesting to override stock limits if new item is out of stock',
     required: false,
     default: false,
   })

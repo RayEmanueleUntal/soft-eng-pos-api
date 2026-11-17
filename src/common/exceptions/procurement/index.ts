@@ -4,3 +4,5 @@ export * from './products-not-found.exception';
 export * from './purchase-order-not-found.exception';
 export * from './purchase-order-immutable.exception';
 export * from './purchase-order-has-deliveries.exception';
+export * from './duplicate-po-product-uom.exception';
+export * from './purchase-order-has-deliveries.exception';

@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const ItemCondition = {
+  DEFECTIVE: 'DEFECTIVE',
+  CHANGE_OF_MIND: 'CHANGE_OF_MIND'
+} as const
+
+export type ItemCondition = (typeof ItemCondition)[keyof typeof ItemCondition]
+
+
 export const ExpenseCategory = {
   RENT: 'RENT',
   UTILITIES: 'UTILITIES',

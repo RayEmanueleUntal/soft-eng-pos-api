@@ -81,15 +81,19 @@ model TransactionItem {
 model Exchange {
   id               Int         @id @default(autoincrement())
   transactionId    Int
-  productId        Int         // Product being exchanged
-  quantity         Decimal     @default(1.000) @db.Decimal(10, 3)
+  productId        Int         // Product being exchanged (same product, 1-to-1 replacement)
+  quantity         Decimal     @default(1.000) @db.Decimal(10, 3) // Always in Base UOM
   date             DateTime    @default(now())
-  price_difference Decimal     @db.Decimal(10, 2)
-  is_within_7_days Boolean     @default(true)
+  staffId          Int  
 
   transaction      Transaction @relation(fields: [transactionId], references: [id])
   product          Product     @relation(fields: [productId], references: [id])
+  staff            StaffUser   @relation(fields: [staffId], references: [id])
 
+  @@index([transactionId, productId])
+  @@index([productId])
+  @@index([staffId])
+  @@index([date])
   @@map("exchange")
 }
 
@@ -97,8 +101,9 @@ model Return {
   id             Int         @id @default(autoincrement())
   transactionId  Int
   productId      Int         // Product being returned
-  quantity       Decimal     @default(1.000) @db.Decimal(10, 3)
+  quantity       Decimal     @default(1.000) @db.Decimal(10, 3) // Always in Base UOM
   date           DateTime    @default(now())
+  condition      ItemCondition @default(DEFECTIVE)
   defect_reason  String
   refund_amount  Decimal     @db.Decimal(10, 2)
   staffId        Int
@@ -107,6 +112,10 @@ model Return {
   product        Product     @relation(fields: [productId], references: [id])
   staff          StaffUser   @relation(fields: [staffId], references: [id])
 
+  @@index([transactionId, productId])
+  @@index([productId])
+  @@index([staffId])
+  @@index([date])
   @@map("return")
 }
 
@@ -145,7 +154,7 @@ model CashPayment {
 model GCashPayment {
   paymentId           Int     @id
   reference_number    String
-  gcash_mobile_number String
+  gcash_mobile_number String?
 
   payment             Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
@@ -281,6 +290,7 @@ model StaffUser {
   purchaseOrders PurchaseOrder[]
   deliveries     Delivery[]
   returns        Return[]
+  exchanges      Exchange[]
 
   @@map("staff_user")
 }
@@ -601,6 +611,11 @@ model Expense {
 // ==========================================
 // ENUMS
 // ==========================================
+
+enum ItemCondition {
+  DEFECTIVE
+  CHANGE_OF_MIND
+}
 
 enum ExpenseCategory {
   RENT
