@@ -392,6 +392,10 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type CheckPaymentCreateWithoutPaymentInput = {
   bank_name: string
   check_number: string

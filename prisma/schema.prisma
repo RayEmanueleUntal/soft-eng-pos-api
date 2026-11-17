@@ -154,7 +154,7 @@ model CashPayment {
 model GCashPayment {
   paymentId           Int     @id
   reference_number    String
-  gcash_mobile_number String
+  gcash_mobile_number String?
 
   payment             Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 

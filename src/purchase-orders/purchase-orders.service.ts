@@ -13,6 +13,7 @@ import {
   UpdatePOStatusDto,
 } from './dto';
 import {
+  DuplicatePOProductUomException,
   InactiveSupplierException,
   InvalidUomConversionException,
   ProductsNotFoundException,
@@ -23,6 +24,7 @@ import {
 } from 'src/common/exceptions';
 import { POStatus, UnitOfMeasure } from 'src/generated/prisma/enums';
 import { Prisma } from 'src/generated/prisma/client';
+import { PurchaseOrderNoDeliveriesException } from 'src/common/exceptions/procurement/purchase-order-no-deliveries.exception';
 
 @Injectable()
 export class PurchaseOrdersService {
@@ -100,12 +102,14 @@ export class PurchaseOrdersService {
     const productMap = new Map(products.map((p) => [p.id, p]));
 
     // 4. Consolidate duplicate (productId, ordered_uom) pairs in payload to satisfy @@unique([poId, productId]) constraint
+    // Same product + same UoM -> merge quantities.
+    // Same product + different UoM -> reject with 400 Bad Request to preserve UoM/cost snapshot integrity.
     const consolidatedItemsMap = new Map<
-      string,
+      number,
       {
         productId: number;
         requested_quantity: number;
-        ordered_uom?: UnitOfMeasure;
+        ordered_uom: UnitOfMeasure;
         uom_conversion_factor?: number;
         unit_cost?: number;
       }
@@ -114,10 +118,20 @@ export class PurchaseOrdersService {
     for (const item of dto.items) {
       const product = productMap.get(item.productId)!;
       const targetUom = item.ordered_uom ?? product.base_uom;
-      const key = `${item.productId}_${targetUom}`;
 
-      const existing = consolidatedItemsMap.get(key);
+      const existing = consolidatedItemsMap.get(item.productId);
       if (existing) {
+        if (existing.ordered_uom !== targetUom) {
+          this.logger.warn(
+            `Purchase Order creation failed: Product ID ${item.productId} submitted with conflicting UoMs (${existing.ordered_uom} vs ${targetUom}).`,
+          );
+          throw new DuplicatePOProductUomException(
+            item.productId,
+            existing.ordered_uom,
+            targetUom,
+          );
+        }
+
         existing.requested_quantity += item.requested_quantity;
         if (item.unit_cost !== undefined) {
           existing.unit_cost = item.unit_cost; // Overwrite with explicit pricing if specified
@@ -126,7 +140,10 @@ export class PurchaseOrdersService {
           existing.uom_conversion_factor = item.uom_conversion_factor;
         }
       } else {
-        consolidatedItemsMap.set(key, { ...item, ordered_uom: targetUom });
+        consolidatedItemsMap.set(item.productId, {
+          ...item,
+          ordered_uom: targetUom,
+        });
       }
     }
 
@@ -380,6 +397,18 @@ export class PurchaseOrdersService {
         `Failed to update Purchase Order ID ${id}: Status is terminal (${po.po_status})`,
       );
       throw new PurchaseOrderImmutableException(id, po.po_status);
+    }
+
+    // Prevent marking as FULFILLED or PARTIALLY_FULFILLED when zero deliveries have been received
+    if (
+      (dto.po_status === POStatus.FULFILLED ||
+        dto.po_status === POStatus.PARTIALLY_FULFILLED) &&
+      po.deliveries.length === 0
+    ) {
+      this.logger.warn(
+        `Failed to update Purchase Order ID ${id} to ${dto.po_status}: No deliveries recorded.`,
+      );
+      throw new PurchaseOrderNoDeliveriesException(id, dto.po_status);
     }
 
     // Prevent cancellation if deliveries have already been received

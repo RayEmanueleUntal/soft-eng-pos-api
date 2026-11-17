@@ -2670,8 +2670,7 @@ export const ExchangeScalarFieldEnum = {
   productId: 'productId',
   quantity: 'quantity',
   date: 'date',
-  price_difference: 'price_difference',
-  is_within_7_days: 'is_within_7_days'
+  staffId: 'staffId'
 } as const
 
 export type ExchangeScalarFieldEnum = (typeof ExchangeScalarFieldEnum)[keyof typeof ExchangeScalarFieldEnum]
@@ -2683,6 +2682,7 @@ export const ReturnScalarFieldEnum = {
   productId: 'productId',
   quantity: 'quantity',
   date: 'date',
+  condition: 'condition',
   defect_reason: 'defect_reason',
   refund_amount: 'refund_amount',
   staffId: 'staffId'
@@ -3149,9 +3149,16 @@ export type ListEnumUnitOfMeasureFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
- * Reference to a field of type 'Boolean'
+ * Reference to a field of type 'ItemCondition'
  */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+export type EnumItemConditionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemCondition'>
+    
+
+
+/**
+ * Reference to a field of type 'ItemCondition[]'
+ */
+export type ListEnumItemConditionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemCondition[]'>
     
 
 
@@ -3166,6 +3173,13 @@ export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PaymentMethod[]'
  */
 export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

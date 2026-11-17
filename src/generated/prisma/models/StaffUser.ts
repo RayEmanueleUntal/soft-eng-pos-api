@@ -242,6 +242,7 @@ export type StaffUserWhereInput = {
   purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
   deliveries?: Prisma.DeliveryListRelationFilter
   returns?: Prisma.ReturnListRelationFilter
+  exchanges?: Prisma.ExchangeListRelationFilter
 }
 
 export type StaffUserOrderByWithRelationInput = {
@@ -262,6 +263,7 @@ export type StaffUserOrderByWithRelationInput = {
   purchaseOrders?: Prisma.PurchaseOrderOrderByRelationAggregateInput
   deliveries?: Prisma.DeliveryOrderByRelationAggregateInput
   returns?: Prisma.ReturnOrderByRelationAggregateInput
+  exchanges?: Prisma.ExchangeOrderByRelationAggregateInput
 }
 
 export type StaffUserWhereUniqueInput = Prisma.AtLeast<{
@@ -285,6 +287,7 @@ export type StaffUserWhereUniqueInput = Prisma.AtLeast<{
   purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
   deliveries?: Prisma.DeliveryListRelationFilter
   returns?: Prisma.ReturnListRelationFilter
+  exchanges?: Prisma.ExchangeListRelationFilter
 }, "id" | "username">
 
 export type StaffUserOrderByWithAggregationInput = {
@@ -332,6 +335,7 @@ export type StaffUserCreateInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateInput = {
@@ -352,6 +356,7 @@ export type StaffUserUncheckedCreateInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUpdateInput = {
@@ -371,6 +376,7 @@ export type StaffUserUpdateInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateInput = {
@@ -391,6 +397,7 @@ export type StaffUserUncheckedUpdateInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateManyInput = {
@@ -482,6 +489,20 @@ export type StaffUserUpdateOneRequiredWithoutTransactionsNestedInput = {
   upsert?: Prisma.StaffUserUpsertWithoutTransactionsInput
   connect?: Prisma.StaffUserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUserUpdateToOneWithWhereWithoutTransactionsInput, Prisma.StaffUserUpdateWithoutTransactionsInput>, Prisma.StaffUserUncheckedUpdateWithoutTransactionsInput>
+}
+
+export type StaffUserCreateNestedOneWithoutExchangesInput = {
+  create?: Prisma.XOR<Prisma.StaffUserCreateWithoutExchangesInput, Prisma.StaffUserUncheckedCreateWithoutExchangesInput>
+  connectOrCreate?: Prisma.StaffUserCreateOrConnectWithoutExchangesInput
+  connect?: Prisma.StaffUserWhereUniqueInput
+}
+
+export type StaffUserUpdateOneRequiredWithoutExchangesNestedInput = {
+  create?: Prisma.XOR<Prisma.StaffUserCreateWithoutExchangesInput, Prisma.StaffUserUncheckedCreateWithoutExchangesInput>
+  connectOrCreate?: Prisma.StaffUserCreateOrConnectWithoutExchangesInput
+  upsert?: Prisma.StaffUserUpsertWithoutExchangesInput
+  connect?: Prisma.StaffUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUserUpdateToOneWithWhereWithoutExchangesInput, Prisma.StaffUserUpdateWithoutExchangesInput>, Prisma.StaffUserUncheckedUpdateWithoutExchangesInput>
 }
 
 export type StaffUserCreateNestedOneWithoutReturnsInput = {
@@ -634,6 +655,7 @@ export type StaffUserCreateWithoutTransactionsInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutTransactionsInput = {
@@ -653,6 +675,7 @@ export type StaffUserUncheckedCreateWithoutTransactionsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutTransactionsInput = {
@@ -687,6 +710,7 @@ export type StaffUserUpdateWithoutTransactionsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutTransactionsInput = {
@@ -697,6 +721,101 @@ export type StaffUserUncheckedUpdateWithoutTransactionsInput = {
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customerPayments?: Prisma.CustomerPaymentUncheckedUpdateManyWithoutStaffNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutStaffNestedInput
+  initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
+  approvedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
+  returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
+}
+
+export type StaffUserCreateWithoutExchangesInput = {
+  username: string
+  password_hash: string
+  first_name: string
+  last_name: string
+  assigned_role: $Enums.AssignedRole
+  is_active?: boolean
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStaffInput
+  customerPayments?: Prisma.CustomerPaymentCreateNestedManyWithoutStaffInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutStaffInput
+  initiatedMovements?: Prisma.StockMovementCreateNestedManyWithoutStaffInput
+  approvedMovements?: Prisma.StockMovementCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
+  returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+}
+
+export type StaffUserUncheckedCreateWithoutExchangesInput = {
+  id?: number
+  username: string
+  password_hash: string
+  first_name: string
+  last_name: string
+  assigned_role: $Enums.AssignedRole
+  is_active?: boolean
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStaffInput
+  customerPayments?: Prisma.CustomerPaymentUncheckedCreateNestedManyWithoutStaffInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutStaffInput
+  initiatedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutStaffInput
+  approvedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutApprovedByInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
+  returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+}
+
+export type StaffUserCreateOrConnectWithoutExchangesInput = {
+  where: Prisma.StaffUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.StaffUserCreateWithoutExchangesInput, Prisma.StaffUserUncheckedCreateWithoutExchangesInput>
+}
+
+export type StaffUserUpsertWithoutExchangesInput = {
+  update: Prisma.XOR<Prisma.StaffUserUpdateWithoutExchangesInput, Prisma.StaffUserUncheckedUpdateWithoutExchangesInput>
+  create: Prisma.XOR<Prisma.StaffUserCreateWithoutExchangesInput, Prisma.StaffUserUncheckedCreateWithoutExchangesInput>
+  where?: Prisma.StaffUserWhereInput
+}
+
+export type StaffUserUpdateToOneWithWhereWithoutExchangesInput = {
+  where?: Prisma.StaffUserWhereInput
+  data: Prisma.XOR<Prisma.StaffUserUpdateWithoutExchangesInput, Prisma.StaffUserUncheckedUpdateWithoutExchangesInput>
+}
+
+export type StaffUserUpdateWithoutExchangesInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  first_name?: Prisma.StringFieldUpdateOperationsInput | string
+  last_name?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transactions?: Prisma.TransactionUpdateManyWithoutStaffNestedInput
+  customerPayments?: Prisma.CustomerPaymentUpdateManyWithoutStaffNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutStaffNestedInput
+  initiatedMovements?: Prisma.StockMovementUpdateManyWithoutStaffNestedInput
+  approvedMovements?: Prisma.StockMovementUpdateManyWithoutApprovedByNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
+  returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+}
+
+export type StaffUserUncheckedUpdateWithoutExchangesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  first_name?: Prisma.StringFieldUpdateOperationsInput | string
+  last_name?: Prisma.StringFieldUpdateOperationsInput | string
+  assigned_role?: Prisma.EnumAssignedRoleFieldUpdateOperationsInput | $Enums.AssignedRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStaffNestedInput
   customerPayments?: Prisma.CustomerPaymentUncheckedUpdateManyWithoutStaffNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutStaffNestedInput
   initiatedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutStaffNestedInput
@@ -724,6 +843,7 @@ export type StaffUserCreateWithoutReturnsInput = {
   reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutReturnsInput = {
@@ -743,6 +863,7 @@ export type StaffUserUncheckedCreateWithoutReturnsInput = {
   reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutReturnsInput = {
@@ -777,6 +898,7 @@ export type StaffUserUpdateWithoutReturnsInput = {
   reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutReturnsInput = {
@@ -796,6 +918,7 @@ export type StaffUserUncheckedUpdateWithoutReturnsInput = {
   reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateWithoutCustomerPaymentsInput = {
@@ -814,6 +937,7 @@ export type StaffUserCreateWithoutCustomerPaymentsInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutCustomerPaymentsInput = {
@@ -833,6 +957,7 @@ export type StaffUserUncheckedCreateWithoutCustomerPaymentsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutCustomerPaymentsInput = {
@@ -867,6 +992,7 @@ export type StaffUserUpdateWithoutCustomerPaymentsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutCustomerPaymentsInput = {
@@ -886,6 +1012,7 @@ export type StaffUserUncheckedUpdateWithoutCustomerPaymentsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateWithoutInitiatedMovementsInput = {
@@ -904,6 +1031,7 @@ export type StaffUserCreateWithoutInitiatedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutInitiatedMovementsInput = {
@@ -923,6 +1051,7 @@ export type StaffUserUncheckedCreateWithoutInitiatedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutInitiatedMovementsInput = {
@@ -946,6 +1075,7 @@ export type StaffUserCreateWithoutApprovedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutApprovedMovementsInput = {
@@ -965,6 +1095,7 @@ export type StaffUserUncheckedCreateWithoutApprovedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutApprovedMovementsInput = {
@@ -999,6 +1130,7 @@ export type StaffUserUpdateWithoutInitiatedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutInitiatedMovementsInput = {
@@ -1018,6 +1150,7 @@ export type StaffUserUncheckedUpdateWithoutInitiatedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUpsertWithoutApprovedMovementsInput = {
@@ -1047,6 +1180,7 @@ export type StaffUserUpdateWithoutApprovedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutApprovedMovementsInput = {
@@ -1066,6 +1200,7 @@ export type StaffUserUncheckedUpdateWithoutApprovedMovementsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateWithoutPurchaseOrdersInput = {
@@ -1084,6 +1219,7 @@ export type StaffUserCreateWithoutPurchaseOrdersInput = {
   reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutPurchaseOrdersInput = {
@@ -1103,6 +1239,7 @@ export type StaffUserUncheckedCreateWithoutPurchaseOrdersInput = {
   reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutPurchaseOrdersInput = {
@@ -1137,6 +1274,7 @@ export type StaffUserUpdateWithoutPurchaseOrdersInput = {
   reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutPurchaseOrdersInput = {
@@ -1156,6 +1294,7 @@ export type StaffUserUncheckedUpdateWithoutPurchaseOrdersInput = {
   reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateWithoutDeliveriesInput = {
@@ -1174,6 +1313,7 @@ export type StaffUserCreateWithoutDeliveriesInput = {
   reviewedRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutDeliveriesInput = {
@@ -1193,6 +1333,7 @@ export type StaffUserUncheckedCreateWithoutDeliveriesInput = {
   reviewedRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutReviewedByInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutDeliveriesInput = {
@@ -1227,6 +1368,7 @@ export type StaffUserUpdateWithoutDeliveriesInput = {
   reviewedRequests?: Prisma.ApprovalRequestUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutDeliveriesInput = {
@@ -1246,6 +1388,7 @@ export type StaffUserUncheckedUpdateWithoutDeliveriesInput = {
   reviewedRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateWithoutApprovalRequestsInput = {
@@ -1264,6 +1407,7 @@ export type StaffUserCreateWithoutApprovalRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutApprovalRequestsInput = {
@@ -1283,6 +1427,7 @@ export type StaffUserUncheckedCreateWithoutApprovalRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutApprovalRequestsInput = {
@@ -1306,6 +1451,7 @@ export type StaffUserCreateWithoutReviewedRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutReviewedRequestsInput = {
@@ -1325,6 +1471,7 @@ export type StaffUserUncheckedCreateWithoutReviewedRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutReviewedRequestsInput = {
@@ -1359,6 +1506,7 @@ export type StaffUserUpdateWithoutApprovalRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutApprovalRequestsInput = {
@@ -1378,6 +1526,7 @@ export type StaffUserUncheckedUpdateWithoutApprovalRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUpsertWithoutReviewedRequestsInput = {
@@ -1407,6 +1556,7 @@ export type StaffUserUpdateWithoutReviewedRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutReviewedRequestsInput = {
@@ -1426,6 +1576,7 @@ export type StaffUserUncheckedUpdateWithoutReviewedRequestsInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserCreateWithoutExpensesInput = {
@@ -1444,6 +1595,7 @@ export type StaffUserCreateWithoutExpensesInput = {
   purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserUncheckedCreateWithoutExpensesInput = {
@@ -1463,6 +1615,7 @@ export type StaffUserUncheckedCreateWithoutExpensesInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutStaffInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutStaffInput
   returns?: Prisma.ReturnUncheckedCreateNestedManyWithoutStaffInput
+  exchanges?: Prisma.ExchangeUncheckedCreateNestedManyWithoutStaffInput
 }
 
 export type StaffUserCreateOrConnectWithoutExpensesInput = {
@@ -1497,6 +1650,7 @@ export type StaffUserUpdateWithoutExpensesInput = {
   purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUpdateManyWithoutStaffNestedInput
 }
 
 export type StaffUserUncheckedUpdateWithoutExpensesInput = {
@@ -1516,6 +1670,7 @@ export type StaffUserUncheckedUpdateWithoutExpensesInput = {
   purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutStaffNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutStaffNestedInput
   returns?: Prisma.ReturnUncheckedUpdateManyWithoutStaffNestedInput
+  exchanges?: Prisma.ExchangeUncheckedUpdateManyWithoutStaffNestedInput
 }
 
 
@@ -1534,6 +1689,7 @@ export type StaffUserCountOutputType = {
   purchaseOrders: number
   deliveries: number
   returns: number
+  exchanges: number
 }
 
 export type StaffUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1547,6 +1703,7 @@ export type StaffUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   purchaseOrders?: boolean | StaffUserCountOutputTypeCountPurchaseOrdersArgs
   deliveries?: boolean | StaffUserCountOutputTypeCountDeliveriesArgs
   returns?: boolean | StaffUserCountOutputTypeCountReturnsArgs
+  exchanges?: boolean | StaffUserCountOutputTypeCountExchangesArgs
 }
 
 /**
@@ -1629,6 +1786,13 @@ export type StaffUserCountOutputTypeCountReturnsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.ReturnWhereInput
 }
 
+/**
+ * StaffUserCountOutputType without action
+ */
+export type StaffUserCountOutputTypeCountExchangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExchangeWhereInput
+}
+
 
 export type StaffUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1648,6 +1812,7 @@ export type StaffUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   purchaseOrders?: boolean | Prisma.StaffUser$purchaseOrdersArgs<ExtArgs>
   deliveries?: boolean | Prisma.StaffUser$deliveriesArgs<ExtArgs>
   returns?: boolean | Prisma.StaffUser$returnsArgs<ExtArgs>
+  exchanges?: boolean | Prisma.StaffUser$exchangesArgs<ExtArgs>
   _count?: boolean | Prisma.StaffUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["staffUser"]>
 
@@ -1693,6 +1858,7 @@ export type StaffUserInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   purchaseOrders?: boolean | Prisma.StaffUser$purchaseOrdersArgs<ExtArgs>
   deliveries?: boolean | Prisma.StaffUser$deliveriesArgs<ExtArgs>
   returns?: boolean | Prisma.StaffUser$returnsArgs<ExtArgs>
+  exchanges?: boolean | Prisma.StaffUser$exchangesArgs<ExtArgs>
   _count?: boolean | Prisma.StaffUserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StaffUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1711,6 +1877,7 @@ export type $StaffUserPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     purchaseOrders: Prisma.$PurchaseOrderPayload<ExtArgs>[]
     deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
     returns: Prisma.$ReturnPayload<ExtArgs>[]
+    exchanges: Prisma.$ExchangePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2124,6 +2291,7 @@ export interface Prisma__StaffUserClient<T, Null = never, ExtArgs extends runtim
   purchaseOrders<T extends Prisma.StaffUser$purchaseOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$purchaseOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deliveries<T extends Prisma.StaffUser$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   returns<T extends Prisma.StaffUser$returnsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$returnsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReturnPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  exchanges<T extends Prisma.StaffUser$exchangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffUser$exchangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExchangePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2790,6 +2958,30 @@ export type StaffUser$returnsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.ReturnScalarFieldEnum | Prisma.ReturnScalarFieldEnum[]
+}
+
+/**
+ * StaffUser.exchanges
+ */
+export type StaffUser$exchangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Exchange
+   */
+  select?: Prisma.ExchangeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Exchange
+   */
+  omit?: Prisma.ExchangeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExchangeInclude<ExtArgs> | null
+  where?: Prisma.ExchangeWhereInput
+  orderBy?: Prisma.ExchangeOrderByWithRelationInput | Prisma.ExchangeOrderByWithRelationInput[]
+  cursor?: Prisma.ExchangeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExchangeScalarFieldEnum | Prisma.ExchangeScalarFieldEnum[]
 }
 
 /**

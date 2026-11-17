@@ -1,5 +1,20 @@
-import { PaymentMethod } from 'src/generated/prisma/enums';
-import { ItemCondition } from '../dto';
+import {
+  ItemCondition,
+  PaymentMethod,
+  UnitOfMeasure,
+} from 'src/generated/prisma/enums';
+
+export interface RefundItemPayload {
+  productId: number;
+  productName: string;
+  requestedQuantity: number;
+  unitOfMeasure: UnitOfMeasure;
+  conversionFactor: number;
+  baseQuantity: number; // Always in product's base_uom
+  itemRefundAmount: number;
+  condition: ItemCondition;
+  reason: string;
+}
 
 export interface RefundPaymentBreakdown {
   totalRefundAmount: number;
@@ -14,9 +29,6 @@ export interface RefundPaymentBreakdown {
 
 export interface RefundApprovalPayload {
   transactionId: number;
-  productId: number;
-  quantity: number; // in Base UOM
-  condition: ItemCondition;
-  reason: string;
-  paymentBreakdown: RefundPaymentBreakdown; // Exposed directly to approving Admin/Manager
+  items: RefundItemPayload[];
+  paymentBreakdown: RefundPaymentBreakdown;
 }

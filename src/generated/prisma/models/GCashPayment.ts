@@ -170,7 +170,7 @@ export type GCashPaymentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type GCashPaymentGroupByOutputType = {
   paymentId: number
   reference_number: string
-  gcash_mobile_number: string
+  gcash_mobile_number: string | null
   _count: GCashPaymentCountAggregateOutputType | null
   _avg: GCashPaymentAvgAggregateOutputType | null
   _sum: GCashPaymentSumAggregateOutputType | null
@@ -199,14 +199,14 @@ export type GCashPaymentWhereInput = {
   NOT?: Prisma.GCashPaymentWhereInput | Prisma.GCashPaymentWhereInput[]
   paymentId?: Prisma.IntFilter<"GCashPayment"> | number
   reference_number?: Prisma.StringFilter<"GCashPayment"> | string
-  gcash_mobile_number?: Prisma.StringFilter<"GCashPayment"> | string
+  gcash_mobile_number?: Prisma.StringNullableFilter<"GCashPayment"> | string | null
   payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
 }
 
 export type GCashPaymentOrderByWithRelationInput = {
   paymentId?: Prisma.SortOrder
   reference_number?: Prisma.SortOrder
-  gcash_mobile_number?: Prisma.SortOrder
+  gcash_mobile_number?: Prisma.SortOrderInput | Prisma.SortOrder
   payment?: Prisma.PaymentOrderByWithRelationInput
 }
 
@@ -216,14 +216,14 @@ export type GCashPaymentWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.GCashPaymentWhereInput[]
   NOT?: Prisma.GCashPaymentWhereInput | Prisma.GCashPaymentWhereInput[]
   reference_number?: Prisma.StringFilter<"GCashPayment"> | string
-  gcash_mobile_number?: Prisma.StringFilter<"GCashPayment"> | string
+  gcash_mobile_number?: Prisma.StringNullableFilter<"GCashPayment"> | string | null
   payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
 }, "paymentId">
 
 export type GCashPaymentOrderByWithAggregationInput = {
   paymentId?: Prisma.SortOrder
   reference_number?: Prisma.SortOrder
-  gcash_mobile_number?: Prisma.SortOrder
+  gcash_mobile_number?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.GCashPaymentCountOrderByAggregateInput
   _avg?: Prisma.GCashPaymentAvgOrderByAggregateInput
   _max?: Prisma.GCashPaymentMaxOrderByAggregateInput
@@ -237,48 +237,48 @@ export type GCashPaymentScalarWhereWithAggregatesInput = {
   NOT?: Prisma.GCashPaymentScalarWhereWithAggregatesInput | Prisma.GCashPaymentScalarWhereWithAggregatesInput[]
   paymentId?: Prisma.IntWithAggregatesFilter<"GCashPayment"> | number
   reference_number?: Prisma.StringWithAggregatesFilter<"GCashPayment"> | string
-  gcash_mobile_number?: Prisma.StringWithAggregatesFilter<"GCashPayment"> | string
+  gcash_mobile_number?: Prisma.StringNullableWithAggregatesFilter<"GCashPayment"> | string | null
 }
 
 export type GCashPaymentCreateInput = {
   reference_number: string
-  gcash_mobile_number: string
+  gcash_mobile_number?: string | null
   payment: Prisma.PaymentCreateNestedOneWithoutGCashPaymentInput
 }
 
 export type GCashPaymentUncheckedCreateInput = {
   paymentId: number
   reference_number: string
-  gcash_mobile_number: string
+  gcash_mobile_number?: string | null
 }
 
 export type GCashPaymentUpdateInput = {
   reference_number?: Prisma.StringFieldUpdateOperationsInput | string
-  gcash_mobile_number?: Prisma.StringFieldUpdateOperationsInput | string
+  gcash_mobile_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment?: Prisma.PaymentUpdateOneRequiredWithoutGCashPaymentNestedInput
 }
 
 export type GCashPaymentUncheckedUpdateInput = {
   paymentId?: Prisma.IntFieldUpdateOperationsInput | number
   reference_number?: Prisma.StringFieldUpdateOperationsInput | string
-  gcash_mobile_number?: Prisma.StringFieldUpdateOperationsInput | string
+  gcash_mobile_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type GCashPaymentCreateManyInput = {
   paymentId: number
   reference_number: string
-  gcash_mobile_number: string
+  gcash_mobile_number?: string | null
 }
 
 export type GCashPaymentUpdateManyMutationInput = {
   reference_number?: Prisma.StringFieldUpdateOperationsInput | string
-  gcash_mobile_number?: Prisma.StringFieldUpdateOperationsInput | string
+  gcash_mobile_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type GCashPaymentUncheckedUpdateManyInput = {
   paymentId?: Prisma.IntFieldUpdateOperationsInput | number
   reference_number?: Prisma.StringFieldUpdateOperationsInput | string
-  gcash_mobile_number?: Prisma.StringFieldUpdateOperationsInput | string
+  gcash_mobile_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type GCashPaymentNullableScalarRelationFilter = {
@@ -346,12 +346,12 @@ export type GCashPaymentUncheckedUpdateOneWithoutPaymentNestedInput = {
 
 export type GCashPaymentCreateWithoutPaymentInput = {
   reference_number: string
-  gcash_mobile_number: string
+  gcash_mobile_number?: string | null
 }
 
 export type GCashPaymentUncheckedCreateWithoutPaymentInput = {
   reference_number: string
-  gcash_mobile_number: string
+  gcash_mobile_number?: string | null
 }
 
 export type GCashPaymentCreateOrConnectWithoutPaymentInput = {
@@ -372,12 +372,12 @@ export type GCashPaymentUpdateToOneWithWhereWithoutPaymentInput = {
 
 export type GCashPaymentUpdateWithoutPaymentInput = {
   reference_number?: Prisma.StringFieldUpdateOperationsInput | string
-  gcash_mobile_number?: Prisma.StringFieldUpdateOperationsInput | string
+  gcash_mobile_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type GCashPaymentUncheckedUpdateWithoutPaymentInput = {
   reference_number?: Prisma.StringFieldUpdateOperationsInput | string
-  gcash_mobile_number?: Prisma.StringFieldUpdateOperationsInput | string
+  gcash_mobile_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -428,7 +428,7 @@ export type $GCashPaymentPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     paymentId: number
     reference_number: string
-    gcash_mobile_number: string
+    gcash_mobile_number: string | null
   }, ExtArgs["result"]["gCashPayment"]>
   composites: {}
 }
