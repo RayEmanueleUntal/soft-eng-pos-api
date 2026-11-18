@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ItemCondition } from 'src/generated/prisma/enums';
 
 export class ReceiptReturnDto {
   @ApiProperty({ example: 1, description: 'Return record ID' })
@@ -13,11 +14,18 @@ export class ReceiptReturnDto {
   })
   product_name!: string;
 
-  @ApiProperty({ example: 2.0, description: 'Quantity returned' })
+  @ApiProperty({ example: 2.0, description: 'Quantity returned (in Base UOM)' })
   quantity!: number;
 
   @ApiProperty({ example: '2026-09-02T14:15:00.000Z' })
   date!: Date;
+
+  @ApiProperty({
+    enum: ItemCondition,
+    example: ItemCondition.DEFECTIVE,
+    description: 'Condition of the returned item',
+  })
+  condition!: ItemCondition;
 
   @ApiProperty({
     example: 'Damaged threads upon opening box',

@@ -70,15 +70,23 @@ export class AnalyticsService {
     const hasDateFilter = Object.keys(dateFilter).length > 0;
 
     // Include both COMPLETED and PARTIALLY_REFUNDED so partial returns don't wipe out valid sales
+    const validStatuses = [
+      TransactionStatus.COMPLETED,
+      TransactionStatus.PARTIALLY_REFUNDED,
+    ];
+
     const transactionWhere = {
-      status: {
-        in: [TransactionStatus.COMPLETED, TransactionStatus.PARTIALLY_REFUNDED],
-      },
+      status: { in: validStatuses },
       ...(hasDateFilter && { date: dateFilter }),
     };
 
     const returnWhere = {
       ...(hasDateFilter && { date: dateFilter }),
+      // Only deduct returns for transactions that are still counted in grossRevenue!
+      // Fully REFUNDED transactions are already excluded from transactionWhere.
+      transaction: {
+        status: { in: validStatuses },
+      },
     };
 
     const expenseWhere = {
@@ -247,15 +255,23 @@ export class AnalyticsService {
     const hasDateFilter = Object.keys(dateFilter).length > 0;
 
     // Include COMPLETED and PARTIALLY_REFUNDED so partial returns remain represented
+    const validStatuses = [
+      TransactionStatus.COMPLETED,
+      TransactionStatus.PARTIALLY_REFUNDED,
+    ];
+
     const transactionWhere = {
-      status: {
-        in: [TransactionStatus.COMPLETED, TransactionStatus.PARTIALLY_REFUNDED],
-      },
+      status: { in: validStatuses },
       ...(hasDateFilter && { date: dateFilter }),
     };
 
     const returnWhere = {
       ...(hasDateFilter && { date: dateFilter }),
+      // Only deduct returns for transactions that are still counted in grossRevenue!
+      // Fully REFUNDED transactions are already excluded from transactionWhere.
+      transaction: {
+        status: { in: validStatuses },
+      },
     };
 
     const expenseWhere = {
@@ -683,6 +699,9 @@ export class AnalyticsService {
 
     const fastReturnWhere = {
       ...(hasFastDateFilter && { date: fastDateFilter }),
+      transaction: {
+        status: { in: validStatuses },
+      },
     };
 
     // Cutoff date for Slow-Moving / Dead Stock aging calculation

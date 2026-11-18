@@ -134,6 +134,7 @@ export class GetReceiptResponseDto {
         product_name: r.product?.name ?? 'Unknown',
         quantity: Number(r.quantity),
         date: r.date,
+        condition: r.condition,
         defect_reason: r.defect_reason,
         refund_amount: Number(r.refund_amount),
         processed_by_staff: r.staff
@@ -149,8 +150,10 @@ export class GetReceiptResponseDto {
         product_name: e.product?.name ?? 'Unknown',
         quantity: Number(e.quantity),
         date: e.date,
-        price_difference: Number(e.price_difference),
-        is_within_7_days: e.is_within_7_days,
+        staffId: e.staffId,
+        processed_by_staff: e.staff
+          ? `${e.staff.first_name ?? ''} ${e.staff.last_name ?? ''}`.trim()
+          : 'Unknown Staff',
       }));
     }
 

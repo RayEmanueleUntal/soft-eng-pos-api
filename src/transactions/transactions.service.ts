@@ -134,6 +134,7 @@ export class TransactionsService {
               ? {
                   include: {
                     product: true,
+                    staff: true,
                   },
                 }
               : false,
@@ -211,6 +212,7 @@ export class TransactionsService {
           ? {
               include: {
                 product: true,
+                staff: true,
               },
             }
           : false,

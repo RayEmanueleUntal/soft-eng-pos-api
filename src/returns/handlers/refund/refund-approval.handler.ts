@@ -72,29 +72,37 @@ export class RefundApprovalHandler
     }
 
     for (const item of items) {
-      const txItem = transaction.transactionItems.find(
+      const matchingTxItems = transaction.transactionItems.filter(
         (ti) => ti.productId === item.productId,
       );
 
-      if (!txItem) {
+      if (matchingTxItems.length === 0) {
         throw new NotFoundException(
           `Product #${item.productId} not found in Transaction #${transactionId}.`,
         );
       }
 
-      // Concurrency-safe re-check against over-returning/exchanging
-      const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+      const baseUom = matchingTxItems[0].product.base_uom;
+
+      // Concurrency-safe re-check across all line items of this product in the transaction
+      const baseQuantityDeducted = matchingTxItems.reduce(
+        (sum, ti) => sum + ti.base_quantity_deducted.toNumber(),
+        0,
+      );
       const alreadyUsedBaseQty = usedQtyByProduct.get(item.productId) ?? 0;
 
-      if (alreadyUsedBaseQty + item.baseQuantity > baseQuantityDeducted) {
+      if (
+        Number((alreadyUsedBaseQty + item.baseQuantity).toFixed(3)) >
+        Number(baseQuantityDeducted.toFixed(3))
+      ) {
         throw new BadRequestException(
-          `Cannot approve refund: ${item.baseQuantity} ${txItem.product.base_uom} for Product #${item.productId} exceeds remaining eligible quantity (${baseQuantityDeducted - alreadyUsedBaseQty}).`,
+          `Cannot approve refund: ${item.baseQuantity} ${baseUom} for Product #${item.productId} exceeds remaining eligible quantity (${Number((baseQuantityDeducted - alreadyUsedBaseQty).toFixed(3))}).`,
         );
       }
 
       usedQtyByProduct.set(
         item.productId,
-        alreadyUsedBaseQty + item.baseQuantity,
+        Number((alreadyUsedBaseQty + item.baseQuantity).toFixed(3)),
       );
 
       // 1. Record Return (stored in Base UOM with condition)
@@ -115,7 +123,7 @@ export class RefundApprovalHandler
         await this.inventoryService.restockProductStock(tx, {
           productId: item.productId,
           quantityToAdd: item.baseQuantity,
-          provided_uom: txItem.product.base_uom,
+          provided_uom: baseUom,
           userId: requestedById,
           reason: `RETURN RESTOCK: ${item.reason} (Tx #${transactionId})`,
           operation_name: 'REFUND_RESTOCK',
@@ -178,10 +186,21 @@ export class RefundApprovalHandler
     }
 
     // 4. Update Transaction Status (REFUNDED if all purchased items are returned/exchanged, else PARTIALLY_REFUNDED)
-    const isFullyResolved = transaction.transactionItems.every((ti) => {
-      const totalUsed = usedQtyByProduct.get(ti.productId) ?? 0;
-      return totalUsed >= ti.base_quantity_deducted.toNumber();
-    });
+    const purchasedBaseByProduct = new Map<number, number>();
+    for (const ti of transaction.transactionItems) {
+      const current = purchasedBaseByProduct.get(ti.productId) ?? 0;
+      purchasedBaseByProduct.set(
+        ti.productId,
+        Number((current + ti.base_quantity_deducted.toNumber()).toFixed(3)),
+      );
+    }
+
+    const isFullyResolved = Array.from(purchasedBaseByProduct.entries()).every(
+      ([productId, totalPurchasedBase]) => {
+        const totalUsed = usedQtyByProduct.get(productId) ?? 0;
+        return totalUsed >= totalPurchasedBase;
+      },
+    );
 
     await tx.transaction.update({
       where: { id: transactionId },

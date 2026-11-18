@@ -80,6 +80,7 @@ export class TransactionListItemResponseDto {
 
   static fromEntity(entity: any): TransactionListItemResponseDto {
     const returnsList = entity.returns ?? [];
+    const exchangesList = entity.exchanges ?? [];
 
     return {
       id: entity.id,
@@ -105,9 +106,13 @@ export class TransactionListItemResponseDto {
         const discount = item.discount.toNumber();
         const lineSubtotal = unitPrice * qty;
 
-        const returnedQtyForProduct = returnsList
+        const returnedBaseQty = returnsList
           .filter((r: any) => r.productId === item.productId)
           .reduce((sum: number, r: any) => sum + r.quantity.toNumber(), 0);
+
+        const exchangedBaseQty = exchangesList
+          .filter((e: any) => e.productId === item.productId)
+          .reduce((sum: number, e: any) => sum + e.quantity.toNumber(), 0);
 
         return {
           productId: item.productId,
@@ -119,7 +124,7 @@ export class TransactionListItemResponseDto {
           net_price: item.subtotal.toNumber(),
           pricing_uom: item.unit_of_measure,
           type: entity.transaction_type,
-          already_returned_qty: returnedQtyForProduct,
+          already_returned_qty: returnedBaseQty + exchangedBaseQty,
         };
       }),
       payments: (entity.payments ?? []).map((p: any) => ({
@@ -148,21 +153,29 @@ export class TransactionListItemResponseDto {
           product_name: r.product?.name ?? 'Unknown Product',
           quantity: r.quantity.toNumber(),
           date: r.date,
+          condition: r.condition,
           defect_reason: r.defect_reason,
           refund_amount: r.refund_amount.toNumber(),
-          processed_by_staff:
-            r.staff?.name ?? r.staff?.username ?? 'Unknown Staff',
+          processed_by_staff: r.staff
+            ? `${r.staff.first_name ?? ''} ${r.staff.last_name ?? ''}`.trim() ||
+              r.staff.username ||
+              'Unknown Staff'
+            : 'Unknown Staff',
         })),
       }),
       ...(entity.exchanges && {
-        exchanges: (entity.exchanges ?? []).map((e: any) => ({
+        exchanges: exchangesList.map((e: any) => ({
           id: e.id,
           productId: e.productId,
           product_name: e.product?.name ?? 'Unknown Product',
           quantity: e.quantity.toNumber(),
           date: e.date,
-          price_difference: e.price_difference.toNumber(),
-          is_within_7_days: e.is_within_7_days,
+          staffId: e.staffId,
+          processed_by_staff: e.staff
+            ? `${e.staff.first_name ?? ''} ${e.staff.last_name ?? ''}`.trim() ||
+              e.staff.username ||
+              'Unknown Staff'
+            : 'Unknown Staff',
         })),
       }),
     };
