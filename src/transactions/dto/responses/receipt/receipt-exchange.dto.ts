@@ -9,26 +9,28 @@ export class ReceiptExchangeDto {
 
   @ApiProperty({
     example: 'Hex Bolt M10-1.50 x 40mm',
-    description: 'Name of replacement/exchanged product item',
+    description: 'Name of exchanged product item',
   })
   product_name!: string;
 
-  @ApiProperty({ example: 2.0, description: 'Quantity exchanged' })
+  @ApiProperty({
+    example: 2.0,
+    description: 'Quantity exchanged (in Base UOM)',
+  })
   quantity!: number;
 
   @ApiProperty({ example: '2026-09-03T09:00:00.000Z' })
   date!: Date;
 
   @ApiProperty({
-    example: 45.0,
-    description:
-      'Price difference charged (positive) or refunded (negative) during exchange',
+    example: 3,
+    description: 'Staff user ID who processed the exchange',
   })
-  price_difference!: number;
+  staffId!: number;
 
   @ApiProperty({
-    example: true,
-    description: 'Indicates if exchange occurred within warranty/policy limit',
+    example: 'Juan Dela Cruz',
+    description: 'Staff member who processed the exchange',
   })
-  is_within_7_days!: boolean;
+  processed_by_staff!: string;
 }

@@ -84,7 +84,7 @@ export class ReturnsService {
       seenProductIds.add(item.productId);
     }
 
-    // Fetch transaction with all items, products, payments, and prior returns
+    // Fetch transaction with all items, products, payments, prior returns, and prior exchanges
     const transaction = await this.prisma.transaction.findUnique({
       where: { id: transactionId },
       include: {
@@ -107,35 +107,46 @@ export class ReturnsService {
     let totalRefundAmount = 0;
 
     for (const item of items) {
-      const txItem = transaction.transactionItems.find(
+      const matchingTxItems = transaction.transactionItems.filter(
         (ti) => ti.productId === item.productId,
       );
 
-      if (!txItem) {
+      if (matchingTxItems.length === 0) {
         throw new NotFoundException(
           `Product #${item.productId} was not found in Transaction #${transactionId}.`,
         );
       }
 
-      const purchasedUom = txItem.unit_of_measure;
-      const baseUom = txItem.product.base_uom;
+      const productName = matchingTxItems[0].product.name;
+      const baseUom = matchingTxItems[0].product.base_uom;
+      const purchasedUoms = Array.from(
+        new Set(matchingTxItems.map((ti) => ti.unit_of_measure)),
+      );
       const chosenUom = item.unit_of_measure ?? baseUom;
 
-      // Requirement 2: Accepted UOM must be either the purchased UOM or the base UOM
-      if (chosenUom !== purchasedUom && chosenUom !== baseUom) {
+      // Accepted UOM must be one of the purchased UOMs on this transaction or the product's base UOM
+      if (!purchasedUoms.includes(chosenUom) && chosenUom !== baseUom) {
         throw new BadRequestException(
-          `Invalid UOM '${chosenUom}' for Product #${item.productId} (${txItem.product.name}). Allowed UOMs: '${purchasedUom}' (purchased) or '${baseUom}' (base).`,
+          `Invalid UOM '${chosenUom}' for Product #${item.productId} (${productName}). Allowed UOMs: ${purchasedUoms.map((u) => `'${u}'`).join(', ')} (purchased) or '${baseUom}' (base).`,
         );
       }
 
+      const matchingUomLine = matchingTxItems.find(
+        (ti) => ti.unit_of_measure === chosenUom,
+      );
       const conversionFactor =
-        chosenUom === baseUom ? 1 : txItem.uom_conversion_factor.toNumber();
+        chosenUom === baseUom
+          ? 1
+          : matchingUomLine!.uom_conversion_factor.toNumber();
       const baseQuantity = Number(
         (item.quantity * conversionFactor).toFixed(3),
       );
 
-      // Requirement 3: Total returned + exchanged base quantity must not exceed purchased base_quantity_deducted
-      const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+      // Sum base_quantity_deducted across all line items of this product in the transaction
+      const baseQuantityDeducted = matchingTxItems.reduce(
+        (sum, ti) => sum + ti.base_quantity_deducted.toNumber(),
+        0,
+      );
 
       const alreadyReturnedBaseQty = transaction.returns
         .filter((r) => r.productId === item.productId)
@@ -155,13 +166,17 @@ export class ReturnsService {
 
       if (baseQuantity > remainingReturnableBaseQty) {
         throw new BadRequestException(
-          `Refund quantity (${baseQuantity} ${baseUom}) for Product #${item.productId} (${txItem.product.name}) exceeds remaining returnable quantity (${remainingReturnableBaseQty} ${baseUom}).`,
+          `Refund quantity (${baseQuantity} ${baseUom}) for Product #${item.productId} (${productName}) exceeds remaining returnable quantity (${remainingReturnableBaseQty} ${baseUom}).`,
         );
       }
 
-      // Snapshotted effective unit price in base UOM
+      // Snapshotted effective unit price in base UOM across all matching line items
+      const totalProductSubtotal = matchingTxItems.reduce(
+        (sum, ti) => sum + ti.subtotal.toNumber(),
+        0,
+      );
       const effectiveBaseUnitPrice =
-        txItem.subtotal.toNumber() / baseQuantityDeducted;
+        totalProductSubtotal / baseQuantityDeducted;
       const itemRefundAmount = Number(
         (effectiveBaseUnitPrice * baseQuantity).toFixed(2),
       );
@@ -172,7 +187,7 @@ export class ReturnsService {
 
       resolvedItems.push({
         productId: item.productId,
-        productName: txItem.product.name,
+        productName,
         requestedQuantity: item.quantity,
         unitOfMeasure: chosenUom,
         conversionFactor,
@@ -282,35 +297,46 @@ export class ReturnsService {
     const resolvedItems: ExchangeItemPayload[] = [];
 
     for (const item of items) {
-      const txItem = transaction.transactionItems.find(
+      const matchingTxItems = transaction.transactionItems.filter(
         (ti) => ti.productId === item.productId,
       );
 
-      if (!txItem) {
+      if (matchingTxItems.length === 0) {
         throw new NotFoundException(
           `Product #${item.productId} was not found in Transaction #${transactionId}.`,
         );
       }
 
-      const purchasedUom = txItem.unit_of_measure;
-      const baseUom = txItem.product.base_uom;
+      const productName = matchingTxItems[0].product.name;
+      const baseUom = matchingTxItems[0].product.base_uom;
+      const purchasedUoms = Array.from(
+        new Set(matchingTxItems.map((ti) => ti.unit_of_measure)),
+      );
       const chosenUom = item.unit_of_measure ?? baseUom;
 
-      // Requirement 2: Accepted UOM must be either the purchased UOM or the base UOM
-      if (chosenUom !== purchasedUom && chosenUom !== baseUom) {
+      // Accepted UOM must be one of the purchased UOMs on this transaction or the product's base UOM
+      if (!purchasedUoms.includes(chosenUom) && chosenUom !== baseUom) {
         throw new BadRequestException(
-          `Invalid UOM '${chosenUom}' for Product #${item.productId} (${txItem.product.name}). Allowed UOMs: '${purchasedUom}' (purchased) or '${baseUom}' (base).`,
+          `Invalid UOM '${chosenUom}' for Product #${item.productId} (${productName}). Allowed UOMs: ${purchasedUoms.map((u) => `'${u}'`).join(', ')} (purchased) or '${baseUom}' (base).`,
         );
       }
 
+      const matchingUomLine = matchingTxItems.find(
+        (ti) => ti.unit_of_measure === chosenUom,
+      );
       const conversionFactor =
-        chosenUom === baseUom ? 1 : txItem.uom_conversion_factor.toNumber();
+        chosenUom === baseUom
+          ? 1
+          : matchingUomLine!.uom_conversion_factor.toNumber();
       const baseQuantity = Number(
         (item.quantity * conversionFactor).toFixed(3),
       );
 
-      // Requirement 3: Total returned + exchanged base quantity must not exceed purchased base_quantity_deducted
-      const baseQuantityDeducted = txItem.base_quantity_deducted.toNumber();
+      // Sum base_quantity_deducted across all line items of this product in the transaction
+      const baseQuantityDeducted = matchingTxItems.reduce(
+        (sum, ti) => sum + ti.base_quantity_deducted.toNumber(),
+        0,
+      );
 
       const alreadyReturnedBaseQty = transaction.returns
         .filter((r) => r.productId === item.productId)
@@ -330,13 +356,13 @@ export class ReturnsService {
 
       if (baseQuantity > remainingEligibleBaseQty) {
         throw new BadRequestException(
-          `Exchange quantity (${baseQuantity} ${baseUom}) for Product #${item.productId} (${txItem.product.name}) exceeds remaining eligible quantity (${remainingEligibleBaseQty} ${baseUom}).`,
+          `Exchange quantity (${baseQuantity} ${baseUom}) for Product #${item.productId} (${productName}) exceeds remaining eligible quantity (${remainingEligibleBaseQty} ${baseUom}).`,
         );
       }
 
       resolvedItems.push({
         productId: item.productId,
-        productName: txItem.product.name,
+        productName,
         requestedQuantity: item.quantity,
         unitOfMeasure: chosenUom,
         conversionFactor,
