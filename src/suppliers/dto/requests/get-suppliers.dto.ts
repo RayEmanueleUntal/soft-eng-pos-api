@@ -1,6 +1,19 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { SortOrder } from 'src/common/enums';
+
+export enum SupplierSortBy {
+  NAME = 'name',
+  LEAD_TIME = 'lead_time_days',
+}
 
 export class GetSuppliersDto {
   @ApiPropertyOptional({
@@ -24,6 +37,24 @@ export class GetSuppliersDto {
   })
   @IsBoolean()
   is_active?: boolean;
+
+  @ApiPropertyOptional({
+    enum: SupplierSortBy,
+    description:
+      'Field to sort by (name or lead_time_days). Defaults to newest first (id desc) if omitted.',
+  })
+  @IsOptional()
+  @IsEnum(SupplierSortBy)
+  sort_by?: SupplierSortBy;
+
+  @ApiPropertyOptional({
+    enum: SortOrder,
+    default: SortOrder.ASC,
+    description: 'Sort direction (asc or desc).',
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sort_order?: SortOrder = SortOrder.ASC;
 
   @ApiPropertyOptional({ example: 1, default: 1 })
   @IsOptional()

@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsEnum,
   IsInt,
   IsOptional,
   IsString,
@@ -8,6 +9,7 @@ import {
   Min,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { SortOrder } from 'src/common/enums';
 
 export class GetForwardersQueryDto {
   @ApiPropertyOptional({
@@ -31,6 +33,16 @@ export class GetForwardersQueryDto {
   })
   @IsBoolean()
   is_active?: boolean;
+
+  @ApiPropertyOptional({
+    enum: SortOrder,
+    description:
+      'Alphabetical sort order by company name (asc = A-Z, desc = Z-A). Omit for default ordering (newest first).',
+    example: SortOrder.ASC,
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder;
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()

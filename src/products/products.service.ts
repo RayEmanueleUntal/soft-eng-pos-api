@@ -5,6 +5,7 @@ import {
   GetProductsDto,
   PaginatedProductsResponseDto,
   ProductResponseDto,
+  ProductSortBy,
 } from './dto';
 import { DuplicateProductException } from 'src/common/exceptions';
 import { Prisma } from 'src/generated/prisma/client';
@@ -13,6 +14,7 @@ import { UpdateProductDto } from './dto/request/update-product.dto';
 import { ProductHasHistoryException } from 'src/common/exceptions';
 import { DeleteProductQueryDto } from './dto/request/delete-product-query.dto';
 import { DeleteProductResponseDto } from './dto';
+import { SortOrder } from 'src/common/enums';
 
 @Injectable()
 export class ProductsService {
@@ -33,6 +35,8 @@ export class ProductsService {
       thread,
       material,
       belowRop,
+      sortBy = ProductSortBy.CREATED_AT,
+      sortOrder = SortOrder.DESC,
       page = 1,
       limit = 15,
     } = productsDto;
@@ -74,6 +78,12 @@ export class ProductsService {
       };
     }
 
+    // D. Build deterministic orderBy clause with secondary ID tie-breaker
+    const orderBy: Prisma.ProductOrderByWithRelationInput[] =
+      sortBy === ProductSortBy.ID
+        ? [{ id: sortOrder }]
+        : [{ [sortBy]: sortOrder }, { id: 'desc' }];
+
     const skip = (page - 1) * limit;
 
     const [products, total] = await this.prisma.$transaction([
@@ -81,7 +91,7 @@ export class ProductsService {
         where,
         skip,
         take: limit,
-        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        orderBy,
         include: { bin_location: true, category: true, uoms: true },
       }),
       this.prisma.product.count({ where }),

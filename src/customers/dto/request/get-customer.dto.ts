@@ -1,7 +1,15 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { SortOrder } from 'src/common/enums';
 import { CustomerType } from 'src/generated/prisma/enums';
+
+export enum CustomerSortBy {
+  CREATED_AT = 'createdAt',
+  NAME = 'name',
+  CREDIT_LIMIT = 'credit_limit',
+  OUTSTANDING_BALANCE = 'outstanding_balance',
+}
 
 export class GetCustomerDto {
   @ApiPropertyOptional({
@@ -47,6 +55,34 @@ export class GetCustomerDto {
   @IsOptional()
   @IsString()
   company_name?: string;
+
+  @ApiPropertyOptional({
+    enum: CustomerSortBy,
+    enumName: 'CustomerSortBy',
+    default: CustomerSortBy.CREATED_AT,
+    example: CustomerSortBy.NAME,
+    description:
+      'Field to sort results by: createdAt (default), name (alphabetical), credit_limit, or outstanding_balance.',
+  })
+  @IsOptional()
+  @IsEnum(CustomerSortBy, {
+    message: `sortBy must be one of the following values: ${Object.values(CustomerSortBy).join(', ')}`,
+  })
+  sortBy?: CustomerSortBy = CustomerSortBy.CREATED_AT;
+
+  @ApiPropertyOptional({
+    enum: SortOrder,
+    enumName: 'SortOrder',
+    default: SortOrder.DESC,
+    example: SortOrder.ASC,
+    description:
+      'Sort direction: asc (A-Z / Low to High) or desc (Z-A / High to Low). Defaults to desc.',
+  })
+  @IsOptional()
+  @IsEnum(SortOrder, {
+    message: `sortOrder must be one of the following values: ${Object.values(SortOrder).join(', ')}`,
+  })
+  sortOrder?: SortOrder = SortOrder.DESC;
 
   @ApiPropertyOptional({
     default: 1,

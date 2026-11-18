@@ -20,7 +20,7 @@ import {
 import { StaffUserService } from './staff-user.service';
 import { JwtAuthGuard, RolesGuard } from 'src/auth/guards';
 import { AssignedRole as Role } from 'src/generated/prisma/enums';
-import { Roles } from 'src/auth/decorators';
+import { CurrentUser, Roles } from 'src/auth/decorators';
 import {
   CreateStaffUserDto,
   GetStaffUsersQueryDto,
@@ -111,9 +111,10 @@ export class StaffUserController {
     description: 'Updated username conflicts with an existing staff user.',
   })
   async updateStaff(
+    @CurrentUser() user: { id: number },
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateStaffUserDto,
   ): Promise<StaffUserResponseDto> {
-    return this.staffUsersService.updateStaff(id, updateDto);
+    return this.staffUsersService.updateStaff(user, id, updateDto);
   }
 }
