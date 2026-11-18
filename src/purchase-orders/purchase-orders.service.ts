@@ -10,6 +10,7 @@ import {
   GetPurchaseOrdersQueryDto,
   PaginatedPurchaseOrdersResponseDto,
   PurchaseOrderResponseDto,
+  PurchaseOrderSortBy,
   UpdatePOStatusDto,
 } from './dto';
 import {
@@ -25,6 +26,7 @@ import {
 import { POStatus, UnitOfMeasure } from 'src/generated/prisma/enums';
 import { Prisma } from 'src/generated/prisma/client';
 import { PurchaseOrderNoDeliveriesException } from 'src/common/exceptions/procurement/purchase-order-no-deliveries.exception';
+import { SortOrder } from 'src/common/enums';
 
 @Injectable()
 export class PurchaseOrdersService {
@@ -295,7 +297,7 @@ export class PurchaseOrdersService {
   }
 
   /**
-   * Retrieves a paginated list of Purchase Orders with optional status, supplier, and date filtering.
+   * Retrieves a paginated list of Purchase Orders with optional status, supplier, date filtering, and dynamic sorting.
    */
   async getAllPurchaseOrders(
     query: GetPurchaseOrdersQueryDto,
@@ -303,6 +305,8 @@ export class PurchaseOrdersService {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
+    const sortBy = query.sortBy ?? PurchaseOrderSortBy.ORDER_DATE;
+    const sortOrder = query.sortOrder ?? SortOrder.DESC;
 
     // Build dynamic Prisma filter condition
     const where: Prisma.PurchaseOrderWhereInput = {};
@@ -326,32 +330,60 @@ export class PurchaseOrdersService {
     }
 
     this.logger.log(
-      `Fetching paginated purchase orders: page=${page}, limit=${limit}, filters=${JSON.stringify(where)}`,
+      `Fetching paginated purchase orders: page=${page}, limit=${limit}, sortBy=${sortBy}, sortOrder=${sortOrder}, filters=${JSON.stringify(where)}`,
     );
 
-    const [total, orders] = await Promise.all([
+    const poInclude = {
+      supplier: { select: { id: true, name: true } },
+      staff: { select: { id: true, first_name: true, last_name: true } },
+      poItems: {
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              sku: true,
+              base_uom: true,
+            },
+          },
+        },
+      },
+    } satisfies Prisma.PurchaseOrderInclude;
+
+    // Grand total is computed from poItems (requested_quantity * unit_cost), which Prisma cannot orderBy directly.
+    // Fetch lightweight line-item totals via Prisma, sort & paginate IDs in memory, then hydrate the current page.
+    if (sortBy === PurchaseOrderSortBy.GRAND_TOTAL) {
+      const orders = await this.fetchOrdersSortedByGrandTotal(
+        where,
+        skip,
+        limit,
+        sortOrder,
+        poInclude,
+      );
+
+      const formattedOrders = orders.items.map((order) =>
+        PurchaseOrderResponseDto.fromEntity(order),
+      );
+
+      return PaginatedPurchaseOrdersResponseDto.fromEntity(
+        formattedOrders,
+        orders.total,
+        page,
+        limit,
+      );
+    }
+
+    // Build deterministic Prisma orderBy clause with secondary ID tie-breaker
+    const orderBy = this.buildPurchaseOrderOrderBy(sortBy, sortOrder);
+
+    const [total, orders] = await this.prisma.$transaction([
       this.prisma.purchaseOrder.count({ where }),
       this.prisma.purchaseOrder.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { order_date: 'desc' },
-        include: {
-          supplier: { select: { id: true, name: true } },
-          staff: { select: { id: true, first_name: true, last_name: true } },
-          poItems: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  sku: true,
-                  base_uom: true,
-                },
-              },
-            },
-          },
-        },
+        orderBy,
+        include: poInclude,
       }),
     ]);
 
@@ -365,6 +397,90 @@ export class PurchaseOrdersService {
       page,
       limit,
     );
+  }
+
+  /**
+   * Maps validated sort parameters to Prisma OrderByWithRelationInput.
+   * Uses secondary deterministic tie-breakers (id) for stable pagination.
+   */
+  private buildPurchaseOrderOrderBy(
+    sortBy: PurchaseOrderSortBy,
+    sortOrder: SortOrder,
+  ): Prisma.PurchaseOrderOrderByWithRelationInput[] {
+    switch (sortBy) {
+      case PurchaseOrderSortBy.SUPPLIER:
+        return [{ supplier: { name: sortOrder } }, { id: SortOrder.DESC }];
+      case PurchaseOrderSortBy.ID:
+        return [{ id: sortOrder }];
+      case PurchaseOrderSortBy.ORDER_DATE:
+      default:
+        return [{ order_date: sortOrder }, { id: sortOrder }];
+    }
+  }
+
+  /**
+   * Pure-Prisma sorting for computed grand_total = SUM(requested_quantity * unit_cost).
+   * Selects only lightweight numeric fields for sorting before hydrating full relations for the requested page.
+   */
+  private async fetchOrdersSortedByGrandTotal(
+    where: Prisma.PurchaseOrderWhereInput,
+    skip: number,
+    limit: number,
+    sortOrder: SortOrder,
+    include: Prisma.PurchaseOrderInclude,
+  ) {
+    const lightweightOrders = await this.prisma.purchaseOrder.findMany({
+      where,
+      select: {
+        id: true,
+        poItems: {
+          select: {
+            requested_quantity: true,
+            unit_cost: true,
+          },
+        },
+      },
+    });
+
+    const total = lightweightOrders.length;
+
+    const direction = sortOrder === SortOrder.ASC ? 1 : -1;
+
+    const sortedIds = lightweightOrders
+      .map((po) => {
+        const grandTotal = po.poItems.reduce(
+          (sum, item) =>
+            sum + Number(item.requested_quantity) * Number(item.unit_cost),
+          0,
+        );
+        return { id: po.id, grandTotal };
+      })
+      .sort((a, b) => {
+        if (a.grandTotal !== b.grandTotal) {
+          return (a.grandTotal - b.grandTotal) * direction;
+        }
+        // Deterministic ID tie-breaker
+        return b.id - a.id;
+      })
+      .slice(skip, skip + limit)
+      .map((entry) => entry.id);
+
+    if (sortedIds.length === 0) {
+      return { total, items: [] };
+    }
+
+    const hydratedOrders = await this.prisma.purchaseOrder.findMany({
+      where: { id: { in: sortedIds } },
+      include,
+    });
+
+    // Preserve sorted order after Prisma IN (...) hydration
+    const orderMap = new Map(hydratedOrders.map((po) => [po.id, po]));
+    const items = sortedIds
+      .map((id) => orderMap.get(id))
+      .filter((po): po is NonNullable<typeof po> => Boolean(po));
+
+    return { total, items };
   }
 
   /**

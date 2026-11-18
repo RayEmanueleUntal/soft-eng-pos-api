@@ -10,9 +10,11 @@ import {
   GetSuppliersDto,
   PaginatedSuppliersResponseDto,
   SupplierResponseDto,
+  SupplierSortBy,
   UpdateSupplierDto,
 } from './dto';
 import { Prisma } from 'src/generated/prisma/client';
+import { SortOrder } from 'src/common/enums';
 
 @Injectable()
 export class SuppliersService {
@@ -68,7 +70,14 @@ export class SuppliersService {
   async findAll(
     query: GetSuppliersDto,
   ): Promise<PaginatedSuppliersResponseDto> {
-    const { search, is_active, page = 1, limit = 10 } = query;
+    const {
+      search,
+      is_active,
+      sort_by,
+      sort_order = SortOrder.ASC,
+      page = 1,
+      limit = 10,
+    } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.SupplierWhereInput = {};
@@ -86,12 +95,23 @@ export class SuppliersService {
       ];
     }
 
+    let orderBy:
+      | Prisma.SupplierOrderByWithRelationInput
+      | Prisma.SupplierOrderByWithRelationInput[] = { id: 'desc' };
+
+    if (sort_by === SupplierSortBy.NAME) {
+      orderBy = { name: sort_order };
+    } else if (sort_by === SupplierSortBy.LEAD_TIME) {
+      // Secondary sort by id prevents unstable pagination on duplicate lead times
+      orderBy = [{ lead_time_days: sort_order }, { id: 'desc' }];
+    }
+
     const [suppliers, total] = await Promise.all([
       this.prisma.supplier.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { id: 'desc' },
+        orderBy,
       }),
       this.prisma.supplier.count({ where }),
     ]);

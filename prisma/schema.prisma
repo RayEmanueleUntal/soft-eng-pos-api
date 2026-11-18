@@ -25,10 +25,10 @@ model Transaction {
   transaction_type TransactionType @default(RETAIL)
 
   // Financial Breakdown
-  subtotal         Decimal         @db.Decimal(10, 2)
-  tax_total        Decimal         @default(0.00) @db.Decimal(10, 2)
-  discount_total   Decimal         @default(0.00) @db.Decimal(10, 2)
-  grand_total      Decimal         @db.Decimal(10, 2)
+  subtotal         Decimal         @db.Decimal(18, 2)
+  tax_total        Decimal         @default(0.00) @db.Decimal(18, 2)
+  discount_total   Decimal         @default(0.00) @db.Decimal(18, 2)
+  grand_total      Decimal         @db.Decimal(18, 2)
   
   // Foreign Keys
   customerId       Int?            // Optional for walk-in retail customers
@@ -55,17 +55,17 @@ model TransactionItem {
   productId      Int
 
   // Transaction Selling Details
-  quantity_sold  Decimal     @db.Decimal(10, 3)
+  quantity_sold  Decimal     @db.Decimal(18, 3)
   unit_of_measure UnitOfMeasure   @default(PCS)    // e.g., "pcs", "kg", "box"
 
   // Conversion Snapshot at moment of sale
-  uom_conversion_factor Decimal   @default(1.000) @db.Decimal(10, 3) // Multiplier used: 100.000
-  base_quantity_deducted  Decimal @db.Decimal(10, 3) // Converted inventory deduction: 200.000 PCS 
+  uom_conversion_factor Decimal   @default(1.000) @db.Decimal(18, 3) // Multiplier used: 100.000
+  base_quantity_deducted  Decimal @db.Decimal(18, 3) // Converted inventory deduction: 200.000 PCS 
 
-  unit_price     Decimal     @db.Decimal(10, 2) // Base price per unit at moment of sale
-  cost_price     Decimal     @default(0.00) @db.Decimal(10, 2) // Snapshot of unit cost at moment of sale
-  discount       Decimal     @default(0.00) @db.Decimal(10, 2) // Line-item discount amount
-  subtotal       Decimal     @db.Decimal(10, 2) // (quantity_sold * unit_price) - discount
+  unit_price     Decimal     @db.Decimal(18, 2) // Base price per unit at moment of sale
+  cost_price     Decimal     @default(0.00) @db.Decimal(18, 2) // Snapshot of unit cost at moment of sale
+  discount       Decimal     @default(0.00) @db.Decimal(18, 2) // Line-item discount amount
+  subtotal       Decimal     @db.Decimal(18, 2) // (quantity_sold * unit_price) - discount
 
   // Gross Profit = subtotal - (base_quantity_deducted x cost_price)
 
@@ -82,7 +82,7 @@ model Exchange {
   id               Int         @id @default(autoincrement())
   transactionId    Int
   productId        Int         // Product being exchanged (same product, 1-to-1 replacement)
-  quantity         Decimal     @default(1.000) @db.Decimal(10, 3) // Always in Base UOM
+  quantity         Decimal     @default(1.000) @db.Decimal(18, 3) // Always in Base UOM
   date             DateTime    @default(now())
   staffId          Int  
 
@@ -101,11 +101,11 @@ model Return {
   id             Int         @id @default(autoincrement())
   transactionId  Int
   productId      Int         // Product being returned
-  quantity       Decimal     @default(1.000) @db.Decimal(10, 3) // Always in Base UOM
+  quantity       Decimal     @default(1.000) @db.Decimal(18, 3) // Always in Base UOM
   date           DateTime    @default(now())
   condition      ItemCondition @default(DEFECTIVE)
   defect_reason  String
-  refund_amount  Decimal     @db.Decimal(10, 2)
+  refund_amount  Decimal     @db.Decimal(18, 2)
   staffId        Int
 
   transaction    Transaction @relation(fields: [transactionId], references: [id])
@@ -127,7 +127,7 @@ model Payment {
   id             Int            @id @default(autoincrement())
   transactionId  Int
   date           DateTime       @default(now())
-  amount_paid    Decimal        @db.Decimal(10, 2)
+  amount_paid    Decimal        @db.Decimal(18, 2)
   payment_method PaymentMethod
 
   cashPayment    CashPayment?
@@ -143,8 +143,8 @@ model Payment {
 
 model CashPayment {
   paymentId     Int     @id
-  cash_tendered Decimal @db.Decimal(10, 2)
-  change_given  Decimal @db.Decimal(10, 2)
+  cash_tendered Decimal @db.Decimal(18, 2)
+  change_given  Decimal @db.Decimal(18, 2)
 
   payment       Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
@@ -186,7 +186,7 @@ model BankTransferPayment {
 model CreditPayment {
   paymentId                Int      @id
   due_date                 DateTime
-  remaining_credit_balance Decimal  @db.Decimal(10, 2)
+  remaining_credit_balance Decimal  @db.Decimal(18, 2)
   status                   CreditStatus @default(UNPAID) 
 
   payment                  Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
@@ -205,7 +205,7 @@ model CustomerPayment {
   wholesaleCustId         Int
   staffId                 Int       // Cashier / Staff who collected the payment
 
-  amount_paid             Decimal   @db.Decimal(10, 2)
+  amount_paid             Decimal   @db.Decimal(18, 2)
   payment_method          PaymentMethod  // CASH, GCASH, CHECK, etc.
   reference_number        String?   // Check number, GCash ref, or bank deposit ref (if applies)
 
@@ -213,8 +213,8 @@ model CustomerPayment {
   notes                   String?
 
   // Snapshots for Audit
-  previous_balance        Decimal   @db.Decimal(10, 2) // Balance before payment
-  new_balance             Decimal   @db.Decimal(10, 2) // Balance after payment
+  previous_balance        Decimal   @db.Decimal(18, 2) // Balance before payment
+  new_balance             Decimal   @db.Decimal(18, 2) // Balance after payment
 
   wholeSaleProfile        WholeSaleCustomer  @relation(fields: [wholesaleCustId], references: [customerId], onDelete: Cascade)
   staff                   StaffUser @relation(fields: [staffId], references: [id])
@@ -313,8 +313,8 @@ model Customer {
 
 model WholeSaleCustomer {
   customerId          Int      @id
-  credit_limit        Decimal  @db.Decimal(10, 2)
-  outstanding_balance Decimal  @db.Decimal(10, 2) @default(0)
+  credit_limit        Decimal  @db.Decimal(18, 2)
+  outstanding_balance Decimal  @db.Decimal(18, 2) @default(0)
   company_name        String
 
   customer            Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -349,15 +349,15 @@ model Product {
 
   // Inventory Tracking (Always in Base Units)
   base_uom         UnitOfMeasure    @default(PCS)  // "pcs", "kg", "meter"
-  current_quantity Decimal   @default(0.00) @db.Decimal(10,3)
-  reorder_point_ROP Decimal  @default(0.00) @db.Decimal(10,3)
+  current_quantity Decimal   @default(0.00) @db.Decimal(18,3)
+  reorder_point_ROP Decimal  @default(0.00) @db.Decimal(18,3)
   needsRecount     Boolean   @default(false) // Set to TRUE during forced stock-out overrides
 
   // Default Base Unit Pricing
-  cost_price       Decimal   @default(0.00)   @db.Decimal(10, 2) // Purchasing cost per Base UoM
+  cost_price       Decimal   @default(0.00)   @db.Decimal(18, 2) // Purchasing cost per Base UoM
   // New Cost Price = ((Current Qty x Current Cost) + (Received Base Qty x New Unit Cost)) / (Current Qty + Received Base Qty) 
-  retail_price     Decimal   @db.Decimal(10, 2) // Retail price per Base UoM
-  wholesale_price  Decimal?  @db.Decimal(10, 2) // Wholesale price per Base UoM
+  retail_price     Decimal   @db.Decimal(18, 2) // Retail price per Base UoM
+  wholesale_price  Decimal?  @db.Decimal(18, 2) // Wholesale price per Base UoM
 
   // Storage Location
   binId            Int?      // Link to BinLocation  
@@ -380,8 +380,9 @@ model Product {
   updatedAt        DateTime  @updatedAt
 
   @@index([categoryId])
-  @@index([name])
   @@index([binId])
+  @@index([createdAt(sort: Desc), id(sort: Desc)]) 
+  @@index([name, id(sort: Desc)])                  
   @@map("product")
 }
 
@@ -392,12 +393,12 @@ model ProductUom {
 
   // How many Base UoM units are inside 1 of this UoM?
   // e.g. If Base UoM is PCS, for BOX: conversion_factor = 100.00 (1 Box = 100 PCS)
-  conversion_factor Decimal     @db.Decimal(10, 3)
+  conversion_factor Decimal     @db.Decimal(18, 3)
 
   // Pricing Overrides for this specific package size (Optional: falls back to base_price * factor)
-  cost_price      Decimal?      @db.Decimal(10, 2) // Quoted purchase price for 1 Box
-  retail_price    Decimal?      @db.Decimal(10, 2) // Retail checkout price for 1 Box
-  wholesale_price Decimal?      @db.Decimal(10, 2) // Wholesale checkout price for 1 Box
+  cost_price      Decimal?      @db.Decimal(18, 2) // Quoted purchase price for 1 Box
+  retail_price    Decimal?      @db.Decimal(18, 2) // Retail checkout price for 1 Box
+  wholesale_price Decimal?      @db.Decimal(18, 2) // Wholesale checkout price for 1 Box
 
   is_default_purchase Boolean   @default(false) // Default unit selected on Purchase Orders
   is_default_sales    Boolean   @default(false) // Default unit selected at POS register
@@ -430,9 +431,9 @@ model StockMovement {
   type             MovementType
 
   current_uom      UnitOfMeasure       @default(PCS)
-  quantity_changed Decimal      @db.Decimal(10, 3)  // Positive for stock in, negative for stock out
-  previous_quantity Decimal     @db.Decimal(10, 3)  // e.g., 0 (DB level before change)
-  new_quantity     Decimal      @db.Decimal(10, 3)  // e.g., -2 (DB level after change)
+  quantity_changed Decimal      @db.Decimal(18, 3)  // Positive for stock in, negative for stock out
+  previous_quantity Decimal     @db.Decimal(18, 3)  // e.g., 0 (DB level before change)
+  new_quantity     Decimal      @db.Decimal(18, 3)  // e.g., -2 (DB level after change)
 
   isOverride       Boolean      @default(false) // Flags if this bypassed normal stock limits
   reason           String       // e.g., "OVERRIDE_OUT_OF_STOCK: Customer bought physical item"
@@ -477,12 +478,12 @@ model POItem {
   productId          Int
 
   // Ordering Quantities & Unit Conversion Snapshots
-  requested_quantity Decimal       @db.Decimal(10, 3) // e.g., 2 (Sacks)
+  requested_quantity Decimal       @db.Decimal(18, 3) // e.g., 2 (Sacks)
   ordered_uom        UnitOfMeasure @default(PCS) // Unit ordered on PO
-  uom_conversion_factor Decimal    @default(1.000) @db.Decimal(10, 3) // Supplier-specific multiplier to Base UoM (e.g., 2000.000) 
-  expected_base_quantity Decimal   @db.Decimal(10, 3) // requested_quantity * uom_conversion_factor
+  uom_conversion_factor Decimal    @default(1.000) @db.Decimal(18, 3) // Supplier-specific multiplier to Base UoM (e.g., 2000.000) 
+  expected_base_quantity Decimal   @db.Decimal(18, 3) // requested_quantity * uom_conversion_factor
 
-  unit_cost          Decimal       @db.Decimal(10, 2)  // Price quoted by supplier
+  unit_cost          Decimal       @db.Decimal(18, 2)  // Price quoted by supplier
 
   purchaseOrder      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
   product            Product       @relation(fields: [productId], references: [id])
@@ -510,6 +511,7 @@ model Supplier {
 
   @@index([name])
   @@index([is_active])
+  @@index([lead_time_days])
   @@map("supplier")
 }
 
@@ -535,10 +537,10 @@ model DeliveryItem {
   productId     Int
 
   // Receiving Quantities & Intake Base Yield Calculation
-  received_quantity Decimal   @db.Decimal(10, 3)
+  received_quantity Decimal   @db.Decimal(18, 3)
   received_uom      UnitOfMeasure @default(PCS)
-  uom_conversion_factor Decimal   @default(1.000) @db.Decimal(10, 3) // Multiplier used at intake
-  actual_base_quantity  Decimal   @db.Decimal(10, 3) // Exact physical count added to Product.current_quantity
+  uom_conversion_factor Decimal   @default(1.000) @db.Decimal(18, 3) // Multiplier used at intake
+  actual_base_quantity  Decimal   @db.Decimal(18, 3) // Exact physical count added to Product.current_quantity
 
   delivery      Delivery      @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
   product       Product       @relation(fields: [productId], references: [id])
@@ -592,7 +594,7 @@ model SystemSetting {
 model Expense {
   id             Int            @id @default(autoincrement())
   category       ExpenseCategory
-  amount         Decimal        @db.Decimal(10, 2)
+  amount         Decimal        @db.Decimal(18, 2)
   date           DateTime       @default(now())
   payment_method PaymentMethod  @default(CASH)
   notes          String?        // Detailed description (e.g., "Meralco bill for Oct")

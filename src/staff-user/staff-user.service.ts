@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -154,6 +155,7 @@ export class StaffUserService {
    * Hashes updated passwords using Argon2 when provided.
    */
   async updateStaff(
+    user: { id: number },
     id: number,
     updateDto: UpdateStaffUserDto,
   ): Promise<StaffUserResponseDto> {
@@ -197,6 +199,15 @@ export class StaffUserService {
     }
 
     if (is_active !== undefined) {
+      if (!is_active && id === user.id) {
+        this.logger.warn(
+          `Staff user ID ${id} attempted to set themselves as inactive`,
+        );
+        throw new BadRequestException(
+          'A staff user is not allowed to set themselves as inactive.',
+        );
+      }
+
       dataToUpdate.is_active = is_active;
     }
 

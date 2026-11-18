@@ -11,6 +11,7 @@ import {
   ForwarderAlreadyExistsException,
   ForwarderNotFoundException,
 } from 'src/common/exceptions';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class ForwarderService {
@@ -59,7 +60,7 @@ export class ForwarderService {
   async findAllForwarders(
     query: GetForwardersQueryDto,
   ): Promise<PaginatedForwardersResponseDto> {
-    const { search, is_active, page = 1, limit = 20 } = query;
+    const { search, is_active, sortOrder, page = 1, limit = 20 } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -75,13 +76,19 @@ export class ForwarderService {
       ];
     }
 
+    // Use alphabetical sorting on company_name if sortOrder is explicitly provided;
+    // otherwise fall back to default ordering (newest created first).
+    const orderBy: Prisma.ForwarderOrderByWithRelationInput = sortOrder
+      ? { company_name: sortOrder }
+      : { createdAt: 'desc' };
+
     const [total, forwarders] = await Promise.all([
       this.prisma.forwarder.count({ where }),
       this.prisma.forwarder.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { company_name: 'asc' },
+        orderBy,
       }),
     ]);
 

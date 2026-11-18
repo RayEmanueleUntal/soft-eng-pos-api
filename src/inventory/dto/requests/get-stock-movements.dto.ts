@@ -10,6 +10,13 @@ import {
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { MovementType } from 'src/generated/prisma/enums';
+import { SortOrder } from 'src/common/enums';
+
+export enum StockMovementSortBy {
+  NAME = 'name',
+  QUANTITY_CHANGED = 'quantity_changed',
+  DATE = 'date',
+}
 
 export class GetStockMovementsDto {
   @ApiPropertyOptional({
@@ -79,6 +86,28 @@ export class GetStockMovementsDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  @ApiPropertyOptional({
+    enum: StockMovementSortBy,
+    default: StockMovementSortBy.DATE,
+    example: StockMovementSortBy.DATE,
+    description:
+      'Field to sort by: name (Product A-Z / Z-A), quantity_changed (Qty Adj High-Low / Low-High), or date (Newest / Oldest)',
+  })
+  @IsOptional()
+  @IsEnum(StockMovementSortBy)
+  sortBy?: StockMovementSortBy = StockMovementSortBy.DATE;
+
+  @ApiPropertyOptional({
+    enum: SortOrder,
+    default: SortOrder.DESC,
+    example: SortOrder.DESC,
+    description:
+      'Sort direction: asc (A-Z, Low to High, Oldest to Newest) or desc (Z-A, High to Low, Newest to Oldest)',
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder = SortOrder.DESC;
 
   @ApiPropertyOptional({
     description: 'Page number for pagination',

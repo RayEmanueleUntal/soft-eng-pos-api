@@ -12,6 +12,7 @@ import {
   GetStockMovementsDto,
   LowStockAlertsResponseDto,
   PaginatedStockMovementsResponseDto,
+  StockMovementSortBy,
   StockOutDto,
 } from './dto';
 import { Prisma } from 'src/generated/prisma/client';
@@ -22,6 +23,7 @@ import { TransactionClient } from 'src/generated/prisma/internal/prismaNamespace
 import { Product, ProductUom } from 'src/generated/prisma/client';
 import { StockMovementResponseDto } from './dto/responses/stock-movement-response.dto';
 import { InsufficientStockException } from 'src/common/exceptions';
+import { SortOrder } from 'src/common/enums';
 
 // Extended Product type including configured uoms relation
 type ProductWithUoms = Product & { uoms: ProductUom[] };
@@ -473,6 +475,8 @@ export class InventoryService {
       isOverride,
       startDate,
       endDate,
+      sortBy = StockMovementSortBy.DATE,
+      sortOrder = SortOrder.DESC,
       page = 1,
       limit = 20,
     } = queryDto;
@@ -502,6 +506,12 @@ export class InventoryService {
       }),
     };
 
+    // Build deterministic orderBy clause with secondary ID tie-breaker
+    const orderBy: Prisma.StockMovementOrderByWithRelationInput[] =
+      sortBy === StockMovementSortBy.NAME
+        ? [{ product: { name: sortOrder } }, { id: 'desc' }]
+        : [{ [sortBy]: sortOrder }, { id: 'desc' }];
+
     const skip = (page - 1) * limit;
 
     const [movements, total] = await this.prisma.$transaction([
@@ -509,7 +519,7 @@ export class InventoryService {
         where,
         skip,
         take: limit,
-        orderBy: { date: 'desc' },
+        orderBy,
         include: {
           product: true,
           staff: true,

@@ -12,6 +12,7 @@ import {
   CreateCustomerPaymentDto,
   CustomerOverdueStatusResponseDto,
   CustomerPaymentResponseDto,
+  CustomerSortBy,
   GetCustomerDto,
   GetCustomerPaymentsDto,
   PaginatedCustomerPaymentsResponseDto,
@@ -27,6 +28,7 @@ import {
   InvalidPaymentAmountException,
   WholesaleProfileNotFoundException,
 } from 'src/common/exceptions';
+import { SortOrder } from 'src/common/enums';
 
 @Injectable()
 export class CustomersService {
@@ -127,12 +129,14 @@ export class CustomersService {
       contact_number,
       type,
       company_name,
+      sortBy = CustomerSortBy.CREATED_AT,
+      sortOrder = SortOrder.DESC,
       page = 1,
       limit = 10,
     } = queryDto;
 
     this.logger.log(
-      `User #${userId} requesting customer list (page=${page}, limit=${limit}, search="${search ?? ''}", type="${type ?? 'ALL'}")`,
+      `User #${userId} requesting customer list (page=${page}, limit=${limit}, search="${search ?? ''}", type="${type ?? 'ALL'}", sortBy="${sortBy}", sortOrder="${sortOrder}")`,
     );
 
     const andConditions: Prisma.CustomerWhereInput[] = [];
@@ -185,6 +189,7 @@ export class CustomersService {
     const where: Prisma.CustomerWhereInput =
       andConditions.length > 0 ? { AND: andConditions } : {};
 
+    const orderBy = this.buildCustomerOrderBy(sortBy, sortOrder);
     const skip = (page - 1) * limit;
 
     // 3. Execute count and findMany in a transaction for accuracy
@@ -194,7 +199,7 @@ export class CustomersService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         include: {
           wholesale: true,
         },
@@ -212,6 +217,37 @@ export class CustomersService {
       limit,
       totalPages: Math.ceil(total / limit) || 1,
     };
+  }
+
+  /**
+   * Maps validated sort parameters into a deterministic Prisma orderBy clause.
+   * Ensures retail customers (null wholesale relations) are pushed to the end
+   * when sorting by wholesale financial attributes.
+   */
+  private buildCustomerOrderBy(
+    sortBy: CustomerSortBy,
+    sortOrder: SortOrder,
+  ): Prisma.CustomerOrderByWithRelationInput[] {
+    switch (sortBy) {
+      case CustomerSortBy.NAME:
+        return [{ name: sortOrder }, { id: 'asc' }];
+
+      case CustomerSortBy.CREDIT_LIMIT:
+        return [
+          { wholesale: { credit_limit: sortOrder } },
+          { createdAt: 'desc' },
+        ];
+
+      case CustomerSortBy.OUTSTANDING_BALANCE:
+        return [
+          { wholesale: { outstanding_balance: sortOrder } },
+          { createdAt: 'desc' },
+        ];
+
+      case CustomerSortBy.CREATED_AT:
+      default:
+        return [{ createdAt: sortOrder }, { id: 'desc' }];
+    }
   }
 
   /**

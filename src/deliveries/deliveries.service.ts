@@ -4,6 +4,7 @@ import { InventoryService } from 'src/inventory/inventory.service';
 import {
   CreateDeliveryDto,
   DeliveryResponseDto,
+  DeliverySortField,
   GetDeliveriesQueryDto,
   PaginatedDeliveriesResponseDto,
 } from './dto';
@@ -16,6 +17,7 @@ import {
 } from 'src/common/exceptions';
 import { Prisma } from 'src/generated/prisma/client';
 import { POStatus, UnitOfMeasure } from 'src/generated/prisma/enums';
+import { SortOrder } from 'src/common/enums';
 
 @Injectable()
 export class DeliveriesService {
@@ -366,6 +368,9 @@ export class DeliveriesService {
     const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
 
+    const sortBy = query.sortBy ?? DeliverySortField.DELIVERY_DATE;
+    const sortOrder = query.sortOrder ?? SortOrder.DESC;
+
     const where: any = {};
     if (query.poId) where.poId = query.poId;
     if (query.startDate || query.endDate) {
@@ -374,8 +379,11 @@ export class DeliveriesService {
       if (query.endDate) where.delivery_date.lte = new Date(query.endDate);
     }
 
+    // Use secondary `id` sort for deterministic pagination when timestamps match
+    const orderBy = [{ [sortBy]: sortOrder }, { id: sortOrder }];
+
     this.logger.log(
-      `Fetching paginated deliveries: page=${page}, limit=${limit}, filters=${JSON.stringify(where)}`,
+      `Fetching paginated deliveries: page=${page}, limit=${limit}, sortBy=${sortBy}, sortOrder=${sortOrder}, filters=${JSON.stringify(where)}`,
     );
 
     const [deliveries, total] = await Promise.all([
@@ -383,7 +391,7 @@ export class DeliveriesService {
         where,
         skip,
         take: limit,
-        orderBy: { delivery_date: 'desc' },
+        orderBy,
         include: {
           staff: { select: { id: true, first_name: true, last_name: true } },
           deliveryItems: {
